@@ -7,8 +7,10 @@
     "gulp": "^3.9.1"
   },
   "devDependencies": {
+    "gulp-contains": "^1.1.0",
     "gulp-rename": "^1.2.2",
-    "gulp-replace": "^0.6.1"
+    "gulp-replace": "^0.6.1",
+    "gulp-sync": "^0.1.4"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

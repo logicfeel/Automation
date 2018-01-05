@@ -1,127 +1,96 @@
-var gulp = require('gulp');             
-// var concat = require('gulp-concat');
-var rename = require("gulp-rename");
-var replace = require("gulp-replace");
-var search = require('gulp-search');
-// src(원본) 불필요 제거 : DB명
+// 'use strict';
 
+var gulp        = require('gulp'); 
+// var search      = require("gulp-search");
+var fs          = require("fs");
+var contains = require('gulp-contains');
 
-// 기본실행
-gulp.task('combine-js', function () {
-	return gulp.src('src/**/*.js')      // src 폴더 하위으 모든 .js 파일
-	.pipe(concat('all.js'))             // 합칠 파일명 (플러그인)
-	.pipe(gulp.dest('dist/js'));        // 쓰기 폴더
+var replace     = require("gulp-replace");
+var sourcemaps  = require('gulp-sourcemaps');
+
+/**
+ * 스칼라 목록을 가져와서 
+ * gulpSetup.json의
+ * _replace 에 배열 형태로 추가함 
+  */
+
+  var arr = [];
+ 
+  gulp.task('before', function () {
+    console.log('arr:' + arr.toString());
+    console.log('after');
+
 });
 
-
-gulp.task('map-js', function () {
-	return gulp.src('src/**/*.js')      // src 폴더 하위으 모든 .js 파일
-	.pipe(sourcemaps.init())
-	.pipe(concat('all.js'))             // 합칠 파일명 (플러그인)
-	.pipe(sourcemaps.write('maps'))
-	.pipe(gulp.dest('dist/js'));        // 쓰기 폴더
-});
-
-gulp.task('rename-js', function () {
-	return gulp.src('src/**/*.js')      // src 폴더 하위으 모든 .js 파일
-	.pipe(sourcemaps.init())
-	.pipe(rename(function (path) {
-		path.dirname += "/ciao";        	// 폴더 변경
-		path.basename += "-goodbye";    // 파일명 변경
-		path.extname = ".md";           // 확장자 변경 (* 점을 포함)
-	  }))	
-	.pipe(sourcemaps.write('../maps'))
-	.pipe(gulp.dest('dist/js'));        // 쓰기 폴더
-});
-
-gulp.task('replace-js', function () {
-	return gulp.src('src/**/*.sql')      // src 폴더 하위으 모든 .js 파일
-	.pipe(replace('ALTER', 'UPDATE'))        // 바꾸기
-	.pipe(gulp.dest('dist/js'));        // 쓰기 폴더
-});
-
-//----------------------------------------------
-// var _match = "sstory40";
-
-var bbb = "B";
-// global._match = "sstory40";
-global._match = "B";
-// global.useGlobal = true;
-
-gulp.task('clean-dbname', function () {
-
-    // var _match = "sstory40";
-    // var _match;
-    var abc = 3;
-
-    console.log('clean-dbname:' + bbb);
-    console.log('clean-dbname2:' + global._match);
+gulp.task('scaler', function (cb) {
     
-    // global._match = "sstory40";
-    
-    gulp.src('src/**/*.sql')
-        // USE [DB명] : GO 제거
-        // .pipe(replace(/USE\s\[\w+\]/g, function(match, p1, offset, string) {
-        //     var ed_idx = match.indexOf("]");
-        //     var make = "USE ";
-        //     // global._match = match.substring(make.length + 1, ed_idx);
-        //     global._match = "sstory40";
-        //     // this.file._match = _match;
-        //     console.log('global2:' + bbb);
-        //     console.log('log:' + global._match);
-        //     return '';
-        // }))
+    var setup = fs.readFileSync("gulp-setup.json");
+    var jsonSetup = JSON.parse(setup);
 
-        // [DB명] : 제거
-        // .pipe(replace(String(global._match), function(match) {
-        //     console.log('log2-1:' + global._match);
-        //     console.log('log2-2:' + this.file.history);
-        //     return '';
-        // }))
-        .pipe(replace(global._match, function(match) {
-            console.log('log3-1:' + _match);
-            console.log('log3-2:' + match);
-            console.log('global3:' + bbb);
-            return '';
-        }))
-        // .pipe(replace('sstory40', function(match) {
-        //     console.log('log3-1:' + _match);
-        //     console.log('log3-2:' + match);
-        //     console.log('global3:' + bbb);
-        //     return '';
-        // }))
-        // .pipe(replace('[sstory40].', ''))
-	    .pipe(gulp.dest('dist/'));
+    // gulp.src('src/**/*.sql')
+    //     // regex : 스칼라 함수 
+    //     .pipe(search(/[\S]+\.[\w]+\(.*\)/g, function(item) {
+    //         arr.push(item);
+    //         console.log('ii');
+    //         return item;
+            
+    //     }, {
+    //         path: 'dist',
+    //         filename: 'scaler.json'}
+    //     )
+    // );
+
+    // gulp.src('src/**/*.sql')
+    // .pipe(contains({
+    //     search: /[\S]+\.[\w]+\(.*\)/g,
+    //     onFound: function (string, file, cb) {
+    //         // string is the string that was found 
+    //         // file is the vinyl file object 
+    //         // cb is the through2 callback 
+    //         console.log('innerdd');
+    //         // return false to continue the stream 
+    //     }
+    // }));
+
+    gulp.src('src/**/*.sql')
+    // USE [DB명] : GO 제거
+    .pipe(replace(/[\S]+\.[\w]+\(.*\)/g, function(match, p1, offset, string) {
+        var ed_idx = match.indexOf("]");
+        var make = "USE ";
+        // global._match = match.substring(make.length + 1, ed_idx);
+        bbb = "sstory40";
+        global._match = "sstory40";
+        // this.file._match = _match;
+        console.log('global2:' + bbb);
+        console.log('log:' + global._match);
+
+        var f = "gulp-setup.json";
+        var setup = fs.readFileSync(f);
+        var jsonSetup = JSON.parse(setup);
+        jsonSetup._replace.push(match);
+        fs.writeFileSync(f, JSON.stringify(jsonSetup));
+        var objData = {};
+        objData.src = "";
+        objData.string = "";
+        objData.replacement = "";
+
+        return match;
+    }));
+
+    console.log('inner');
+        // .pipe(gulp.dest('dist'));
 });
 
-gulp.task('dbuser-get', function () {
-
-    console.log('dbuser-get');
-    
-    gulp.src('src/**/*.sql')
-        // USE [DB명] : GO 제거
-        .pipe(replace(/USE\s\[\w+\]/g, function(match, p1, offset, string) {
-            var ed_idx = match.indexOf("]");
-            var make = "USE ";
-            // global._match = match.substring(make.length + 1, ed_idx);
-            bbb = "sstory40";
-            global._match = "sstory40";
-            // this.file._match = _match;
-            console.log('global2:' + bbb);
-            console.log('log:' + global._match);
-            return '';
-        }))
-
-});
-
-gulp.task('templates', function(){
-    gulp.src('src/**/*.sql')
-        .pipe(search(/sstory40/g, function(item) {
-            return item;
-        }))
-        .pipe(gulp.dest('...'));
-  });
 
 
-gulp.task('default', ['dbuser-get']);
 
+// 
+
+// 이전 실행
+// gulp.task('before', ['after']);
+
+// gulp.task('default', gulpsync.async(['scaler', 'before']));
+gulp.task('default', ['scaler', 'before']);
+
+
+console.log('-End');

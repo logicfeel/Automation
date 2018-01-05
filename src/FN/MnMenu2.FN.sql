@@ -36,8 +36,8 @@ END
 -- ###################################################
 -- ## 테스트 코드
 /*
-	SELECT sstory40.MnAuth_FN_AuthChk('1')
-	SELECT sstory40.MnAuth_FN_AuthChk('777')
+	SELECT sstory40.MnAuth_FN_AuthChk2('1')
+	SELECT sstory40.MnAuth_FN_AuthChk2('777')
 */
 
 GO
