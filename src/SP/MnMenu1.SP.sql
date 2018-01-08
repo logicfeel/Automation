@@ -87,7 +87,10 @@ END
 	select * from MnAcct_Account
 */
 
-
+/*
+	SELECT sstory40.MnAuth_FN_AuthChk3('1')
+	SELECT sstory40.MnAuth_FN_AuthChk3('777')
+*/
 
 GO
 

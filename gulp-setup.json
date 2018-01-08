@@ -1,1 +1,56 @@
-{"database":"TODO","options":{"last_go":true,"comment":true,"log":true,"map":"dist/map/","scalar_rename":false},"clear":{"use":false,"ddl_dbname":false,"set_ansi_null":false,"set_quoted":false},"replace":[{"src":"","string":"","replacement":""}],"task":"default","_replace":["sstory40.MnAuth_FN_AuthChk('1')","sstory40.MnAuth_FN_AuthChk('777')","sstory40.MnAuth_FN_AuthChk2('1')","sstory40.MnAuth_FN_AuthChk2('777')","sstory40.MnAuth_FN_AuthChk('1')"]}
+{
+  "_replace": [
+    {
+      "replacement": "",
+      "src": "SP\\MnMenu1.SP.sql",
+      "string": "sstory40.MnAuth_FN_AuthChk3('1')"
+    },
+    {
+      "replacement": "",
+      "src": "SP\\MnMenu1.SP.sql",
+      "string": "sstory40.MnAuth_FN_AuthChk3('777')"
+    },
+    {
+      "replacement": "",
+      "src": "FN\\MnMenu1.FN.sql",
+      "string": "sstory40.MnAuth_FN_AuthChk('1')"
+    },
+    {
+      "replacement": "",
+      "src": "FN\\MnMenu1.FN.sql",
+      "string": "sstory40.MnAuth_FN_AuthChk('777')"
+    },
+    {
+      "replacement": "",
+      "src": "FN\\MnMenu2.FN.sql",
+      "string": "sstory40.MnAuth_FN_AuthChk2('1')"
+    },
+    {
+      "replacement": "",
+      "src": "FN\\MnMenu2.FN.sql",
+      "string": "sstory40.MnAuth_FN_AuthChk2('777')"
+    }
+  ],
+  "clear": {
+    "ddl_dbname": false,
+    "set_ansi_null": false,
+    "set_quoted": false,
+    "use": false
+  },
+  "database": "TODO",
+  "options": {
+    "comment": true,
+    "last_go": true,
+    "log": true,
+    "map": "dist/map/",
+    "scalar_rename": false
+  },
+  "replace": [
+    {
+      "replacement": "",
+      "src": "",
+      "string": ""
+    }
+  ],
+  "task": "default"
+}
