@@ -27,7 +27,7 @@ gulp.task('scaler-get', function (cb) {
     fs.writeFileSync(SETUP_FILE, JSON.stringify(jsonSetup));
 
     return gulp.src('src/**/*.sql')
-        // USE [DB명] : GO 제거
+        // 정규표현 : 스칼라 함수 
         .pipe(replace(/[\S]+\.[\w]+\(.*\)/g, function(match, p1, offset, string) {
             var setup = fs.readFileSync(SETUP_FILE);
             var jsonSetup = JSON.parse(setup);
@@ -70,12 +70,14 @@ gulp.task('main-task', ['before-task'], function () {
 
 
 
-var SETUP = {};
-SETUP.clear = {};
-SETUP.clear.use = true;
+var SETUP = {
+    clear: {
+        use: true
+    }
+};
 
 var contentSet = lazypipe()
-    // USE DB 제거 
+    // 정규표현 : USE DB 
     .pipe(replace, /^USE+ [\[\w]+\]*\s+GO/g, function(match, p1, offset, string) {
             if (SETUP.clear.use) return '';
             else return match;
