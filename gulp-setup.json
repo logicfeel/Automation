@@ -2,16 +2,6 @@
   "_replace": [
     {
       "replacement": "",
-      "src": "SP\\MnMenu1.SP.sql",
-      "string": "sstory40.MnAuth_FN_AuthChk3('1')"
-    },
-    {
-      "replacement": "",
-      "src": "SP\\MnMenu1.SP.sql",
-      "string": "sstory40.MnAuth_FN_AuthChk3('777')"
-    },
-    {
-      "replacement": "",
       "src": "FN\\MnMenu1.FN.sql",
       "string": "sstory40.MnAuth_FN_AuthChk('1')"
     },
@@ -29,21 +19,30 @@
       "replacement": "",
       "src": "FN\\MnMenu2.FN.sql",
       "string": "sstory40.MnAuth_FN_AuthChk2('777')"
+    },
+    {
+      "replacement": "",
+      "src": "SP\\MnMenu1.SP.sql",
+      "string": "sstory40.MnAuth_FN_AuthChk3('1')"
+    },
+    {
+      "replacement": "",
+      "src": "SP\\MnMenu1.SP.sql",
+      "string": "sstory40.MnAuth_FN_AuthChk3('777')"
     }
   ],
   "clear": {
-    "ddl_dbname": false,
-    "set_ansi_null": false,
-    "set_quoted": false,
+    "ddl_obj_name": false,
     "use": false
   },
-  "database": "TODO",
+  "obj_name": "sstory40",
   "options": {
     "comment": true,
     "last_go": true,
     "log": true,
     "map": "dist/map/",
-    "scalar_rename": false
+    "scalar_rename": false,
+    "ddl_create": true
   },
   "replace": [
     {

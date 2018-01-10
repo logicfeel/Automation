@@ -6,7 +6,8 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-
+/*ㅇㅇㅇㅇ
+*/
 
 -- ============================================= 
 -- Author		: 김영호
@@ -40,6 +41,5 @@ END
 	SELECT sstory40.MnAuth_FN_AuthChk2('777')
 */
 
-GO
 
 

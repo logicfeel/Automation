@@ -94,3 +94,19 @@
 >- DB 플렛폼 변경에 대한 검토
 >- table 의 변경  (현재는 확장만 가능하게)
 >- sp 등의 이름 변경 (* 불가능 할듯)  인터페이스 역활 이므로..
+
+
+# 설계
+- 사전 작업
+    - DML : (SP, FN, TF) 
+        + obj_name 사용 목록 추출
+            * string: 기존 명칭
+            * replacement: 교체 명칭 (기본 obj_name 사용)
+            > `!U, VW 에서 obj_name 사용은 제외됨`
+- 주 작업
+    - DDL : (U, VW, TR, SP, FN, TF)
+        + obj_name 지정 또는 clear
+    - DML : 교체 목록에 따른 작업진행
+    - replace 의 사용자 교체 작업 진행
+
+    
