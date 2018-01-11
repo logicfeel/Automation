@@ -1,48 +1,33 @@
 {
   "_replace": [
     {
-      "replacement": "",
-      "src": "FN\\MnMenu1.FN.sql",
-      "string": "sstory40.MnAuth_FN_AuthChk('1')"
-    },
-    {
-      "replacement": "",
-      "src": "FN\\MnMenu1.FN.sql",
-      "string": "sstory40.MnAuth_FN_AuthChk('777')"
-    },
-    {
-      "replacement": "",
-      "src": "FN\\MnMenu2.FN.sql",
-      "string": "sstory40.MnAuth_FN_AuthChk2('1')"
-    },
-    {
-      "replacement": "",
-      "src": "FN\\MnMenu2.FN.sql",
-      "string": "sstory40.MnAuth_FN_AuthChk2('777')"
-    },
-    {
-      "replacement": "",
+      "replacement": "exec qtb.[MnAcct_Account_SP_C]",
       "src": "SP\\MnMenu1.SP.sql",
-      "string": "sstory40.MnAuth_FN_AuthChk3('1')"
+      "string": "exec abc.[MnAcct_Account_SP_C]"
     },
     {
-      "replacement": "",
+      "replacement": "excute qtb.[MnAcct_Account_SP_C]",
       "src": "SP\\MnMenu1.SP.sql",
-      "string": "sstory40.MnAuth_FN_AuthChk3('777')"
+      "string": "excute abc.[MnAcct_Account_SP_C]"
+    },
+    {
+      "replacement": "exec @qtb=abc.[MnAcct_Account_SP_C]",
+      "src": "SP\\MnMenu1.SP.sql",
+      "string": "exec @abc=abc.[MnAcct_Account_SP_C]"
     }
   ],
   "clear": {
     "ddl_obj_name": false,
     "use": false
   },
-  "obj_name": "sstory40",
+  "obj_name": "db_obj_name",
   "options": {
     "comment": true,
+    "ddl_create": true,
     "last_go": true,
     "log": true,
     "map": "dist/map/",
-    "scalar_rename": false,
-    "ddl_create": true
+    "scalar_rename": false
   },
   "replace": [
     {

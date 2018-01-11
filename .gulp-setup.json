@@ -1,0 +1,24 @@
+{
+  "_replace": [],
+  "clear": {
+    "ddl_obj_name": false,
+    "use": false
+  },
+  "obj_name": "db_obj_name",
+  "options": {
+    "comment": true,
+    "ddl_create": true,
+    "last_go": true,
+    "log": true,
+    "map": "dist/map/",
+    "scalar_rename": false
+  },
+  "replace": [
+    {
+      "replacement": "",
+      "src": "",
+      "string": ""
+    }
+  ],
+  "task": "default"
+}

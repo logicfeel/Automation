@@ -4,17 +4,22 @@ ALTER PROC [MnAcct_Account_SP_C]
 	@account_id				varchar(20),
 AS
 
+ALTER PROC abc.[MnAcct_Account_SP_C]
+	@sto_idx				int,
+	@account_id				varchar(20),
+AS
+
 -- DDL FN
-ALTER FUNCTION [_MnAuth_FN_AuthChk](@bt varchar(10))
+ALTER FUNCTION abc.[_MnAuth_FN_AuthChk](@bt varchar(10))
 	RETURNS char(10)
 AS
 
-create FUNCTION [_MnAuth_FN_AuthChk] (@bt varchar(10))
+create FUNCTION abc.[_MnAuth_FN_AuthChk] (@bt varchar(10))
 	RETURNS char(10)
 AS
 
 -- DDL U
-CREATE TABLE [MnAcct_Account](
+CREATE TABLE abc.[MnAcct_Account](
 	[account_idx] [int] IDENTITY(1,1) NOT NULL,
 PRIMARY KEY CLUSTERED 
 (
@@ -39,6 +44,7 @@ exec @abc=abc.[MnAcct_Account_SP_C]
 -- DDL TF
 	SELECT a.parent_idx, a.rank_it, a.menuName, a.auth_idx, b.*
 	FROM abb.MnMeuA_Common_TF(@menu_idx) a, MnMeuA_Info b
+	abb.MnMeuA_Common_TF(@menu_idx) a, MnMeuA_Info b
 	WHERE 1=1
 		AND a.menu_idx = b.menu_idx
 		AND b.onwerType_cd = 'C'	
