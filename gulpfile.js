@@ -50,12 +50,12 @@ var REG_EXP = {
     // DDL create, alter "전체DDL문"  $1: 전체명, $2: 객체명 (*객체명 없을시 공백)
     DDL_ALL: /(?:alter|create)\s+(?:proc|procedure|function|table)\s+(((?:\[|")?\w+(?:\]|")?\.)?\[?\w+\]?)/gi,
     // DML SP $1: 전체명, $2: [객체명]. $3: 객체문자열
-    // DML_SP: new RegExp(/(?:EXEC|EXCUTE) +(?:@\w+=\s*)?(((?:\[|")?(\w+)(?:\]|")?\.)\[?\w+\]?)/, 'i'),
     DML_SP: /(?:EXEC|EXCUTE) +(?:@\w+=\s*)?(((?:\[|")?(\w+)(?:\]|")?\.)\[?\w+\]?)/gi,
     // $1: FUNCTION, TABLE 값 여부로 DDL, DML 구분 ## 필터링 후 사용 ##
     // $2: 전체명
-    // $3: 객체명
-    DML_FN: new RegExp(/(\w+)?\W+(((?:\[|")?\w+(?:\]|")?\.)\[?\w+\]?)\s*\([^\)]*\)/, 'g'),
+    // $3: 객체명 '.'포함 [객체명].
+    // $4: 객체명
+    DML_FN: /(\w+)?\s*(((?:\[|")?(\w+)(?:\]|")?\.)\[?\w+\]?)\s*\([^\)]*\)/gi,
 
     // 스칼라 함수
     _SCALER: /[\S]+\.[\w]+\(.*\)/g,
@@ -209,7 +209,9 @@ gulp.task('get-replace', function () {
             var _match;
             
             // TODO: 조건문 추가해야함 : 일단 무조건 바꾸는걸로
-            _match = match.replace(p3, SETUP.obj_name);
+            _match = p2.replace(p3, SETUP.obj_name);
+            _match = match.replace(p2, _match);
+
             objData = {
                 src: this.file.relative,
                 string: match,
@@ -219,6 +221,30 @@ gulp.task('get-replace', function () {
             fs.writeFileSync(SETUP.file, JSON.stringify(jsonSetup));
             return match;
             })
+        )
+        .pipe(replace(REG_EXP.DML_FN, function(match, p1, p2, p3, p4, offset, string) {
+            // .pipe(replace(/(?:EXEC|EXCUTE) +(?:@\w+=\s*)?(((?:\[|")?(\w+)(?:\]|")?\.)\[?\w+\]?)/gi, function(match, p1, p2, p3, offset, string) {
+                var setup = fs.readFileSync(SETUP.file);
+                var jsonSetup = JSON.parse(setup);
+                var objData = {};
+                var _match;
+                
+                if (p1.toUpperCase().trim() === 'TABLE' || p1.toUpperCase().trim() === 'FUNCTION') {
+                    return  match;
+                }  else {
+                    // TODO: 조건문 추가해야함 : 일단 무조건 바꾸는걸로
+                    _match = p3.replace(p4, SETUP.obj_name);
+                    _match = match.replace(p3, _match);
+                    objData = {
+                        src: this.file.relative,
+                        string: match,
+                        replacement: _match
+                    };
+                    jsonSetup._replace.push(objData);
+                    fs.writeFileSync(SETUP.file, JSON.stringify(jsonSetup));
+                }
+                return match;
+            })
         );
     }
 );
@@ -227,8 +253,30 @@ gulp.task('get-replace', function () {
  * --------------------------------------------------
  * 설정파일 정렬
  */
-// gulp.task('init-sort', ['get-replace'], function () {
-gulp.task('init-sort',function () {
+// gulp.task('sort-replace', ['get-replace'], function () {
+gulp.task('sort-replace',function () {
+    return gulp.src(SETUP.file)
+        .pipe(sortJSON({ space: 2 }))
+        .pipe(gulp.dest('./'));  
+});
+
+
+/** 
+ * --------------------------------------------------
+ * DDL 설치
+ */
+gulp.task('install', function () {
+    return gulp.src(SETUP.file)
+        .pipe(sortJSON({ space: 2 }))
+        .pipe(gulp.dest('./'));  
+});
+
+
+/** 
+ * --------------------------------------------------
+ * DML 설치
+ */
+gulp.task('install', function () {
     return gulp.src(SETUP.file)
         .pipe(sortJSON({ space: 2 }))
         .pipe(gulp.dest('./'));  
@@ -236,18 +284,23 @@ gulp.task('init-sort',function () {
 
 /** 
  * --------------------------------------------------
- * 사전 작업
+ * 설치
  */
-gulp.task('before', ['init-sort']);
+    gulp.task('install', function () {
+        return gulp.src(SETUP.file)
+            .pipe(sortJSON({ space: 2 }))
+            .pipe(gulp.dest('./'));  
+    });
+    
 
 /** 
  * --------------------------------------------------
  * 사전 작업 : 동기화방식
- * 1> _replace 객체 초기화
- * 2> 객체형 추출
- * 3> 설정파일 정렬
+ * - init-replace : _replace 객체 초기화
+ * - get-replace : 객체형 추출
+ * - sort-replace : 설정 JSON 정렬
  */
-gulp.task('before-sync', gulpsync.sync(['init-replace', 'get-replace', 'init-sort' ]));
+gulp.task('before-sync', gulpsync.sync(['init-replace', 'get-replace', 'sort-replace' ]));
 
 
 /** 

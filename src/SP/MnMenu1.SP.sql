@@ -96,7 +96,7 @@ END
 /*
 exec abc.[MnAcct_Account_SP_C] 1, 'admin', 'admin', '관리자'
 
-excute abc.[MnAcct_Account_SP_C] 1, 'admin', 'admin', '관리자'
+excute [abc].[MnAcct_Account_SP_C] 1, 'admin', 'admin', '관리자'
 
 exec  @abc =  abc.[MnAcct_Account_SP_C]
 exec @abc=abc.[MnAcct_Account_SP_C]
