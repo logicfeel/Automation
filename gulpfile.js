@@ -4,7 +4,7 @@
 var gulp        = require('gulp'); 
 // var search      = require("gulp-search");
 var fs          = require("fs");
-var contains    = require('gulp-contains');
+// var contains    = require('gulp-contains');
 // var sortJson    = require('sort-json');
 var sortJSON = require('gulp-json-sort').default;
 
@@ -12,13 +12,15 @@ var replace     = require("gulp-replace");
 var sourcemaps  = require('gulp-sourcemaps');
 var lazypipe    = require('lazypipe');
 var rename      = require('gulp-rename');
-var gulpsync = require('gulp-sync')(gulp);
+var gulpsync    = require('gulp-sync')(gulp);
+var concat      = require('gulp-concat'); 
 
 var SETUP_FILE = "gulp-setup.json";   // 설정 파일명
 
 var SETUP = {
     file: "gulp-setup.json",
     obj_name: "qtb",
+    ddl_create: true,  // false 는 그대로 두기
     clear: {
         use: true, 
         comment: true,
@@ -56,8 +58,8 @@ var REG_EXP = {
     // $3: 객체명 '.'포함 [객체명].
     // $4: 객체명
     DML_FN: /(\w+)?\s*(((?:\[|")?(\w+)(?:\]|")?\.)\[?\w+\]?)\s*\([^\)]*\)/gi,
-
-    // 스칼라 함수
+    DDL_COMMAND : /(alter|create)\s+(?=proc|procedure|function|table)/gi,
+    // 스칼라
     _SCALER: /[\S]+\.[\w]+\(.*\)/g,
     // DML_FN 조건 + "_FN" 이름 기준으로 찾기
     _DML_FN_NM: /(((?:\[|")?\w+(?:\]|")?\.)\[?\w+_FN\w+\]?)\s*\([^\)]*\)/gi,
@@ -182,6 +184,17 @@ gulp.task('test', function () {
 
 /** 
  * --------------------------------------------------
+ * 설정파일 초기화
+ */
+gulp.task('init', function () {
+    return gulp.src('.' + SETUP.file)
+        .pipe(rename(SETUP.file))
+        .pipe(gulp.dest('./'));    
+});
+
+
+/** 
+ * --------------------------------------------------
  * SETUP.file._replace = [] : 초기화
  */
 gulp.task('init-replace', function () {
@@ -263,24 +276,60 @@ gulp.task('sort-replace',function () {
 
 /** 
  * --------------------------------------------------
- * DDL 설치
+ * 사전 작업 : 동기화방식
+ * - init-replace : _replace 객체 초기화
+ * - get-replace : 객체형 추출
+ * - sort-replace : 설정 JSON 정렬
  */
-gulp.task('install', function () {
-    return gulp.src(SETUP.file)
-        .pipe(sortJSON({ space: 2 }))
-        .pipe(gulp.dest('./'));  
+gulp.task('before-sync', gulpsync.sync(['init-replace', 'get-replace', 'sort-replace' ]));
+
+/** 
+ * --------------------------------------------------
+ * install 공통
+ */
+var _install_common = lazypipe()
+    .pipe(replace, REG_EXP.DDL_COMMAND, function(match, p1, offset, string) {
+        if (SETUP.ddl_create) {
+            match = match.replace(p1, 'CREATE');
+        } 
+        return match;
+    });
+
+
+/** 
+ * --------------------------------------------------
+ * 전체 통합파일
+ */
+gulp.task('install-all', function () {
+    return gulp.src(paths.src)
+        .pipe(_install_common())
+        .pipe(concat('all.sql'))
+        .pipe(gulp.dest(paths.dist));  
 });
 
 
 /** 
  * --------------------------------------------------
- * DML 설치
+ * 타입별 파일Y?
  */
-gulp.task('install', function () {
-    return gulp.src(SETUP.file)
-        .pipe(sortJSON({ space: 2 }))
-        .pipe(gulp.dest('./'));  
+gulp.task('install-type', function () {
+    return gulp.src(paths.src)
+        .pipe(_install_common())
+        .pipe(concat('all.sql'))
+        .pipe(gulp.dest(paths.dist));   
 });
+
+
+/** 
+ * --------------------------------------------------
+ * 개별 파일
+ */
+gulp.task('install-unit', function () {
+    return gulp.src(paths.src)
+        .pipe(_install_common())
+        .pipe(gulp.dest(paths.dist));
+});
+
 
 /** 
  * --------------------------------------------------
@@ -293,25 +342,8 @@ gulp.task('install', function () {
     });
     
 
-/** 
- * --------------------------------------------------
- * 사전 작업 : 동기화방식
- * - init-replace : _replace 객체 초기화
- * - get-replace : 객체형 추출
- * - sort-replace : 설정 JSON 정렬
- */
-gulp.task('before-sync', gulpsync.sync(['init-replace', 'get-replace', 'sort-replace' ]));
 
 
-/** 
- * --------------------------------------------------
- * 설정파일 초기화
- */
-gulp.task('init', function () {
-    return gulp.src('.' + SETUP.file)
-        .pipe(rename(SETUP.file))
-        .pipe(gulp.dest('./'));    
-});
 
 // var build = gulp.series('init', 'before');
 
@@ -320,6 +352,7 @@ gulp.task('init', function () {
 // gulp.task('default', ['test']);
 // gulp.task('default', ['before']);
 gulp.task('default', ['before-sync']);
+// gulp.task('default', ['install-all']);
 // gulp.task('default', ['init']);
 
 console.log('-default-');
