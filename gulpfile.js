@@ -29,6 +29,8 @@ var SETUP = {
     },
     options: {
         last_go: true,
+        obj_type: 1, // 0:유지, 1: 제거, 2: 교체, 3:교체(있을경우) 
+        obj_fnc_type: 3, // 0:유지, 2: 교체, 3:교체(있을경우) 
         ddl_create: true
     }
 };
@@ -49,9 +51,15 @@ var REG_EXP = {
     LAST_GO: /..\s*$/g,                                                 
     // DDL create, alter "객체명사용목록"  $1: 전체명, $2: 객체명
     DDL_OBJ: /(?:alter|create)\s+(?:proc|procedure|function|table)\s+(((?:\[|")?\w+(?:\]|")?\.)\[?\w+\]?)/gi,
-    // DDL create, alter "전체DDL문"  $1: 전체명, $2: 객체명 (*객체명 없을시 공백)
-    DDL_ALL: /(?:alter|create)\s+(?:proc|procedure|function|table)\s+(((?:\[|")?\w+(?:\]|")?\.)?\[?\w+\]?)/gi,
-    // DML SP $1: 전체명, $2: [객체명]. $3: 객체문자열
+    // DDL create, alter "전체DDL문"  
+    // $1: 전체명, 
+    // $2: 객체명 '.'포함 [객체명].
+    // $3: 객체명
+    DDL_ALL: /(?:alter|create)\s+(?:proc|procedure|function|table)\s+(((?:\[|")?(\w+)(?:\]|")?\.)?\[?\w+\]?)/gi,
+    // DML SP 
+    // $1: 전체명, 
+    // $2: [객체명]. 
+    // $3: 객체명
     DML_SP: /(?:EXEC|EXCUTE) +(?:@\w+=\s*)?(((?:\[|")?(\w+)(?:\]|")?\.)\[?\w+\]?)/gi,
     // $1: FUNCTION, TABLE 값 여부로 DDL, DML 구분 ## 필터링 후 사용 ##
     // $2: 전체명
@@ -211,19 +219,22 @@ gulp.task('init-replace', function () {
  * --------------------------------------------------
  * 사전 작업
  */
-// gulp.task('get-replace', ['init-replace'], function () {
 gulp.task('get-replace', function () {    
     return gulp.src(paths.src)
         .pipe(replace(REG_EXP.DML_SP, function(match, p1, p2, p3, offset, string) {
-        // .pipe(replace(/(?:EXEC|EXCUTE) +(?:@\w+=\s*)?(((?:\[|")?(\w+)(?:\]|")?\.)\[?\w+\]?)/gi, function(match, p1, p2, p3, offset, string) {
             var setup = fs.readFileSync(SETUP.file);
             var jsonSetup = JSON.parse(setup);
             var objData = {};
+            var _list;
             var _match;
             
+
             // TODO: 조건문 추가해야함 : 일단 무조건 바꾸는걸로
-            _match = p2.replace(p3, SETUP.obj_name);
-            _match = match.replace(p2, _match);
+            // => 테스트 했으니 해도 해도됨
+            // _match = p2.replace(p3, SETUP.obj_name);
+            // _match = match.replace(p2, _match);
+            
+            _match = objReplace(match, p1, p2, p3, SETUP.obj_name, SETUP.options.obj_type);
 
             objData = {
                 src: this.file.relative,
@@ -236,18 +247,22 @@ gulp.task('get-replace', function () {
             })
         )
         .pipe(replace(REG_EXP.DML_FN, function(match, p1, p2, p3, p4, offset, string) {
-            // .pipe(replace(/(?:EXEC|EXCUTE) +(?:@\w+=\s*)?(((?:\[|")?(\w+)(?:\]|")?\.)\[?\w+\]?)/gi, function(match, p1, p2, p3, offset, string) {
                 var setup = fs.readFileSync(SETUP.file);
                 var jsonSetup = JSON.parse(setup);
                 var objData = {};
                 var _match;
-                
+
                 if (p1.toUpperCase().trim() === 'TABLE' || p1.toUpperCase().trim() === 'FUNCTION') {
                     return  match;
                 }  else {
+
                     // TODO: 조건문 추가해야함 : 일단 무조건 바꾸는걸로
-                    _match = p3.replace(p4, SETUP.obj_name);
-                    _match = match.replace(p3, _match);
+                    // => 테스트 했으니 해도 해도됨
+                    // _match = p3.replace(p4, SETUP.obj_name);
+                    // _match = match.replace(p3, _match);
+
+                    //  SETUP.options.obj_fnc_type (* fn은 있을 경우만 교체)
+                    _match = objReplace(match, p2, p3, p4, SETUP.obj_name, SETUP.options.obj_fnc_type);
                     objData = {
                         src: this.file.relative,
                         string: match,
@@ -283,6 +298,36 @@ gulp.task('sort-replace',function () {
  */
 gulp.task('before-sync', gulpsync.sync(['init-replace', 'get-replace', 'sort-replace' ]));
 
+
+
+/** 
+ * --------------------------------------------------
+ * 공통 함수
+ */
+// 객체명 교체
+// flag =  0:유지, 1: 제거, 2: 교체,  3:교체(있을때만) * FN 에서 사용
+function objReplace(fullName, prefix, suffix, obj, replacement, flag) {
+    var _match;
+
+    if (flag === 1 ) {          // 제거
+        _match = fullName.replace(suffix, '');
+    } else if (flag === 2) {    // 교체(일괄)
+        if (typeof obj === 'undefined' || obj.trim() === '') {
+            _match = replacement + '.' + prefix;
+            _match = fullName.replace(prefix, _match);
+        } else {
+            _match = suffix.replace(obj, replacement);
+            _match = fullName.replace(suffix, _match);
+        }        
+    } else if (flag === 3) {    // 3:교체(있을때만)
+        if (typeof obj !== 'undefined') {
+            _match = suffix.replace(obj, replacement);
+            _match = fullName.replace(suffix, _match);
+        }
+    }
+    return _match;
+}
+
 /** 
  * --------------------------------------------------
  * install 공통
@@ -291,8 +336,14 @@ var _install_common = lazypipe()
     .pipe(replace, REG_EXP.DDL_COMMAND, function(match, p1, offset, string) {
         if (SETUP.ddl_create) {
             match = match.replace(p1, 'CREATE');
-        } 
+        }
         return match;
+    })
+    .pipe(replace, REG_EXP.DDL_ALL, function(match, p1, p2, p3, offset, string) {
+        var _match;
+
+        _match = objReplace(match, p1, p2, p3, SETUP.obj_name, SETUP.options.obj_type);
+        return _match;
     });
 
 
@@ -304,7 +355,7 @@ gulp.task('install-all', function () {
     return gulp.src(paths.src)
         .pipe(_install_common())
         .pipe(concat('all.sql'))
-        .pipe(gulp.dest(paths.dist));  
+        .pipe(gulp.dest(paths.dist));
 });
 
 
@@ -316,7 +367,7 @@ gulp.task('install-type', function () {
     return gulp.src(paths.src)
         .pipe(_install_common())
         .pipe(concat('all.sql'))
-        .pipe(gulp.dest(paths.dist));   
+        .pipe(gulp.dest(paths.dist));
 });
 
 

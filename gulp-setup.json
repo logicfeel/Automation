@@ -1,5 +1,51 @@
 {
-  "_replace": [],
+  "_replace": [
+    {
+      "replacement": "SELECT qtb.MnAuth_FN_AuthChk('1')",
+      "src": "FN\\MnMenu1.FN.sql",
+      "string": "SELECT sstory40.MnAuth_FN_AuthChk('1')"
+    },
+    {
+      "replacement": "SELECT qtb.MnAuth_FN_AuthChk('777')",
+      "src": "FN\\MnMenu1.FN.sql",
+      "string": "SELECT sstory40.MnAuth_FN_AuthChk('777')"
+    },
+    {
+      "replacement": "SELECT qtb.MnAuth_FN_AuthChk2('1')",
+      "src": "FN\\MnMenu2.FN.sql",
+      "string": "SELECT sstory40.MnAuth_FN_AuthChk2('1')"
+    },
+    {
+      "replacement": "SELECT qtb.MnAuth_FN_AuthChk2('777')",
+      "src": "FN\\MnMenu2.FN.sql",
+      "string": "SELECT sstory40.MnAuth_FN_AuthChk2('777')"
+    },
+    {
+      "replacement": "exec [MnAcct_Account_SP_C]",
+      "src": "SP\\MnMenu1.SP.sql",
+      "string": "exec abc.[MnAcct_Account_SP_C]"
+    },
+    {
+      "replacement": "excute [MnAcct_Account_SP_C]",
+      "src": "SP\\MnMenu1.SP.sql",
+      "string": "excute [abc].[MnAcct_Account_SP_C]"
+    },
+    {
+      "replacement": "exec @abc=[MnAcct_Account_SP_C]",
+      "src": "SP\\MnMenu1.SP.sql",
+      "string": "exec @abc=abc.[MnAcct_Account_SP_C]"
+    },
+    {
+      "replacement": "SELECT qtb.MnAuth_FN_AuthChk3('1')",
+      "src": "SP\\MnMenu1.SP.sql",
+      "string": "SELECT sstory40.MnAuth_FN_AuthChk3('1')"
+    },
+    {
+      "replacement": "SELECT qtb.MnAuth_FN_AuthChk3('777')",
+      "src": "SP\\MnMenu1.SP.sql",
+      "string": "SELECT sstory40.MnAuth_FN_AuthChk3('777')"
+    }
+  ],
   "clear": {
     "ddl_obj_name": false,
     "use": false

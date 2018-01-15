@@ -1,5 +1,15 @@
 {
   "_replace": [],
+  "_replace2": [
+    {
+      "src": "FN\\MnMenu2.FN.sql",
+      "list": 
+      {
+        "replacement": "SELECT qtb.MnAuth_FN_AuthChk2('777')",
+        "string": "SELECT sstory40.MnAuth_FN_AuthChk2('777')"        
+      }
+    }
+  ],
   "clear": {
     "ddl_obj_name": false,
     "use": false

@@ -20,7 +20,7 @@ GO
 
 */
 -- =============================================
-ALTER PROC [sstory40].[MnAcct_Account_SP_C]
+ALTER PROC [MnAcct_Account_SP_C]
 	@sto_idx				int,
 	@account_id				varchar(20),
 	@passwd					varchar(20),
