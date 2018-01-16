@@ -1,63 +1,67 @@
 {
   "_replace": [
     {
-      "replacement": "SELECT qtb.MnAuth_FN_AuthChk('1')",
+      "replacement": "SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk('1')",
       "src": "FN\\MnMenu1.FN.sql",
       "string": "SELECT sstory40.MnAuth_FN_AuthChk('1')"
     },
     {
-      "replacement": "SELECT qtb.MnAuth_FN_AuthChk('777')",
+      "replacement": "SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk('777')",
       "src": "FN\\MnMenu1.FN.sql",
       "string": "SELECT sstory40.MnAuth_FN_AuthChk('777')"
     },
     {
-      "replacement": "SELECT qtb.MnAuth_FN_AuthChk2('1')",
+      "replacement": "SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk2('1')",
       "src": "FN\\MnMenu2.FN.sql",
       "string": "SELECT sstory40.MnAuth_FN_AuthChk2('1')"
     },
     {
-      "replacement": "SELECT qtb.MnAuth_FN_AuthChk2('777')",
+      "replacement": "SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk2('777')",
       "src": "FN\\MnMenu2.FN.sql",
       "string": "SELECT sstory40.MnAuth_FN_AuthChk2('777')"
     },
     {
-      "replacement": "exec [MnAcct_Account_SP_C]",
+      "replacement": "exec DB_OBJ_NAME.[MnAcct_Account_SP_C]",
       "src": "SP\\MnMenu1.SP.sql",
       "string": "exec abc.[MnAcct_Account_SP_C]"
     },
     {
-      "replacement": "excute [MnAcct_Account_SP_C]",
+      "replacement": "excute [DB_OBJ_NAME].[MnAcct_Account_SP_C]",
       "src": "SP\\MnMenu1.SP.sql",
       "string": "excute [abc].[MnAcct_Account_SP_C]"
     },
     {
-      "replacement": "exec @abc=[MnAcct_Account_SP_C]",
+      "replacement": "exec  @abc =  DB_OBJ_NAME.[MnAcct_Account_SP_C]",
+      "src": "SP\\MnMenu1.SP.sql",
+      "string": "exec  @abc =  abc.[MnAcct_Account_SP_C]"
+    },
+    {
+      "replacement": "exec @abc=DB_OBJ_NAME.[MnAcct_Account_SP_C]",
       "src": "SP\\MnMenu1.SP.sql",
       "string": "exec @abc=abc.[MnAcct_Account_SP_C]"
     },
     {
-      "replacement": "SELECT qtb.MnAuth_FN_AuthChk3('1')",
+      "replacement": "SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk3('1')",
       "src": "SP\\MnMenu1.SP.sql",
       "string": "SELECT sstory40.MnAuth_FN_AuthChk3('1')"
     },
     {
-      "replacement": "SELECT qtb.MnAuth_FN_AuthChk3('777')",
+      "replacement": "SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk3('777')",
       "src": "SP\\MnMenu1.SP.sql",
       "string": "SELECT sstory40.MnAuth_FN_AuthChk3('777')"
     }
   ],
   "clear": {
-    "ddl_obj_name": false,
+    "comment": false,
     "use": false
   },
-  "obj_name": "db_obj_name",
+  "obj_name": "DB_OBJ_NAME",
   "options": {
-    "comment": true,
     "ddl_create": true,
     "last_go": true,
     "log": true,
-    "map": "dist/map/",
-    "scalar_rename": false
+    "obj_fnc_type": 3,
+    "obj_type": 1
   },
   "replace": [
     {

@@ -1,34 +1,24 @@
 {
   "_replace": [],
-  "_replace2": [
-    {
-      "src": "FN\\MnMenu2.FN.sql",
-      "list": 
-      {
-        "replacement": "SELECT qtb.MnAuth_FN_AuthChk2('777')",
-        "string": "SELECT sstory40.MnAuth_FN_AuthChk2('777')"        
-      }
-    }
-  ],
+  "obj_name": "DB_OBJ_NAME",
   "clear": {
-    "ddl_obj_name": false,
+    "comment": false,
     "use": false
   },
-  "obj_name": "db_obj_name",
   "options": {
-    "comment": true,
+    "obj_type": 1,
+    "obj_fnc_type": 3,
     "ddl_create": true,
-    "last_go": true,
     "log": true,
-    "map": "dist/map/",
-    "scalar_rename": false
+    "last_go": true
   },
   "replace": [
     {
-      "replacement": "",
+      "string": "",
       "src": "",
-      "string": ""
+      "replacement": ""
     }
   ],
   "task": "default"
+  
 }
