@@ -2,18 +2,16 @@
 // gulp 3.9 기준
 
 var gulp        = require('gulp'); 
-var fs          = require("fs");
+var fs          = require('fs');
 var sortJSON    = require('gulp-json-sort').default;
 var lazypipe    = require('lazypipe');
-
 var replace     = require("gulp-replace");
-var sourcemaps  = require('gulp-sourcemaps');
-var rename      = require('gulp-rename');
 var gulpsync    = require('gulp-sync')(gulp);
 var concat      = require('gulp-concat'); 
-
 var through     = require('through2');
 
+var sourcemaps  = require('gulp-sourcemaps');
+var rename      = require('gulp-rename');
 
 // #########################################################
 // 지역변수
@@ -28,7 +26,8 @@ var PATH = {
 // gulp-setup.json 로딩 전역 설정
 var SETUP       = {};
 
-var SETUP_FILE  = "gulp-setup.json";   // 설정 파일명
+var CONCAT_FILE = 'all.sql';
+var SETUP_FILE  = 'gulp-setup.json'   // 설정 파일명
 /**  설정 파일 설명
 {
     "_replace": [],             @summary 사전 컴파일 자료 
@@ -57,7 +56,9 @@ var SETUP_FILE  = "gulp-setup.json";   // 설정 파일명
 
 var REG_EXP = {
     // USE DB
-    USE_OBJ_NAME: /^USE+ [\[\w]+\]*\s+GO/g,                             
+    //USE_OBJ_NAME: /^USE+ [\[\w]+\]*\s+GO/g, 
+    // TODO: 테스트 후 교체 해야함
+    USE_OBJ_NAME: /^USE\s+((?:\[|")?(\w+)(?:\]|")?)\s+GO/g,    
     // /****  ****/
     COMMENT: /\/\*{4,}.+\*{4,}\//g,                                     
     // 첫 공백
@@ -70,24 +71,24 @@ var REG_EXP = {
     DDL_OBJ: /(?:alter|create)\s+(?:proc|procedure|function|table)\s+(((?:\[|")?\w+(?:\]|")?\.)\[?\w+\]?)/gi,
     /**
      * DDL create, alter "전체DDL문"  
-     * $1: 전체명, 
-     * $2: 객체명 '.'포함 [객체명].
-     * $3: 객체명
+     * @param $1: 객체명 + 접미사(.) + 접두사(기능이름)
+     * @param $2: 객체명 + 접미사(.)
+     * @param $3: 객체명
      */
     DDL_ALL: /(?:alter|create)\s+(?:proc|procedure|function|table)\s+(((?:\[|")?(\w+)(?:\]|")?\.)?\[?\w+\]?)/gi,
     /**
      * DML SP 
-     * $1: 전체명, 
-     * $2: 객체명 '.'포함 [객체명].
-     * $3: 객체명
+     * @param $1: 객체명 + 접미사(.) + 접두사(기능이름)
+     * @param $2: 객체명 + 접미사(.)
+     * @param $3: 객체명
      */
     DML_SP: /(?:EXEC|EXCUTE) +(?:@\w+\s*=\s*)?(((?:\[|")?(\w+)(?:\]|")?\.)?\[?\w+\]?)/gi,
     /**
      * DML FN 
-     * $1: FUNCTION, TABLE 값 여부로 DDL, DML 구분 ## 필터링 후 사용 ##
-     * $2: 전체명, 
-     * $3: 객체명 '.'포함 [객체명].
-     * $4: 객체명
+     * @param $1: FUNCTION, TABLE 구분값 : 여부로 DDL, DML 구분 ## 필터링 후 사용 ##
+     * @param $2: 객체명 + 접미사(.) + 접두사(기능이름)
+     * @param $3: 객체명 + 접미사(.)
+     * @param $4: 객체명
      */
     DML_FN: /(\w+)?\s*(((?:\[|")?(\w+)(?:\]|")?\.)\[?\w+\]?)\s*\([^\)]*\)/gi,
     // DDL 명령
@@ -107,39 +108,49 @@ var REG_EXP = {
 /** 
  * --------------------------------------------------
  * 객체명 교체
- * flag =  0:유지, 1: 제거, 2: 교체,  3:교체(있을때만) * FN 에서 사용
+ * flag =  
+ * @param fullName: 원본이름
+ * @param prefix: 객체명 + 접미사(.) + 접두사(기능이름)
+ * @param suffix: 객체명 + 접미사(.)
+ * @param obj: 객체명
+ * @param replacement: 교체할 객체명
+ * @param flag: 0:유지, 1: 제거, 2: 교체,  3:교체(있을때만) * FN 에서 사용
+ * 
+ * @return 변경된 fullName
  */
-function objReplace(fullName, prefix, suffix, obj, replacement, flag) {
-    var _match;
+function objNameReplace(fullName, prefix, suffix, obj, replacement, flag) {
+    var _fullName;
 
     if (flag === 1 ) {          // 제거
-        _match = fullName.replace(suffix, '');
+        _fullName = fullName.replace(suffix, '');
     } else if (flag === 2) {    // 교체(일괄)
         if (typeof obj === 'undefined' || obj.trim() === '') {
-            _match = replacement + '.' + prefix;
-            _match = fullName.replace(prefix, _match);
+            _fullName = replacement + '.' + prefix;
+            _fullName = fullName.replace(prefix, _fullName);
         } else {
-            _match = suffix.replace(obj, replacement);
-            _match = fullName.replace(suffix, _match);
+            _fullName = suffix.replace(obj, replacement);
+            _fullName = fullName.replace(suffix, _fullName);
         }        
     } else if (flag === 3) {    // 3:교체(있을때만)
         if (typeof obj !== 'undefined') {
-            _match = suffix.replace(obj, replacement);
-            _match = fullName.replace(suffix, _match);
+            _fullName = suffix.replace(obj, replacement);
+            _fullName = fullName.replace(suffix, _fullName);
         }
     }
-    return _match;
+    return _fullName;
 }
 
 
 // ##################################################
 // task 목록
 
+
 /** 
  * --------------------------------------------------
  * install before 사전 작업
  */
 gulp.task('install-before', gulpsync.sync(['load-setup', 'init-replace', 'get-replace', 'save-setup']));
+
 
 /** 
  * --------------------------------------------------
@@ -157,7 +168,7 @@ gulp.task('install-all', ['load-setup'], function () {
         // .pipe(gulp.src('sample.sql'))        // <= 이런식으로 파일 추가도 가능
         .pipe(_install_common())
         .pipe(gulp.dest(PATH.dist))
-        .pipe(concat('all.sql'))
+        .pipe(concat(CONCAT_FILE))
         .pipe(gulp.dest(PATH.dist));
 });
 
@@ -166,10 +177,19 @@ gulp.task('install-all', ['load-setup'], function () {
  * --------------------------------------------------
  * 타입별 파일Y?
  */
+// gulp.task('install-type', ['load-setup'], function () {
+//     return gulp.src('src/*SP/*')
+//         .pipe(gulp.src('src/*FN/*'))         // <<= 전체파일이  재정렬 됨
+//         .pipe(_install_common())
+//         .pipe(concat(CONCAT_FILE))
+//         .pipe(gulp.dest(PATH.dist));
+// });
+
+//
 gulp.task('install-type', ['load-setup'], function () {
-    return gulp.src(PATH.src)
+    return gulp.src(['src/*SP/*', 'src/*FN/*']) // REVIEW: 그룹별 정렬됨
         .pipe(_install_common())
-        .pipe(concat('all.sql'))
+        .pipe(concat(CONCAT_FILE))
         .pipe(gulp.dest(PATH.dist));
 });
 
@@ -187,11 +207,23 @@ gulp.task('install-unit', ['load-setup'], function () {
 
 /** 
  * --------------------------------------------------
+ * SETUP_FILE  설정파일 초기화 : .gulp-setup.json >> gulp-setup.json
+ */
+gulp.task('init', function () {
+    return gulp.src('.' + SETUP_FILE)
+        .pipe(rename(SETUP_FILE))
+        .pipe(gulp.dest('./'));    
+});
+
+
+/** 
+ * --------------------------------------------------
  * setup.json 로딩
  */
 gulp.task('init-replace', function () {
-    SETUP._replace = [];
     console.log('___initing setup.json___');
+
+    SETUP._replace = [];
 });
 
 
@@ -200,9 +232,10 @@ gulp.task('init-replace', function () {
  * setup.json 로딩
  */
 gulp.task('load-setup', function () {
-    var setup = fs.readFileSync(SETUP_FILE);
-    SETUP = JSON.parse(setup);
     console.log('___loading setup.json___');
+    var setup = fs.readFileSync(SETUP_FILE);
+
+    SETUP = JSON.parse(setup);
 });
 
 
@@ -223,39 +256,12 @@ gulp.task('save-setup', function () {
 
 /** 
  * --------------------------------------------------
- * SETUP_FILE 설정파일 초기화
- */
-gulp.task('init', function () {
-    return gulp.src('.' + SETUP_FILE)
-        .pipe(rename(SETUP_FILE))
-        .pipe(gulp.dest('./'));    
-});
-
-
-// /** 
-//  * --------------------------------------------------
-//  * SETUP_FILE._replace = [] : 초기화
-//  */
-// gulp.task('init-replace', function () {
-//     // var setup = fs.readFileSync(SETUP_FILE);
-//     // var jsonSetup = JSON.parse(setup);
-
-//     // // 초기화
-//     // jsonSetup._replace = [];    
-//     // fs.writeFileSync(SETUP_FILE, JSON.stringify(jsonSetup));
-//     SETUP._replace = [];
-// });
-
-
-/** 
- * --------------------------------------------------
  * 사전 작업 : 교체 목록 가져옴
  */
 gulp.task('get-replace', function () {    
     return gulp.src(PATH.src)
         .pipe(replace(REG_EXP.DML_SP, function(match, p1, p2, p3, offset, string) {
                 var objData = {};
-                var _list;
                 var _match;
                 
                 // 제외 조건 : 유지 + 객체 없음
@@ -263,7 +269,7 @@ gulp.task('get-replace', function () {
                 // 제외 조건 : 있을때만 교체 + 객체 없음
                 if (SETUP.options.obj_fnc_type === 3 && typeof p3 === 'undefined') return match;
 
-                _match = objReplace(match, p1, p2, p3, SETUP.obj_name, SETUP.options.obj_fnc_type);
+                _match = objNameReplace(match, p1, p2, p3, SETUP.obj_name, SETUP.options.obj_fnc_type);
                 objData = {
                     src: this.file.relative,
                     string: match,
@@ -281,7 +287,7 @@ gulp.task('get-replace', function () {
                     return  match;
                 } else {
                     //  SETUP.options.obj_fnc_type (* fn은 있을 경우만 교체)
-                    _match = objReplace(match, p2, p3, p4, SETUP.obj_name, SETUP.options.obj_fnc_type);
+                    _match = objNameReplace(match, p2, p3, p4, SETUP.obj_name, SETUP.options.obj_fnc_type);
                     objData = {
                         src: this.file.relative,
                         string: match,
@@ -302,18 +308,21 @@ gulp.task('get-replace', function () {
  * ! 파이프 파일을 통합하기 전에 이용
  */
 var _install_common = lazypipe()
+    // DDL 명령 (create, alter)
     .pipe(replace, REG_EXP.DDL_COMMAND, function(match, p1, offset, string) {
         if (SETUP.options.ddl_create) {
             match = match.replace(p1, 'CREATE');
         }
         return match;
     })
+    // DDL 구문
     .pipe(replace, REG_EXP.DDL_ALL, function(match, p1, p2, p3, offset, string) {
         var _match;
 
-        _match = objReplace(match, p1, p2, p3, SETUP.obj_name, SETUP.options.obj_type);
+        _match = objNameReplace(match, p1, p2, p3, SETUP.obj_name, SETUP.options.obj_type);
         return _match;
     })
+    // DML 구문 (프로시저)
     .pipe(replace, REG_EXP.DML_SP, function(match, p1, p2, p3, offset, string) {
         var _index = null;
 
@@ -331,9 +340,8 @@ var _install_common = lazypipe()
         } else {
             return match;
         }
-
-        
     })
+    // DML 구문 (스칼라, 테이블)
     .pipe(replace, REG_EXP.DML_FN, function(match, p1, p2, p3, p4, offset, string) {
         var _match;
         var _index = null;
@@ -354,9 +362,15 @@ var _install_common = lazypipe()
         return _match;
     })
     // USE [객체명]
-    .pipe(replace, REG_EXP.USE_OBJ_NAME, function(match, p1, offset, string) {
+    .pipe(replace, REG_EXP.USE_OBJ_NAME, function(match, p1, p2, offset, string) {
+        var _match;
+
         if (SETUP.clear.use) return '';
-        else return match;
+        else {
+            // 객체명 있는 경우 교체함
+            _match = objNameReplace(match, null, p1, p2, SETUP.obj_name, 3); 
+            return _match;
+        }
     })
     // 주석 /** **/ 
     .pipe(replace, REG_EXP.COMMENT, function(match, p1, offset, string) {
@@ -369,8 +383,8 @@ var _install_common = lazypipe()
     .pipe(replace, REG_EXP.LAST_SPACE, '')
     // 정규표현 : 마지막 GO
     .pipe(replace, REG_EXP.LAST_GO, function(match, p1, offset, string) {
-        if (SETUP.options.last_go && match.trim() != "GO") return match + "\n\nGO\n";
-        else return match;
+        if (SETUP.options.last_go && match.trim() != 'GO') return match + '\n\nGO\n';
+        else return match + '\n';
     })
     .pipe(function() {
         // console.log('___func__');
@@ -406,7 +420,6 @@ var _install_common = lazypipe()
 
 
 
-
 // ##################################################
 // gulp.task('default', ['main-task']);
 // gulp.task('default', ['link-task']);
@@ -414,6 +427,7 @@ var _install_common = lazypipe()
 // gulp.task('default', ['before']);
 // gulp.task('default', ['before-sync']);
 gulp.task('default', ['install-all']);
+// gulp.task('default', ['install-type']);
 // gulp.task('default', ['install-before']);
 // gulp.task('default', ['init']);
 

@@ -1,4 +1,4 @@
-USE [sstory40]
+USE [DB_OBJ_NAME]
 GO
 
 /****** Object:  StoredProcedure [sstory40].[MnAcct_Account_SP_C]    Script Date: 01/03/2018 06:12:51 ******/

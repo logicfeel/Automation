@@ -1,4 +1,81 @@
-USE [sstory40]
+/****** Object:  Table [sstory40].[MnAcct_Group]    Script Date: 01/03/2018 06:08:40 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+SET ANSI_PADDING ON
+GO
+
+CREATE TABLE [MnAcct_Group](
+	[group_ac_idx] [int] IDENTITY(1,1) NOT NULL,
+	[groupName] [varchar](50) NOT NULL,
+	[memo] [varchar](200) NULL,
+	[create_dt] [datetime] NOT NULL,
+	[del_yn] [char](1) NOT NULL,
+	[using_yn] [char](1) NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[group_ac_idx] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+SET ANSI_PADDING OFF
+GO
+
+CREATE TABLE [MnAcct_Group] ADD  DEFAULT (getdate()) FOR [create_dt]
+GO
+
+CREATE TABLE [MnAcct_Group] ADD  DEFAULT ('N') FOR [del_yn]
+GO
+
+CREATE TABLE [MnAcct_Group] ADD  DEFAULT ('Y') FOR [using_yn]
+GO
+
+/****** Object:  Table [sstory40].[MnAcct_Account]    Script Date: 01/03/2018 06:04:54 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+SET ANSI_PADDING ON
+GO
+
+CREATE TABLE [MnAcct_Account](
+	[account_idx] [int] IDENTITY(1,1) NOT NULL,
+	[account_id] [varchar](20) NOT NULL,
+	[passwd] [varchar](20) NOT NULL,
+	[memo] [varchar](200) NULL,
+	[sto_idx] [int] NOT NULL,
+	[create_dt] [datetime] NOT NULL,
+	[del_yn] [char](1) NOT NULL,
+	[using_yn] [char](1) NOT NULL,
+	[admName] [varchar](50) NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[account_idx] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+SET ANSI_PADDING OFF
+GO
+
+CREATE TABLE [MnAcct_Account] ADD  DEFAULT (getdate()) FOR [create_dt]
+GO
+
+CREATE TABLE [MnAcct_Account] ADD  DEFAULT ('N') FOR [del_yn]
+GO
+
+CREATE TABLE [MnAcct_Account] ADD  DEFAULT ('Y') FOR [using_yn]
+GO
+
+USE [DB_OBJ_NAME]
 GO
 /****** Object:  UserDefinedFunction [sstory40].[_MnAuth_FN_AuthChk]    Script Date: 01/03/2018 06:10:26 ******/
 SET ANSI_NULLS ON
@@ -41,7 +118,8 @@ END
 */
 
 GO
-USE [sstory40]
+
+USE [DB_OBJ_NAME]
 GO
 /****** Object:  UserDefinedFunction [sstory40].[_MnAuth_FN_AuthChk]    Script Date: 01/03/2018 06:10:26 ******/
 SET ANSI_NULLS ON
@@ -86,7 +164,7 @@ END
 
 GO
 
-USE [sstory40]
+USE [DB_OBJ_NAME]
 GO
 
 /****** Object:  StoredProcedure [sstory40].[MnAcct_Account_SP_C]    Script Date: 01/03/2018 06:12:51 ******/
@@ -191,7 +269,8 @@ exec @abc=DB_OBJ_NAME.[MnAcct_Account_SP_C]
 */
 
 GO
-USE [sstory40]
+
+USE [DB_OBJ_NAME]
 GO
 
 /****** Object:  StoredProcedure [sstory40].[MnAcct_Account_SP_D]    Script Date: 01/03/2018 06:13:12 ******/

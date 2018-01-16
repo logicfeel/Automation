@@ -1,4 +1,4 @@
-USE [sstory40]
+USE [DB_OBJ_NAME]
 GO
 /****** Object:  UserDefinedFunction [sstory40].[_MnAuth_FN_AuthChk]    Script Date: 01/03/2018 06:10:26 ******/
 SET ANSI_NULLS ON
