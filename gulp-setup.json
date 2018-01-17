@@ -1,63 +1,66 @@
 {
   "_replace": [
     {
-      "replacement": "SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk('1')",
-      "src": "FN\\MnMenu1.FN.sql",
+      "replacement": "SELECT rtwgs4.MnAuth_FN_AuthChk('1')",
+      "src": "02-FN\\MnMenu1.FN.sql",
       "string": "SELECT sstory40.MnAuth_FN_AuthChk('1')"
     },
     {
-      "replacement": "SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk('777')",
-      "src": "FN\\MnMenu1.FN.sql",
+      "replacement": "SELECT rtwgs4.MnAuth_FN_AuthChk('777')",
+      "src": "02-FN\\MnMenu1.FN.sql",
       "string": "SELECT sstory40.MnAuth_FN_AuthChk('777')"
     },
     {
-      "replacement": "SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk2('1')",
-      "src": "FN\\MnMenu2.FN.sql",
+      "replacement": "SELECT rtwgs4.MnAuth_FN_AuthChk2('1')",
+      "src": "02-FN\\MnMenu2.FN.sql",
       "string": "SELECT sstory40.MnAuth_FN_AuthChk2('1')"
     },
     {
-      "replacement": "SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk2('777')",
-      "src": "FN\\MnMenu2.FN.sql",
+      "replacement": "SELECT rtwgs4.MnAuth_FN_AuthChk2('777')",
+      "src": "02-FN\\MnMenu2.FN.sql",
       "string": "SELECT sstory40.MnAuth_FN_AuthChk2('777')"
     },
     {
-      "replacement": "exec DB_OBJ_NAME.[MnAcct_Account_SP_C]",
-      "src": "SP\\MnMenu1.SP.sql",
+      "replacement": "exec rtwgs4.[MnAcct_Account_SP_C]",
+      "src": "03-SP\\MnMenu1.SP.sql",
       "string": "exec abc.[MnAcct_Account_SP_C]"
     },
     {
-      "replacement": "excute [DB_OBJ_NAME].[MnAcct_Account_SP_C]",
-      "src": "SP\\MnMenu1.SP.sql",
+      "replacement": "excute [rtwgs4].[MnAcct_Account_SP_C]",
+      "src": "03-SP\\MnMenu1.SP.sql",
       "string": "excute [abc].[MnAcct_Account_SP_C]"
     },
     {
-      "replacement": "exec  @abc =  DB_OBJ_NAME.[MnAcct_Account_SP_C]",
-      "src": "SP\\MnMenu1.SP.sql",
+      "replacement": "exec  @abc =  rtwgs4.[MnAcct_Account_SP_C]",
+      "src": "03-SP\\MnMenu1.SP.sql",
       "string": "exec  @abc =  abc.[MnAcct_Account_SP_C]"
     },
     {
-      "replacement": "exec @abc=DB_OBJ_NAME.[MnAcct_Account_SP_C]",
-      "src": "SP\\MnMenu1.SP.sql",
+      "replacement": "exec @abc=rtwgs4.[MnAcct_Account_SP_C]",
+      "src": "03-SP\\MnMenu1.SP.sql",
       "string": "exec @abc=abc.[MnAcct_Account_SP_C]"
     },
     {
-      "replacement": "SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk3('1')",
-      "src": "SP\\MnMenu1.SP.sql",
+      "replacement": "SELECT rtwgs4.MnAuth_FN_AuthChk3('1')",
+      "src": "03-SP\\MnMenu1.SP.sql",
       "string": "SELECT sstory40.MnAuth_FN_AuthChk3('1')"
     },
     {
-      "replacement": "SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk3('777')",
-      "src": "SP\\MnMenu1.SP.sql",
+      "replacement": "SELECT rtwgs4.MnAuth_FN_AuthChk3('777')",
+      "src": "03-SP\\MnMenu1.SP.sql",
       "string": "SELECT sstory40.MnAuth_FN_AuthChk3('777')"
     }
   ],
   "clear": {
     "comment": false,
-    "use": false
+    "use": true
   },
-  "obj_name": "DB_OBJ_NAME",
+  "module": "",
+  "obj_name": "rtwgs4",
   "options": {
     "ddl_create": true,
+    "intall_group": true,
+    "intall_unit": true,
     "last_go": true,
     "log": true,
     "obj_fnc_type": 3,

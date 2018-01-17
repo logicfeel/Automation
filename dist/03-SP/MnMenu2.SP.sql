@@ -1,6 +1,3 @@
-USE [DB_OBJ_NAME]
-GO
-
 /****** Object:  StoredProcedure [sstory40].[MnAcct_Account_SP_D]    Script Date: 01/03/2018 06:13:12 ******/
 SET ANSI_NULLS ON
 GO
@@ -63,4 +60,5 @@ END
 */
 
 
-GO
+GO--End
+

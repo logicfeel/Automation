@@ -15,9 +15,20 @@ var gulpif      = require('gulp-if');
 var sourcemaps  = require('gulp-sourcemaps');
 var rename      = require('gulp-rename');
 
-
 // #########################################################
 // 지역변수
+
+// var PATH = {                            
+//     src: "src/**/*.sql",
+//     src_U: "src/*+(Table|U)/*.sql",
+//     src_VW: "src/*VW/*.sql",
+//     src_FN: "src/*FN/*.sql",
+//     src_TF: "src/*TF/*.sql",
+//     src_SP: "src/*SP/*.sql",
+//     src_TR: "src/*TR/*.sql",
+//     dist: "dist",
+//     map: "dist/map/"
+// };
 
 // gulp-setup.json 로딩 전역 설정
 var SETUP = {};
@@ -46,15 +57,13 @@ var SETUP_FILE  = 'gulp-setup.json'   // 설정 파일명
     "obj_name": "DB_OBJ_NAME",  @summary 객체|DB명
     "clear": {
         "comment": false,
-        "use": true
+        "use": false
     },
     "options": {
         "obj_type": 0:유지, @default 1:제거, 2: 교체,  3:교체(있을때만)
         "obj_fnc_type": 0:유지, 2: 교체,  @default 3:교체(있을때만)  !변경시 install-before 실행해야함
         "ddl_create": true,
         "log": true,
-        "intall_group": true,   @summary 타입(그룹)별 파일 설치, * 전체 포함
-        "intall_unit": true,    @summary 개별 파일 설치
         "last_go": true
     },
     "replace": [                @summary 사용자 교체
@@ -72,7 +81,7 @@ var REG_EXP = {
     // USE DB
     //USE_OBJ_NAME: /^USE+ [\[\w]+\]*\s+GO/g, 
     // TODO: 테스트 후 교체 해야함
-    USE_OBJ_NAME: /^\s*USE\s+((?:\[|")?(\w+)(?:\]|")?)\s+GO/g,    
+    USE_OBJ_NAME: /^USE\s+((?:\[|")?(\w+)(?:\]|")?)\s+GO/g,    
     // /****  ****/
     COMMENT: /\/\*{4,}.+\*{4,}\//g,                                     
     // 첫 공백
@@ -170,29 +179,71 @@ gulp.task('install-before', gulpsync.sync(['load-setup', 'init-replace', 'get-re
  * --------------------------------------------------
  * 설치
  */
-gulp.task('install', gulpsync.sync(['install-before', 'install-excute']));
+gulp.task('install', gulpsync.sync(['install-before', 'install-all']));
 
 
 /** 
  * --------------------------------------------------
- * 설치 처리
+ * 전체 통합파일
  */
- gulp.task('install-excute', ['load-setup'], function () {
+// gulp.task('install-all', ['load-setup'], function () {
+//     return gulp.src(PATH.src)
+//         // .pipe(gulp.src('sample.sql'))        // <= 이런식으로 파일 추가도 가능
+//         .pipe(_install_common())
+//         .pipe(gulp.dest(PATH.dist))
+//         .pipe(concat(FILE.ALL))
+//         .pipe(gulp.dest(PATH.dist));
+// });
 
-    // 개별 그룹별 배치 (전체 포함)
-    if (SETUP.options.intall_group) {
+ gulp.task('install-all', ['load-setup'], function () {
+
+    // 개별 그룹별 배치
+    if (SETUP.intall_group) {
         gulp.src(PATH.src)
-            .pipe(_install_common())
-            .pipe(groupConcat(FILE_GROUP))          // REVEIW: 이전에 gulp.dest 하면 없어짐
-            .pipe(gulp.dest(PATH.dist));
+        .pipe(_install_common())
+        .pipe(gulp.dest(PATH.dist))
+        .pipe(groupConcat(FILE_GROUP))          // REVEIW: 이전에 gulp.dest 하면 없어짐
+        .pipe(gulp.dest(PATH.dist));
     }
     
     // 개별 파일 배치    
-    if (SETUP.options.intall_unit) {
-        gulp.src(PATH.src)
-            .pipe(_install_common())
-            .pipe(gulp.dest(PATH.dist));
+    if (SETUP.intall_unit) {
+    gulp.src(PATH.src)
+        .pipe(_install_common())
+        .pipe(gulp.dest(PATH.dist));
     }
+});
+
+
+/** 
+ * --------------------------------------------------
+ * 타입별 파일Y?
+ */
+// gulp.task('install-type', ['load-setup'], function () {
+//     return gulp.src('src/*SP/*')
+//         .pipe(gulp.src('src/*FN/*'))         // <<= 전체파일이  재정렬 됨
+//         .pipe(_install_common())
+//         .pipe(concat(FILE.ALL))
+//         .pipe(gulp.dest(PATH.dist));
+// });
+
+//
+gulp.task('install-type', ['load-setup'], function () {
+    return gulp.src(['src/*SP/*', 'src/*FN/*']) // REVIEW: 그룹별 정렬됨
+        .pipe(_install_common())
+        .pipe(concat(FILE.ALL))
+        .pipe(gulp.dest(PATH.dist));
+});
+
+
+/** 
+ * --------------------------------------------------
+ * 개별 파일
+ */
+gulp.task('install-unit', ['load-setup'], function () {
+    return gulp.src(PATH.src)
+        .pipe(_install_common())
+        .pipe(gulp.dest(PATH.dist));
 });
 
 
@@ -374,8 +425,8 @@ var _install_common = lazypipe()
     .pipe(replace, REG_EXP.LAST_SPACE, '')
     // 정규표현 : 마지막 GO
     .pipe(replace, REG_EXP.LAST_GO, function(match, p1, offset, string) {
-        if (SETUP.options.last_go && match.trim() != 'GO') return match + '\n\nGO--Auto\n\n';
-        else return match + '--End\n\n';
+        if (SETUP.options.last_go && match.trim() != 'GO') return match + '\n\nGO\n';
+        else return match + '\n';
     })
     .pipe(function() {
         // console.log('___func__');
@@ -417,11 +468,9 @@ var _install_common = lazypipe()
 // gulp.task('default', ['test']);
 // gulp.task('default', ['before']);
 // gulp.task('default', ['before-sync']);
-// gulp.task('default', ['install-all']);
-// gulp.task('default', ['install-after']);
+gulp.task('default', ['install-all']);
 // gulp.task('default', ['install-type']);
 // gulp.task('default', ['install-before']);
 // gulp.task('default', ['init']);
-gulp.task('default', ['install']);
 
 // console.log('-default-');

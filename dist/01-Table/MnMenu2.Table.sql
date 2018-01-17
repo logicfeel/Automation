@@ -26,11 +26,12 @@ GO
 SET ANSI_PADDING OFF
 GO
 
-CREATE TABLE [MnAcct_Group] ADD  DEFAULT (getdate()) FOR [create_dt]
+ALTER TABLE [MnAcct_Group] ADD  DEFAULT (getdate()) FOR [create_dt]
 GO
 
-CREATE TABLE [MnAcct_Group] ADD  DEFAULT ('N') FOR [del_yn]
+ALTER TABLE [MnAcct_Group] ADD  DEFAULT ('N') FOR [del_yn]
 GO
 
-CREATE TABLE [MnAcct_Group] ADD  DEFAULT ('Y') FOR [using_yn]
-GO
+ALTER TABLE [MnAcct_Group] ADD  DEFAULT ('Y') FOR [using_yn]
+GO--End
+

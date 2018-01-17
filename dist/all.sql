@@ -26,14 +26,14 @@ GO
 SET ANSI_PADDING OFF
 GO
 
-CREATE TABLE [MnAcct_Group] ADD  DEFAULT (getdate()) FOR [create_dt]
+ALTER TABLE [MnAcct_Group] ADD  DEFAULT (getdate()) FOR [create_dt]
 GO
 
-CREATE TABLE [MnAcct_Group] ADD  DEFAULT ('N') FOR [del_yn]
+ALTER TABLE [MnAcct_Group] ADD  DEFAULT ('N') FOR [del_yn]
 GO
 
-CREATE TABLE [MnAcct_Group] ADD  DEFAULT ('Y') FOR [using_yn]
-GO
+ALTER TABLE [MnAcct_Group] ADD  DEFAULT ('Y') FOR [using_yn]
+GO--End
 
 /****** Object:  Table [sstory40].[MnAcct_Account]    Script Date: 01/03/2018 06:04:54 ******/
 SET ANSI_NULLS ON
@@ -66,17 +66,15 @@ GO
 SET ANSI_PADDING OFF
 GO
 
-CREATE TABLE [MnAcct_Account] ADD  DEFAULT (getdate()) FOR [create_dt]
+ALTER TABLE [MnAcct_Account] ADD  DEFAULT (getdate()) FOR [create_dt]
 GO
 
-CREATE TABLE [MnAcct_Account] ADD  DEFAULT ('N') FOR [del_yn]
+ALTER TABLE [MnAcct_Account] ADD  DEFAULT ('N') FOR [del_yn]
 GO
 
-CREATE TABLE [MnAcct_Account] ADD  DEFAULT ('Y') FOR [using_yn]
-GO
+ALTER TABLE [MnAcct_Account] ADD  DEFAULT ('Y') FOR [using_yn]
+GO--End
 
-USE [DB_OBJ_NAME]
-GO
 /****** Object:  UserDefinedFunction [sstory40].[_MnAuth_FN_AuthChk]    Script Date: 01/03/2018 06:10:26 ******/
 SET ANSI_NULLS ON
 GO
@@ -113,14 +111,12 @@ END
 -- ###################################################
 -- ## 테스트 코드
 /*
-	SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk('1')
-	SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk('777')
+	SELECT rtwgs4.MnAuth_FN_AuthChk('1')
+	SELECT rtwgs4.MnAuth_FN_AuthChk('777')
 */
 
-GO
+GO--End
 
-USE [DB_OBJ_NAME]
-GO
 /****** Object:  UserDefinedFunction [sstory40].[_MnAuth_FN_AuthChk]    Script Date: 01/03/2018 06:10:26 ******/
 SET ANSI_NULLS ON
 GO
@@ -158,14 +154,11 @@ END
 -- ###################################################
 -- ## 테스트 코드
 /*
-	SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk2('1')
-	SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk2('777')
+	SELECT rtwgs4.MnAuth_FN_AuthChk2('1')
+	SELECT rtwgs4.MnAuth_FN_AuthChk2('777')
 */
 
-GO
-
-USE [DB_OBJ_NAME]
-GO
+GO--Auto
 
 /****** Object:  StoredProcedure [sstory40].[MnAcct_Account_SP_C]    Script Date: 01/03/2018 06:12:51 ******/
 SET ANSI_NULLS ON
@@ -254,24 +247,21 @@ END
 */
 
 /*
-	SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk3('1')
-	SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk3('777')
+	SELECT rtwgs4.MnAuth_FN_AuthChk3('1')
+	SELECT rtwgs4.MnAuth_FN_AuthChk3('777')
 */
 
 -- DML SP
 /*
-exec DB_OBJ_NAME.[MnAcct_Account_SP_C] 1, 'admin', 'admin', '관리자'
+exec rtwgs4.[MnAcct_Account_SP_C] 1, 'admin', 'admin', '관리자'
 
-excute [DB_OBJ_NAME].[MnAcct_Account_SP_C] 1, 'admin', 'admin', '관리자'
+excute [rtwgs4].[MnAcct_Account_SP_C] 1, 'admin', 'admin', '관리자'
 
-exec  @abc =  DB_OBJ_NAME.[MnAcct_Account_SP_C]
-exec @abc=DB_OBJ_NAME.[MnAcct_Account_SP_C]
+exec  @abc =  rtwgs4.[MnAcct_Account_SP_C]
+exec @abc=rtwgs4.[MnAcct_Account_SP_C]
 */
 
-GO
-
-USE [DB_OBJ_NAME]
-GO
+GO--End
 
 /****** Object:  StoredProcedure [sstory40].[MnAcct_Account_SP_D]    Script Date: 01/03/2018 06:13:12 ******/
 SET ANSI_NULLS ON
@@ -335,4 +325,5 @@ END
 */
 
 
-GO
+GO--End
+

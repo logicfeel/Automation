@@ -1,16 +1,20 @@
 {
   "_replace": [],
   "obj_name": "DB_OBJ_NAME",
+  "prefix_name": "",
+  "module": "",
   "clear": {
     "comment": false,
-    "use": false
+    "use": true
   },
   "options": {
     "obj_type": 1,
     "obj_fnc_type": 3,
     "ddl_create": true,
     "log": true,
-    "last_go": true
+    "last_go": true,
+    "intall_group": true,
+    "intall_unit": true
   },
   "replace": [
     {
