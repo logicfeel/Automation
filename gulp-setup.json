@@ -1,77 +1,29 @@
 {
-  "_replace": [
-    {
-      "replacement": "SELECT rtwgs4.MnAuth_FN_AuthChk('1')",
-      "src": "02-FN\\MnMenu1.FN.sql",
-      "string": "SELECT sstory40.MnAuth_FN_AuthChk('1')"
-    },
-    {
-      "replacement": "SELECT rtwgs4.MnAuth_FN_AuthChk('777')",
-      "src": "02-FN\\MnMenu1.FN.sql",
-      "string": "SELECT sstory40.MnAuth_FN_AuthChk('777')"
-    },
-    {
-      "replacement": "SELECT rtwgs4.MnAuth_FN_AuthChk2('1')",
-      "src": "02-FN\\MnMenu2.FN.sql",
-      "string": "SELECT sstory40.MnAuth_FN_AuthChk2('1')"
-    },
-    {
-      "replacement": "SELECT rtwgs4.MnAuth_FN_AuthChk2('777')",
-      "src": "02-FN\\MnMenu2.FN.sql",
-      "string": "SELECT sstory40.MnAuth_FN_AuthChk2('777')"
-    },
-    {
-      "replacement": "exec rtwgs4.[MnAcct_Account_SP_C]",
-      "src": "03-SP\\MnMenu1.SP.sql",
-      "string": "exec abc.[MnAcct_Account_SP_C]"
-    },
-    {
-      "replacement": "excute [rtwgs4].[MnAcct_Account_SP_C]",
-      "src": "03-SP\\MnMenu1.SP.sql",
-      "string": "excute [abc].[MnAcct_Account_SP_C]"
-    },
-    {
-      "replacement": "exec  @abc =  rtwgs4.[MnAcct_Account_SP_C]",
-      "src": "03-SP\\MnMenu1.SP.sql",
-      "string": "exec  @abc =  abc.[MnAcct_Account_SP_C]"
-    },
-    {
-      "replacement": "exec @abc=rtwgs4.[MnAcct_Account_SP_C]",
-      "src": "03-SP\\MnMenu1.SP.sql",
-      "string": "exec @abc=abc.[MnAcct_Account_SP_C]"
-    },
-    {
-      "replacement": "SELECT rtwgs4.MnAuth_FN_AuthChk3('1')",
-      "src": "03-SP\\MnMenu1.SP.sql",
-      "string": "SELECT sstory40.MnAuth_FN_AuthChk3('1')"
-    },
-    {
-      "replacement": "SELECT rtwgs4.MnAuth_FN_AuthChk3('777')",
-      "src": "03-SP\\MnMenu1.SP.sql",
-      "string": "SELECT sstory40.MnAuth_FN_AuthChk3('777')"
-    }
-  ],
+  "_replace": [],
+  "obj_name": "DB_OBJ_NAME",
+  "prefix_name": "",
+  "suffix_name": "",
+  "module": "",
   "clear": {
     "comment": false,
     "use": true
   },
-  "module": "",
-  "obj_name": "rtwgs4",
   "options": {
-    "ddl_create": true,
-    "intall_group": true,
-    "intall_unit": true,
-    "last_go": true,
-    "log": true,
+    "obj_type": 1,
     "obj_fnc_type": 3,
-    "obj_type": 1
+    "ddl_create": true,
+    "log": true,
+    "last_go": true,
+    "intall_group": true,
+    "intall_unit": true
   },
   "replace": [
     {
-      "replacement": "",
+      "string": "",
       "src": "",
-      "string": ""
+      "replacement": ""
     }
   ],
   "task": "default"
+  
 }

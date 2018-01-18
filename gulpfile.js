@@ -10,8 +10,10 @@ var gulpsync    = require('gulp-sync')(gulp);
 var concat      = require('gulp-concat'); 
 var through     = require('through2');
 var groupConcat = require('gulp-group-concat');
-var gulpif      = require('gulp-if');
+var clean       = require('gulp-clean');
 
+// 사용전 플러그인
+var gulpif      = require('gulp-if');
 var sourcemaps  = require('gulp-sourcemaps');
 var rename      = require('gulp-rename');
 
@@ -41,39 +43,41 @@ var FILE_GROUP = {
 
 var SETUP_FILE  = 'gulp-setup.json'   // 설정 파일명
 /**  설정 파일 설명
-{
-    "_replace": [],             @summary 사전 컴파일 자료 
-    "obj_name": "DB_OBJ_NAME",  @summary 객체|DB명
-    "clear": {
-        "comment": false,
-        "use": true
-    },
-    "options": {
-        "obj_type": 0:유지, @default 1:제거, 2: 교체,  3:교체(있을때만)
-        "obj_fnc_type": 0:유지, 2: 교체,  @default 3:교체(있을때만)  !변경시 install-before 실행해야함
-        "ddl_create": true,
-        "log": true,
-        "intall_group": true,   @summary 타입(그룹)별 파일 설치, * 전체 포함
-        "intall_unit": true,    @summary 개별 파일 설치
-        "last_go": true
-    },
-    "replace": [                @summary 사용자 교체
-        {
-            "string": "교체대상 String",
-            "src": "대상파일 전체경로 || 공백은 전체파일대상",
-            "replacement": "교체할 String"
-        }
-    ],
-    "task": "default"
-}
+    {
+        "_replace": [],             @summary 사전 컴파일 자료 
+        "obj_name": "DB_OBJ_NAME",  @summary 객체|DB명
+        "prefix_name": "",          @summary 함수|프로시저|테이블명 접두사(앞)
+        "suffix_name": "",          @summary 함수|프로시저|테이블명 접미사(뒤)
+        "clear": {
+            "comment": false,       @summary 자동 생성 주석 제거 유무
+            "use": true             @summary USE [DB] 제거 유무    
+        },
+        "options": {
+            "obj_type": 1,          @summary DDL문 객체명 옵션
+                                    0:유지, *1:제거, 2: 교체,  3:교체(있을때만) 
+            "obj_fnc_type": 3,      @summary 함수,프로시저 객체명 옵션
+                                    0:유지, 2: 교체,  *3:교체(있을때만)  !변경시 install-before 실행해야함
+            "ddl_create": true,     @summary ALTER >> CREATE 변경 여부
+            "log": true,
+            "intall_group": true,   @summary 타입(그룹)별 파일 설치, * 전체 포함
+            "intall_unit": true,    @summary 개별 파일 설치
+            "last_go": true         @summary 파일 마지막에 구분자 GO 추가 유무
+        },
+        "replace": [                @summary 사용자 교체
+            {
+                "string": "",       @summary 사용자 교체 대상
+                "src": "",          @summary 사용자 대상파일, *''공백은 제한 없음
+                "replacement": ""   @summary 사용자 교체 이름
+            }
+        ],
+        "task": "default"
+    }
  */
 
 var REG_EXP = {
-    // USE DB
-    //USE_OBJ_NAME: /^USE+ [\[\w]+\]*\s+GO/g, 
-    // TODO: 테스트 후 교체 해야함
+    // USE [객체|DB명]
     USE_OBJ_NAME: /^\s*USE\s+((?:\[|")?(\w+)(?:\]|")?)\s+GO/g,    
-    // /****  ****/
+    // 시스템 4줄 이상 주석 /****  ****/
     COMMENT: /\/\*{4,}.+\*{4,}\//g,                                     
     // 첫 공백
     FIST_SPACE: /^\s*/g,
@@ -82,30 +86,39 @@ var REG_EXP = {
     // 마지막 2문자 (GO)
     LAST_GO: /..\s*$/g,                                                 
     /**
+     * DDL 명령 alter => create
+     * @param $1: CREATE | ALTER  
+     * @param $2: TABLE | PROC | PROCEDURE | FUNCTION 
+     */    
+    DDL_COMMAND: /(alter|create)\s+(proc|procedure|function|table)(?!\s\S+\s*(add|with))/gi,
+    /**
      * DDL create, alter "전체DDL문"  
-     * @param $1: 객체명 + 접미사(.) + 접두사(기능이름)
+     * @param $1: 객체명 + 접미사(.) + 접두사(타겟명)
      * @param $2: 객체명 + 접미사(.)
      * @param $3: 객체명
+     * @param $4: 타겟명 : 함수|프로시저|테이블명
      */
-    DDL_ALL: /(?:alter|create)\s+(?:proc|procedure|function|table)\s+(((?:\[|")?(\w+)(?:\]|")?\.)?\[?\w+\]?)/gi,
+    DDL_ALL: /(?:(?:alter|create)\s+(?:proc|procedure|function|table)|references)\s+(((?:\[|")?(\w+)(?:\]|")?\.)?\[?(\w+)\]?)/gi,
+   
     /**
      * DML SP 
-     * @param $1: 객체명 + 접미사(.) + 접두사(기능이름)
+     * @param $1: 객체명 + 접미사(.) + 접두사(타겟명)
      * @param $2: 객체명 + 접미사(.)
      * @param $3: 객체명
+     * @param $4: 타겟명 : 함수|프로시저|테이블명
      */
-    DML_SP: /(?:EXEC|EXCUTE) +(?:@\w+\s*=\s*)?(((?:\[|")?(\w+)(?:\]|")?\.)?\[?\w+\]?)/gi,
+    DML_SP: /(?:EXEC|EXCUTE) +(?:@\w+\s*=\s*)?(((?:\[|")?(\w+)(?:\]|")?\.)?\[?(\w+)\]?)/gi,
     /**
      * DML FN 
      * @param $1: FUNCTION, TABLE 구분값 : 여부로 DDL, DML 구분 ## 필터링 후 사용 ##
-     * @param $2: 객체명 + 접미사(.) + 접두사(기능이름)
+     * @param $2: 객체명 + 접미사(.) + 접두사(타겟명)
      * @param $3: 객체명 + 접미사(.)
      * @param $4: 객체명
+     * @param $5: 타겟명 : 함수|프로시저|테이블명
      */
-    DML_FN: /(\w+)?\s*(((?:\[|")?(\w+)(?:\]|")?\.)\[?\w+\]?)\s*\([^\)]*\)/gi,
-    // DDL 명령
-    DDL_COMMAND: /(alter|create)\s+(proc|procedure|function|table)(?!\s\S+\sadd)/gi,
+    DML_FN: /(\w+)?\s*(((?:\[|")?(\w+)(?:\]|")?\.)\[?(\w+)\]?)\s*\([^\)]*\)/gi,
     
+    // 테스트 정규식
     // DDL create, alter "객체명사용목록"  $1: 전체명, $2: 객체명
     _DDL_OBJ: /(?:alter|create)\s+(?:proc|procedure|function|table)\s+(((?:\[|")?\w+(?:\]|")?\.)\[?\w+\]?)/gi,
     // 스칼라 함수 
@@ -119,16 +132,17 @@ var REG_EXP = {
 
 // ##################################################
 // 공통 함수
+
 /** 
  * --------------------------------------------------
  * 객체명 교체
  * flag =  
- * @param fullName: 원본이름
- * @param prefix: 객체명 + 접미사(.) + 접두사(기능이름)
- * @param suffix: 객체명 + 접미사(.)
- * @param obj: 객체명
- * @param replacement: 교체할 객체명
- * @param flag: 0:유지, 1: 제거, 2: 교체,  3:교체(있을때만) * FN 에서 사용
+ * @param fullName: (*필수) 원본이름 
+ * @param prefix: (*선택필수) 객체명 + 접미사(.) + 접두사(기능이름)
+ * @param suffix: (*선택필수) 객체명 + 접미사(.)
+ * @param obj: (*선택필수) 객체명 
+ * @param replacement: (*필수) 교체할 객체명 
+ * @param flag: (*필수) 0:유지, 1: 제거, 2: 교체,  3:교체(있을때만) * FN 에서 사용
  * 
  * @return 변경된 fullName
  */
@@ -157,7 +171,6 @@ function objNameReplace(fullName, prefix, suffix, obj, replacement, flag) {
 
 // ##################################################
 // task 목록
-
 
 /** 
  * --------------------------------------------------
@@ -200,12 +213,20 @@ gulp.task('install', gulpsync.sync(['install-before', 'install-excute']));
  * --------------------------------------------------
  * SETUP_FILE  설정파일 초기화 : .gulp-setup.json >> gulp-setup.json
  */
-gulp.task('init', function () {
+gulp.task('init', ['clean-dest'], function () {
     return gulp.src('.' + SETUP_FILE)
         .pipe(rename(SETUP_FILE))
         .pipe(gulp.dest('./'));    
 });
 
+/** 
+ * --------------------------------------------------
+ * SETUP_FILE  설정파일 초기화 : .gulp-setup.json >> gulp-setup.json
+ */
+gulp.task('clean-dest', function () {
+    return gulp.src(PATH.dist, {read: false})
+      .pipe(clean());
+});
 
 /** 
  * --------------------------------------------------
@@ -251,7 +272,7 @@ gulp.task('save-setup', function () {
  */
 gulp.task('get-replace', function () {    
     return gulp.src(PATH.src)
-        .pipe(replace(REG_EXP.DML_SP, function(match, p1, p2, p3, offset, string) {
+        .pipe(replace(REG_EXP.DML_SP, function(match, p1, p2, p3, p4, offset, string) {
                 var objData = {};
                 var _match;
                 
@@ -261,6 +282,11 @@ gulp.task('get-replace', function () {
                 if (SETUP.options.obj_fnc_type === 3 && typeof p3 === 'undefined') return match;
 
                 _match = objNameReplace(match, p1, p2, p3, SETUP.obj_name, SETUP.options.obj_fnc_type);
+
+                if (SETUP.prefix_name.length > 0 ||  SETUP.suffix_name.length > 0) {
+                    _match = _match.replace(p4, SETUP.prefix_name + p4 + SETUP.suffix_name);
+                }
+        
                 objData = {
                     src: this.file.relative,
                     string: match,
@@ -270,15 +296,21 @@ gulp.task('get-replace', function () {
                 return match;
             })
         )
-        .pipe(replace(REG_EXP.DML_FN, function(match, p1, p2, p3, p4, offset, string) {
+        .pipe(replace(REG_EXP.DML_FN, function(match, p1, p2, p3, p4, p5, offset, string) {
                 var objData = {};
                 var _match;
 
-                if (p1.toUpperCase().trim() === 'TABLE' || p1.toUpperCase().trim() === 'FUNCTION') {
+                if (p1.toUpperCase().trim() === 'TABLE' || p1.toUpperCase().trim() === 'FUNCTION' ||
+                    p1.toUpperCase().trim() === 'REFERENCES') {
                     return  match;
                 } else {
                     //  SETUP.options.obj_fnc_type (* fn은 있을 경우만 교체)
                     _match = objNameReplace(match, p2, p3, p4, SETUP.obj_name, SETUP.options.obj_fnc_type);
+                    
+                    if (SETUP.prefix_name.length > 0 ||  SETUP.suffix_name.length > 0) {
+                        _match = _match.replace(p5, SETUP.prefix_name + p5 + SETUP.suffix_name);
+                    }
+
                     objData = {
                         src: this.file.relative,
                         string: match,
@@ -306,19 +338,33 @@ var _install_common = lazypipe()
         }
         return match;
     })
-    // DDL 구문
-    .pipe(replace, REG_EXP.DDL_ALL, function(match, p1, p2, p3, offset, string) {
+    // DDL 구문 (객체명)
+    .pipe(replace, REG_EXP.DDL_ALL, function(match, p1, p2, p3, p4, offset, string) {
         var _match;
 
         _match = objNameReplace(match, p1, p2, p3, SETUP.obj_name, SETUP.options.obj_type);
+        
+        if (SETUP.prefix_name.length > 0 ||  SETUP.suffix_name.length > 0) {
+            _match = _match.replace(p4, SETUP.prefix_name + p4 + SETUP.suffix_name);
+        }
         return _match;
     })
     // DML 구문 (프로시저)
-    .pipe(replace, REG_EXP.DML_SP, function(match, p1, p2, p3, offset, string) {
+    .pipe(replace, REG_EXP.DML_SP, function(match, p1, p2, p3, p4, offset, string) {
         var _index = null;
+        var _targetName = '';
+        var _match = '';
 
-        if (SETUP.options.obj_fnc_type === 0) return match;     // 유지 이후 처리 안함
-        
+        // _replace에서 타겟명 변경 안된것 처리
+        if (SETUP.prefix_name.length > 0 ||  SETUP.suffix_name.length > 0) {
+            _targetName = SETUP.prefix_name + p4 + SETUP.suffix_name;
+            _match = match.replace(p4, _targetName);
+        } else {
+            _match = match;
+        }
+
+        if (SETUP.options.obj_fnc_type === 0) return _match;     // 유지 이후 처리 안함
+
         SETUP._replace.some(function(value, index, arr){
             if (value.string === match) {
                 _index = index;
@@ -329,7 +375,7 @@ var _install_common = lazypipe()
         if (_index != null) {
             return SETUP._replace[_index].replacement;
         } else {
-            return match;
+            return _match;
         }
     })
     // DML 구문 (스칼라, 테이블)
@@ -339,7 +385,8 @@ var _install_common = lazypipe()
 
         if (SETUP.options.obj_fnc_type === 0) return match;     // 유지 이후 처리 안함
 
-        if (p1.toUpperCase().trim() === 'TABLE' || p1.toUpperCase().trim() === 'FUNCTION') {
+        if (p1.toUpperCase().trim() === 'TABLE' || p1.toUpperCase().trim() === 'FUNCTION' ||
+            p1.toUpperCase().trim() === 'REFERENCES') {
             return  match;
         } else {
             SETUP._replace.some(function(value, index, arr){
@@ -412,16 +459,11 @@ var _install_common = lazypipe()
 
 
 // ##################################################
-// gulp.task('default', ['main-task']);
-// gulp.task('default', ['link-task']);
-// gulp.task('default', ['test']);
-// gulp.task('default', ['before']);
-// gulp.task('default', ['before-sync']);
-// gulp.task('default', ['install-all']);
-// gulp.task('default', ['install-after']);
-// gulp.task('default', ['install-type']);
-// gulp.task('default', ['install-before']);
-// gulp.task('default', ['init']);
-gulp.task('default', ['install']);
+// Task Excute
+
+// gulp.task('default', ['install-excute']);    // 설치 실행
+// gulp.task('default', ['install-before']);    // 실치 작업전
+// gulp.task('default', ['init']);              // 초기화 (설정 파일 초기화, 배치폴더 제거)
+gulp.task('default', ['install']);              // 통합 실행
 
 // console.log('-default-');

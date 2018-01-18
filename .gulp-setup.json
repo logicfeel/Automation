@@ -2,6 +2,7 @@
   "_replace": [],
   "obj_name": "DB_OBJ_NAME",
   "prefix_name": "",
+  "suffix_name": "",
   "module": "",
   "clear": {
     "comment": false,
