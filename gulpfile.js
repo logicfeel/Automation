@@ -12,6 +12,8 @@ var through     = require('through2');
 var groupConcat = require('gulp-group-concat');
 var clean       = require('gulp-clean');
 
+var hb          = require('gulp-hb');
+
 // 사용전 플러그인
 var gulpif      = require('gulp-if');
 var sourcemaps  = require('gulp-sourcemaps');
@@ -19,7 +21,7 @@ var rename      = require('gulp-rename');
 
 
 // #########################################################
-// 지역변수
+// 전역 변수
 
 // gulp-setup.json 로딩 전역 설정
 var SETUP = {};
@@ -93,16 +95,15 @@ var REG_EXP = {
     DDL_COMMAND: /(alter|create)\s+(proc|procedure|function|table)(?!\s\S+\s*(add|with))/gi,
     /**
      * DDL create, alter "전체DDL문"  
-     * @param $1: 객체명 + 접미사(.) + 접두사(타겟명)
+     * @param $1: 객체명 + 접미사(.) + 타겟명
      * @param $2: 객체명 + 접미사(.)
      * @param $3: 객체명
      * @param $4: 타겟명 : 함수|프로시저|테이블명
      */
     DDL_ALL: /(?:(?:alter|create)\s+(?:proc|procedure|function|table)|references)\s+(((?:\[|")?(\w+)(?:\]|")?\.)?\[?(\w+)\]?)/gi,
-   
     /**
      * DML SP 
-     * @param $1: 객체명 + 접미사(.) + 접두사(타겟명)
+     * @param $1: 객체명 + 접미사(.) + 타겟명
      * @param $2: 객체명 + 접미사(.)
      * @param $3: 객체명
      * @param $4: 타겟명 : 함수|프로시저|테이블명
@@ -111,7 +112,7 @@ var REG_EXP = {
     /**
      * DML FN 
      * @param $1: FUNCTION, TABLE 구분값 : 여부로 DDL, DML 구분 ## 필터링 후 사용 ##
-     * @param $2: 객체명 + 접미사(.) + 접두사(타겟명)
+     * @param $2: 객체명 + 접미사(.) + 타겟명
      * @param $3: 객체명 + 접미사(.)
      * @param $4: 객체명
      * @param $5: 타겟명 : 함수|프로시저|테이블명
@@ -136,9 +137,8 @@ var REG_EXP = {
 /** 
  * --------------------------------------------------
  * 객체명 교체
- * flag =  
  * @param fullName: (*필수) 원본이름 
- * @param prefix: (*선택필수) 객체명 + 접미사(.) + 접두사(기능이름)
+ * @param prefix: (*선택필수) 객체명 + 접미사(.) + 타겟명
  * @param suffix: (*선택필수) 객체명 + 접미사(.)
  * @param obj: (*선택필수) 객체명 
  * @param replacement: (*필수) 교체할 객체명 
@@ -211,7 +211,7 @@ gulp.task('install', gulpsync.sync(['install-before', 'install-excute']));
 
 /** 
  * --------------------------------------------------
- * SETUP_FILE  설정파일 초기화 : .gulp-setup.json >> gulp-setup.json
+ * SETUP_FILE  설정파일 초기화 : .gulp-setup.json >복사> gulp-setup.json
  */
 gulp.task('init', ['clean-dest'], function () {
     return gulp.src('.' + SETUP_FILE)
@@ -221,7 +221,7 @@ gulp.task('init', ['clean-dest'], function () {
 
 /** 
  * --------------------------------------------------
- * SETUP_FILE  설정파일 초기화 : .gulp-setup.json >> gulp-setup.json
+ * 설치 폴더(dist) 제거
  */
 gulp.task('clean-dest', function () {
     return gulp.src(PATH.dist, {read: false})
@@ -230,10 +230,10 @@ gulp.task('clean-dest', function () {
 
 /** 
  * --------------------------------------------------
- * setup.json 로딩
+ * gulp-setup.json _replace 초기화
  */
 gulp.task('init-replace', function () {
-    console.log('___initing setup.json___');
+    console.log('___initing gulp-setup.json___');
 
     SETUP._replace = [];
 });
@@ -241,10 +241,11 @@ gulp.task('init-replace', function () {
 
 /** 
  * --------------------------------------------------
- * setup.json 로딩
+ * gulp-setup.json 로딩
  */
 gulp.task('load-setup', function () {
-    console.log('___loading setup.json___');
+    console.log('___loading gulp-setup.json___');
+
     var setup = fs.readFileSync(SETUP_FILE);
 
     SETUP = JSON.parse(setup);
@@ -253,10 +254,10 @@ gulp.task('load-setup', function () {
 
 /** 
  * --------------------------------------------------
- * setup.json 로딩
+ * gulp-setup.json 저장
  */
 gulp.task('save-setup', function () {
-    console.log('___saving setup.json___');
+    console.log('___saving gulp-setup.json___');
     
     fs.writeFileSync(SETUP_FILE, JSON.stringify(SETUP));
    
@@ -379,7 +380,7 @@ var _install_common = lazypipe()
         }
     })
     // DML 구문 (스칼라, 테이블)
-    .pipe(replace, REG_EXP.DML_FN, function(match, p1, p2, p3, p4, offset, string) {
+    .pipe(replace, REG_EXP.DML_FN, function(match, p1, p2, p3, p4, p5, offset, string) {
         var _match;
         var _index = null;
 
@@ -464,6 +465,48 @@ var _install_common = lazypipe()
 // gulp.task('default', ['install-excute']);    // 설치 실행
 // gulp.task('default', ['install-before']);    // 실치 작업전
 // gulp.task('default', ['init']);              // 초기화 (설정 파일 초기화, 배치폴더 제거)
-gulp.task('default', ['install']);              // 통합 실행
+// gulp.task('default', ['install']);           // 통합 실행
+gulp.task('default', ['handlebar']);           // 핸들바
 
 // console.log('-default-');
+
+
+/** 
+ * --------------------------------------------------
+ * 설치 폴더(dist) 제거
+ */
+gulp.task('handlebar', function () {
+    return gulp.src('./src/**/*.hbs')
+        .pipe(hb({debug: true})
+            .partials('./src/assets/partials/**/*.hbs')
+            .partials({
+                layout: '{{#*inline \"nav\"}} My Nav {{/inline}}',
+                far: 'ㄻㄻㄻㄹ'
+            })            
+            .helpers('./src/assets/helpers/*.js')
+            .helpers({
+                bold: function(person) {
+                    return person.id + " " + person.name;
+                },
+                list: function(items, options) {
+                    var out = "<ul>";
+                  
+                    // for(var i=0, l=items.length; i<l; i++) {
+                    //   out = out + "<li>" + options.fn(items[i]) + "</li>";
+                    // }
+                    out = out + "<li>" + options.fn(items) + "</li>";
+                    return out + "</ul>";
+                  }
+            })
+            .data(
+                {
+                    title: "My First Blog Post!",
+                    author: {
+                        id: 47,
+                        name: "Yehuda Katz"
+                    },
+                    body: "My first post. Wheeeee!"
+              })
+        )
+        .pipe(gulp.dest('./web'));
+});
