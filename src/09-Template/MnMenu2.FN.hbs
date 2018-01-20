@@ -61,12 +61,23 @@ END
 
 \{{escaped}}
 
+
 <div class="nav">
   {{> far }}
 </div>
 <div class="content">
   {{> myPartial }}
 </div>
+
+
+{{#> layouts}}
+  {{#*inline "nav"}}
+    My Nav
+  {{/inline}}
+  {{#*inline "content"}}
+    My Content
+  {{/inline}}
+{{/layouts}}
 
 */
 

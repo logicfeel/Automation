@@ -473,7 +473,8 @@ gulp.task('default', ['handlebar']);           // 핸들바
 
 /** 
  * --------------------------------------------------
- * 설치 폴더(dist) 제거
+ * 핸들바 테스트 
+ * https://cloudfour.com/thinks/the-hidden-power-of-handlebars-partials/
  */
 gulp.task('handlebar', function () {
     return gulp.src('./src/**/*.hbs')
