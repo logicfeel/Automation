@@ -26,6 +26,7 @@ var rename      = require('gulp-rename');
 // gulp-setup.json 로딩 전역 설정
 var SETUP = {};
 
+// 기본 경로 (필수)
 var PATH = {
     src: "src/**/*.sql",
     dist: "dist/"
@@ -263,7 +264,7 @@ gulp.task('save-setup', function () {
    
     return gulp.src(SETUP_FILE)
         .pipe(sortJSON({ space: 2 }))
-        .pipe(gulp.dest('./'));     
+        .pipe(gulp.dest('./'));
 });
 
 
@@ -466,7 +467,7 @@ var _install_common = lazypipe()
 // gulp.task('default', ['install-before']);    // 실치 작업전
 // gulp.task('default', ['init']);              // 초기화 (설정 파일 초기화, 배치폴더 제거)
 // gulp.task('default', ['install']);           // 통합 실행
-gulp.task('default', ['handlebar']);           // 핸들바
+gulp.task('default', ['handlebars']);           // 핸들바
 
 // console.log('-default-');
 
@@ -476,7 +477,7 @@ gulp.task('default', ['handlebar']);           // 핸들바
  * 핸들바 테스트 
  * https://cloudfour.com/thinks/the-hidden-power-of-handlebars-partials/
  */
-gulp.task('handlebar', function () {
+gulp.task('handlebars', function () {
     return gulp.src('./src/**/*.hbs')
         .pipe(hb({debug: true})
             .partials('./src/assets/partials/**/*.hbs')
