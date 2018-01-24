@@ -100,22 +100,22 @@
             "_install_정적이름": {
                 "folder": [
                     {
-                        "string": "dist/",
-                        "replace": "install/"
+                        "name": "dist/",
+                        "rename": "install/"
                     },
                     {
-                        "string": "dist/SP/",
-                        "replace": "install/SP/"
+                        "name": "dist/SP/",
+                        "rename": "install/SP/"
                     }
                 ],
                 "file": [
                     {
-                        "string": "ALL.sql",
-                        "replace": "all.sql"
+                        "name": "ALL.sql",
+                        "rename": "all.sql"
                     },
                     {
-                        "string": "U.sql",
-                        "replace": "table.sql"
+                        "name": "U.sql",
+                        "rename": "table.sql"
                     }
                 ]
             },
@@ -123,22 +123,25 @@
                 "dist/": "install/"
             },
             "_install_ds_폴더파일모두변경": {
-                "path": {
-                    "string": "dist/",
-                    "replace": "install/",
-                    "file": {
-                        "ALL.sql": "all.sql",
-                        "U.sql": ""
-                    },
-                    "path": {
-                        "string": "dist/U/",
-                        "replace": "install/table/",
+                "path": [
+                    {
+                        "name": "dist/",
+                        "rename": "install/",
                         "file": {
-                            "SP.sql": "talbe.sql"
-                        }
-    
+                            "ALL.sql": "all.sql",
+                            "U.sql": ""
+                        },
+                        "path": [
+                            {
+                                "name": "dist/U/",
+                                "rename": "install/table/",
+                                "file": {
+                                    "SP.sql": "talbe.sql"
+                                }
+                            }
+                        ]
                     }
-                }
+                ]
             }
         },
         "M5": {
