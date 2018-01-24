@@ -138,12 +138,12 @@ var REG_EXP = {
 /** 
  * --------------------------------------------------
  * 객체명 교체
- * @param fullName: (*필수) 원본이름 
- * @param prefix: (*선택필수) 객체명 + 접미사(.) + 타겟명
- * @param suffix: (*선택필수) 객체명 + 접미사(.)
- * @param obj: (*선택필수) 객체명 
- * @param replacement: (*필수) 교체할 객체명 
- * @param flag: (*필수) 0:유지, 1: 제거, 2: 교체,  3:교체(있을때만) * FN 에서 사용
+ * @param fullName:     (*필수) 원본이름 
+ * @param prefix:       (*선택) 객체명 + 접미사(.) + 타겟명
+ * @param suffix:       (*선택) 객체명 + 접미사(.)
+ * @param obj:          (*선택) 객체명 
+ * @param replacement:  (*필수) 교체할 객체명 
+ * @param flag:         (*필수) 0:유지, 1: 제거, 2: 교체,  3:교체(있을때만) * FN 에서 사용
  * 
  * @return 변경된 fullName
  */

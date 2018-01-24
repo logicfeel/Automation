@@ -56,7 +56,7 @@
                 }                
             ],
             "구분2" : "----------------------------------------------",
-            "install": {
+            "installs": {
                 "dist": "install/",
                 "dist.SP": "install/SP/"
             },
@@ -80,7 +80,66 @@
                     "src": "",
                     "string": ""
                 }
-            ]
+            ],
+            "_install_static":[
+                {
+                    "type": "file",
+                    "string": "dist/",
+                    "replace": "install/"
+                }
+            ],
+            "_install_동적이름": {
+                "folder": {
+                    "dist/": "install/"
+                },
+                "file": {
+                    "ALL.sql": "all.sql",
+                    "U.sql": "table.sql"
+                }
+            },
+            "_install_정적이름": {
+                "folder": [
+                    {
+                        "string": "dist/",
+                        "replace": "install/"
+                    },
+                    {
+                        "string": "dist/SP/",
+                        "replace": "install/SP/"
+                    }
+                ],
+                "file": [
+                    {
+                        "string": "ALL.sql",
+                        "replace": "all.sql"
+                    },
+                    {
+                        "string": "U.sql",
+                        "replace": "table.sql"
+                    }
+                ]
+            },
+            "_install_d_폴더파일모두변경": {
+                "dist/": "install/"
+            },
+            "_install_ds_폴더파일모두변경": {
+                "path": {
+                    "string": "dist/",
+                    "replace": "install/",
+                    "file": {
+                        "ALL.sql": "all.sql",
+                        "U.sql": ""
+                    },
+                    "path": {
+                        "string": "dist/U/",
+                        "replace": "install/table/",
+                        "file": {
+                            "SP.sql": "talbe.sql"
+                        }
+    
+                    }
+                }
+            }
         },
         "M5": {
             "obj_name": "OBJ3",
@@ -101,10 +160,23 @@
             }
         }
     },
-    "_overlap": [
-        ["M4", "modules.M4", "modules.iM1.modules.M4"],
-        ["M3", "modules.M4"]
-    ]
+    "_overlap": {
+        "module": [
+            ["M4", "modules.M4", "modules.iM1.modules.M4"],
+            ["M3", "modules.M4"]
+        ],
+        "file": {
+            "install/all.sql": ["M4/dist/all.sql", "M5/dist/all.sql"]
+        },
+        "file_static": [
+            {
+                "string": "install/all.sql",
+                "modules": ["M4/dist/all.sql", "M5/dist/all.sql"]
+            }
+        ]
+
+    }
+    
 
    
   }
