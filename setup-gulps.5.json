@@ -94,7 +94,7 @@
                 "string": "install/all.sql",
                 "modules": ["M4", "modules.M4"]
             }
-        ],
+        ]
 
     }
 }
