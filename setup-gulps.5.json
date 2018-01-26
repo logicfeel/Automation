@@ -89,16 +89,7 @@
             ["M4", "modules.M4", "modules.iM1.modules.M4"],
             ["M3", "modules.M4"]
         ],
-        "file": {
-            "install/all.sql": ["M4/dist/all.sql", "M5/dist/all.sql"]
-        },
-        "file_static": [
-            {
-                "string": "install/all.sql",
-                "modules": ["M4/dist/all.sql", "M5/dist/all.sql"]
-            }
-        ],
-        "file_static2": [
+        "file": [
             {
                 "string": "install/all.sql",
                 "modules": ["M4", "modules.M4"]
