@@ -1,0 +1,19 @@
+{
+  "name": "gulp-sub",
+  "version": "1.0.0",
+  "description": "## 구성 - gulp 를 활용",
+  "main": "gulpfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/logicfeel/Automation.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/logicfeel/Automation/issues"
+  },
+  "homepage": "https://github.com/logicfeel/Automation#readme"
+}
