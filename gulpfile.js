@@ -2,6 +2,9 @@
 // gulp 3.9 기준
 
 var gulp        = require('gulp'); 
+var Gulp        = require('gulp').Gulp; 
+var g        = new Gulp();
+gulp = g;
 var fs          = require('fs');
 var sortJSON    = require('gulp-json-sort').default;
 var lazypipe    = require('lazypipe');
@@ -12,7 +15,7 @@ var through     = require('through2');
 var groupConcat = require('gulp-group-concat');
 var clean       = require('gulp-clean');
 
-var hb          = require('gulp-hb');
+// var hb          = require('gulp-hb');
 
 // 사용전 플러그인
 var gulpif      = require('gulp-if');
@@ -173,301 +176,304 @@ function objNameReplace(fullName, prefix, suffix, obj, replacement, flag) {
 // ##################################################
 // task 목록
 
-/** 
- * --------------------------------------------------
- * install before 사전 작업
- */
-gulp.task('install-before', gulpsync.sync(['load-setup', 'init-replace', 'get-replace', 'save-setup']));
+// /** 
+//  * --------------------------------------------------
+//  * install before 사전 작업
+//  */
+// gulp.task('install-before', gulpsync.sync(['load-setup', 'init-replace', 'get-replace', 'save-setup']));
 
 
-/** 
- * --------------------------------------------------
- * 설치
- */
-gulp.task('install', gulpsync.sync(['install-before', 'install-excute']));
+// /** 
+//  * --------------------------------------------------
+//  * 설치
+//  */
+// gulp.task('install', gulpsync.sync(['install-before', 'install-excute']));
 
 
-/** 
- * --------------------------------------------------
- * 설치 처리
- */
- gulp.task('install-excute', ['load-setup'], function () {
+// /** 
+//  * --------------------------------------------------
+//  * 설치 처리
+//  */
+//  gulp.task('install-excute', ['load-setup'], function () {
 
-    // 개별 그룹별 배치 (전체 포함)
-    if (SETUP.options.intall_group) {
-        gulp.src(PATH.src)
-            .pipe(_install_common())
-            .pipe(groupConcat(FILE_GROUP))          // REVEIW: 이전에 gulp.dest 하면 없어짐
-            .pipe(gulp.dest(PATH.dist));
-    }
+//     // 개별 그룹별 배치 (전체 포함)
+//     if (SETUP.options.intall_group) {
+//         gulp.src(PATH.src)
+//             .pipe(_install_common())
+//             .pipe(groupConcat(FILE_GROUP))          // REVEIW: 이전에 gulp.dest 하면 없어짐
+//             .pipe(gulp.dest(PATH.dist));
+//     }
     
-    // 개별 파일 배치    
-    if (SETUP.options.intall_unit) {
-        gulp.src(PATH.src)
-            .pipe(_install_common())
-            .pipe(gulp.dest(PATH.dist));
-    }
-});
+//     // 개별 파일 배치    
+//     if (SETUP.options.intall_unit) {
+//         gulp.src(PATH.src)
+//             .pipe(_install_common())
+//             .pipe(gulp.dest(PATH.dist));
+//     }
+// });
 
 
-/** 
- * --------------------------------------------------
- * SETUP_FILE  설정파일 초기화 : .gulp-setup.json >복사> gulp-setup.json
- */
-gulp.task('init', ['clean-dest'], function () {
-    return gulp.src('.' + SETUP_FILE)
-        .pipe(rename(SETUP_FILE))
-        .pipe(gulp.dest('./'));    
-});
+// /** 
+//  * --------------------------------------------------
+//  * SETUP_FILE  설정파일 초기화 : .gulp-setup.json >복사> gulp-setup.json
+//  */
+// gulp.task('init', ['clean-dest'], function () {
+//     return gulp.src('.' + SETUP_FILE)
+//         .pipe(rename(SETUP_FILE))
+//         .pipe(gulp.dest('./'));    
+// });
 
-/** 
- * --------------------------------------------------
- * 설치 폴더(dist) 제거
- */
-gulp.task('clean-dest', function () {
-    return gulp.src(PATH.dist, {read: false})
-      .pipe(clean());
-});
+// /** 
+//  * --------------------------------------------------
+//  * 설치 폴더(dist) 제거
+//  */
+// gulp.task('clean-dest', function () {
+//     return gulp.src(PATH.dist, {read: false})
+//       .pipe(clean());
+// });
 
-/** 
- * --------------------------------------------------
- * gulp-setup.json _replace 초기화
- */
-gulp.task('init-replace', function () {
-    console.log('___initing gulp-setup.json___');
+// /** 
+//  * --------------------------------------------------
+//  * gulp-setup.json _replace 초기화
+//  */
+// gulp.task('init-replace', function () {
+//     console.log('___initing gulp-setup.json___');
 
-    SETUP._replace = [];
-});
-
-
-/** 
- * --------------------------------------------------
- * gulp-setup.json 로딩
- */
-gulp.task('load-setup', function () {
-    console.log('___loading gulp-setup.json___');
-
-    var setup = fs.readFileSync(SETUP_FILE);
-
-    SETUP = JSON.parse(setup);
-});
+//     SETUP._replace = [];
+// });
 
 
-/** 
- * --------------------------------------------------
- * gulp-setup.json 저장
- */
-gulp.task('save-setup', function () {
-    console.log('___saving gulp-setup.json___');
+// /** 
+//  * --------------------------------------------------
+//  * gulp-setup.json 로딩
+//  */
+// gulp.task('load-setup', function () {
+//     console.log('___loading gulp-setup.json___');
+
+//     var setup = fs.readFileSync(SETUP_FILE);
+
+//     SETUP = JSON.parse(setup);
+// });
+
+
+// /** 
+//  * --------------------------------------------------
+//  * gulp-setup.json 저장
+//  */
+// gulp.task('save-setup', function () {
+//     console.log('___saving gulp-setup.json___');
     
-    fs.writeFileSync(SETUP_FILE, JSON.stringify(SETUP));
+//     fs.writeFileSync(SETUP_FILE, JSON.stringify(SETUP));
    
-    return gulp.src(SETUP_FILE)
-        .pipe(sortJSON({ space: 2 }))
-        .pipe(gulp.dest('./'));
-});
+//     return gulp.src(SETUP_FILE)
+//         .pipe(sortJSON({ space: 2 }))
+//         .pipe(gulp.dest('./'));
+// });
 
 
-/** 
- * --------------------------------------------------
- * 사전 작업 : 교체 목록 가져옴
- */
-gulp.task('get-replace', function () {    
-    return gulp.src(PATH.src)
-        .pipe(replace(REG_EXP.DML_SP, function(match, p1, p2, p3, p4, offset, string) {
-                var objData = {};
-                var _match;
+// /** 
+//  * --------------------------------------------------
+//  * 사전 작업 : 교체 목록 가져옴
+//  */
+// gulp.task('get-replace', function () {    
+//     return gulp.src(PATH.src)
+//         .pipe(replace(REG_EXP.DML_SP, function(match, p1, p2, p3, p4, offset, string) {
+//                 var objData = {};
+//                 var _match;
                 
-                // 제외 조건 : 유지 + 객체 없음
-                if (SETUP.options.obj_fnc_type === 1 && typeof p3 === 'undefined') return match;
-                // 제외 조건 : 있을때만 교체 + 객체 없음
-                if (SETUP.options.obj_fnc_type === 3 && typeof p3 === 'undefined') return match;
+//                 // 제외 조건 : 유지 + 객체 없음
+//                 if (SETUP.options.obj_fnc_type === 1 && typeof p3 === 'undefined') return match;
+//                 // 제외 조건 : 있을때만 교체 + 객체 없음
+//                 if (SETUP.options.obj_fnc_type === 3 && typeof p3 === 'undefined') return match;
 
-                _match = objNameReplace(match, p1, p2, p3, SETUP.obj_name, SETUP.options.obj_fnc_type);
+//                 _match = objNameReplace(match, p1, p2, p3, SETUP.obj_name, SETUP.options.obj_fnc_type);
 
-                if (SETUP.prefix_name.length > 0 ||  SETUP.suffix_name.length > 0) {
-                    _match = _match.replace(p4, SETUP.prefix_name + p4 + SETUP.suffix_name);
-                }
+//                 if (SETUP.prefix_name.length > 0 ||  SETUP.suffix_name.length > 0) {
+//                     _match = _match.replace(p4, SETUP.prefix_name + p4 + SETUP.suffix_name);
+//                 }
         
-                objData = {
-                    src: this.file.relative,
-                    string: match,
-                    replacement: _match
-                };
-                SETUP._replace.push(objData);
-                return match;
-            })
-        )
-        .pipe(replace(REG_EXP.DML_FN, function(match, p1, p2, p3, p4, p5, offset, string) {
-                var objData = {};
-                var _match;
+//                 objData = {
+//                     src: this.file.relative,
+//                     string: match,
+//                     replacement: _match
+//                 };
+//                 SETUP._replace.push(objData);
+//                 return match;
+//             })
+//         )
+//         .pipe(replace(REG_EXP.DML_FN, function(match, p1, p2, p3, p4, p5, offset, string) {
+//                 var objData = {};
+//                 var _match;
 
-                if (p1.toUpperCase().trim() === 'TABLE' || p1.toUpperCase().trim() === 'FUNCTION' ||
-                    p1.toUpperCase().trim() === 'REFERENCES') {
-                    return  match;
-                } else {
-                    //  SETUP.options.obj_fnc_type (* fn은 있을 경우만 교체)
-                    _match = objNameReplace(match, p2, p3, p4, SETUP.obj_name, SETUP.options.obj_fnc_type);
+//                 if (p1.toUpperCase().trim() === 'TABLE' || p1.toUpperCase().trim() === 'FUNCTION' ||
+//                     p1.toUpperCase().trim() === 'REFERENCES') {
+//                     return  match;
+//                 } else {
+//                     //  SETUP.options.obj_fnc_type (* fn은 있을 경우만 교체)
+//                     _match = objNameReplace(match, p2, p3, p4, SETUP.obj_name, SETUP.options.obj_fnc_type);
                     
-                    if (SETUP.prefix_name.length > 0 ||  SETUP.suffix_name.length > 0) {
-                        _match = _match.replace(p5, SETUP.prefix_name + p5 + SETUP.suffix_name);
-                    }
+//                     if (SETUP.prefix_name.length > 0 ||  SETUP.suffix_name.length > 0) {
+//                         _match = _match.replace(p5, SETUP.prefix_name + p5 + SETUP.suffix_name);
+//                     }
 
-                    objData = {
-                        src: this.file.relative,
-                        string: match,
-                        replacement: _match
-                    };
-                    SETUP._replace.push(objData);
-                }
-                return match;
-            })
-        );
-    }
-);
+//                     objData = {
+//                         src: this.file.relative,
+//                         string: match,
+//                         replacement: _match
+//                     };
+//                     SETUP._replace.push(objData);
+//                 }
+//                 return match;
+//             })
+//         );
+//     }
+// );
 
 
-/** 
- * --------------------------------------------------
- * install 공통
- * ! 파이프 파일을 통합하기 전에 이용
- */
-var _install_common = lazypipe()
-    // DDL 명령 (create, alter)
-    .pipe(replace, REG_EXP.DDL_COMMAND, function(match, p1, offset, string) {
-        if (SETUP.options.ddl_create) {
-            match = match.replace(p1, 'CREATE');
-        }
-        return match;
-    })
-    // DDL 구문 (객체명)
-    .pipe(replace, REG_EXP.DDL_ALL, function(match, p1, p2, p3, p4, offset, string) {
-        var _match;
+// /** 
+//  * --------------------------------------------------
+//  * install 공통
+//  * ! 파이프 파일을 통합하기 전에 이용
+//  */
+// var _install_common = lazypipe()
+//     // DDL 명령 (create, alter)
+//     .pipe(replace, REG_EXP.DDL_COMMAND, function(match, p1, offset, string) {
+//         if (SETUP.options.ddl_create) {
+//             match = match.replace(p1, 'CREATE');
+//         }
+//         return match;
+//     })
+//     // DDL 구문 (객체명)
+//     .pipe(replace, REG_EXP.DDL_ALL, function(match, p1, p2, p3, p4, offset, string) {
+//         var _match;
 
-        _match = objNameReplace(match, p1, p2, p3, SETUP.obj_name, SETUP.options.obj_type);
+//         _match = objNameReplace(match, p1, p2, p3, SETUP.obj_name, SETUP.options.obj_type);
         
-        if (SETUP.prefix_name.length > 0 ||  SETUP.suffix_name.length > 0) {
-            _match = _match.replace(p4, SETUP.prefix_name + p4 + SETUP.suffix_name);
-        }
-        return _match;
-    })
-    // DML 구문 (프로시저)
-    .pipe(replace, REG_EXP.DML_SP, function(match, p1, p2, p3, p4, offset, string) {
-        var _index = null;
-        var _targetName = '';
-        var _match = '';
+//         if (SETUP.prefix_name.length > 0 ||  SETUP.suffix_name.length > 0) {
+//             _match = _match.replace(p4, SETUP.prefix_name + p4 + SETUP.suffix_name);
+//         }
+//         return _match;
+//     })
+//     // DML 구문 (프로시저)
+//     .pipe(replace, REG_EXP.DML_SP, function(match, p1, p2, p3, p4, offset, string) {
+//         var _index = null;
+//         var _targetName = '';
+//         var _match = '';
 
-        // _replace에서 타겟명 변경 안된것 처리
-        if (SETUP.prefix_name.length > 0 ||  SETUP.suffix_name.length > 0) {
-            _targetName = SETUP.prefix_name + p4 + SETUP.suffix_name;
-            _match = match.replace(p4, _targetName);
-        } else {
-            _match = match;
-        }
+//         // _replace에서 타겟명 변경 안된것 처리
+//         if (SETUP.prefix_name.length > 0 ||  SETUP.suffix_name.length > 0) {
+//             _targetName = SETUP.prefix_name + p4 + SETUP.suffix_name;
+//             _match = match.replace(p4, _targetName);
+//         } else {
+//             _match = match;
+//         }
 
-        if (SETUP.options.obj_fnc_type === 0) return _match;     // 유지 이후 처리 안함
+//         if (SETUP.options.obj_fnc_type === 0) return _match;     // 유지 이후 처리 안함
 
-        SETUP._replace.some(function(value, index, arr){
-            if (value.string === match) {
-                _index = index;
-                return true;
-            }
-        });
+//         SETUP._replace.some(function(value, index, arr){
+//             if (value.string === match) {
+//                 _index = index;
+//                 return true;
+//             }
+//         });
 
-        if (_index != null) {
-            return SETUP._replace[_index].replacement;
-        } else {
-            return _match;
-        }
-    })
-    // DML 구문 (스칼라, 테이블)
-    .pipe(replace, REG_EXP.DML_FN, function(match, p1, p2, p3, p4, p5, offset, string) {
-        var _match;
-        var _index = null;
+//         if (_index != null) {
+//             return SETUP._replace[_index].replacement;
+//         } else {
+//             return _match;
+//         }
+//     })
+//     // DML 구문 (스칼라, 테이블)
+//     .pipe(replace, REG_EXP.DML_FN, function(match, p1, p2, p3, p4, p5, offset, string) {
+//         var _match;
+//         var _index = null;
 
-        if (SETUP.options.obj_fnc_type === 0) return match;     // 유지 이후 처리 안함
+//         if (SETUP.options.obj_fnc_type === 0) return match;     // 유지 이후 처리 안함
 
-        if (p1.toUpperCase().trim() === 'TABLE' || p1.toUpperCase().trim() === 'FUNCTION' ||
-            p1.toUpperCase().trim() === 'REFERENCES') {
-            return  match;
-        } else {
-            SETUP._replace.some(function(value, index, arr){
-                if (value.string === match) {
-                    _index = index;
-                    return true;
-                }
-            });
-            if (_index != null) _match = SETUP._replace[_index].replacement;    
-        }
-        return _match;
-    })
-    // USE [객체명]
-    .pipe(replace, REG_EXP.USE_OBJ_NAME, function(match, p1, p2, offset, string) {
-        var _match;
+//         if (p1.toUpperCase().trim() === 'TABLE' || p1.toUpperCase().trim() === 'FUNCTION' ||
+//             p1.toUpperCase().trim() === 'REFERENCES') {
+//             return  match;
+//         } else {
+//             SETUP._replace.some(function(value, index, arr){
+//                 if (value.string === match) {
+//                     _index = index;
+//                     return true;
+//                 }
+//             });
+//             if (_index != null) _match = SETUP._replace[_index].replacement;    
+//         }
+//         return _match;
+//     })
+//     // USE [객체명]
+//     .pipe(replace, REG_EXP.USE_OBJ_NAME, function(match, p1, p2, offset, string) {
+//         var _match;
 
-        if (SETUP.clear.use) return '';
-        else {
-            // 객체명 있는 경우 교체함
-            _match = objNameReplace(match, null, p1, p2, SETUP.obj_name, 3); 
-            return _match;
-        }
-    })
-    // 주석 /** **/ 
-    .pipe(replace, REG_EXP.COMMENT, function(match, p1, offset, string) {
-        if (SETUP.clear.comment) return '';
-        else return match;
-    })
-    // 첫 빈줄 제거
-    .pipe(replace, REG_EXP.FIST_SPACE, '')    
-    // 마지막 빈줄 제거
-    .pipe(replace, REG_EXP.LAST_SPACE, '')
-    // 정규표현 : 마지막 GO
-    .pipe(replace, REG_EXP.LAST_GO, function(match, p1, offset, string) {
-        if (SETUP.options.last_go && match.trim() != 'GO') return match + '\n\nGO--Auto\n\n';
-        else return match + '--End\n\n';
-    })
-    .pipe(function() {
-        // console.log('___func__');
-        return through.obj(function(file, enc, cb) {
-            var result;
-            var filePath = String(file.relative);
+//         if (SETUP.clear.use) return '';
+//         else {
+//             // 객체명 있는 경우 교체함
+//             _match = objNameReplace(match, null, p1, p2, SETUP.obj_name, 3); 
+//             return _match;
+//         }
+//     })
+//     // 주석 /** **/ 
+//     .pipe(replace, REG_EXP.COMMENT, function(match, p1, offset, string) {
+//         if (SETUP.clear.comment) return '';
+//         else return match;
+//     })
+//     // 첫 빈줄 제거
+//     .pipe(replace, REG_EXP.FIST_SPACE, '')    
+//     // 마지막 빈줄 제거
+//     .pipe(replace, REG_EXP.LAST_SPACE, '')
+//     // 정규표현 : 마지막 GO
+//     .pipe(replace, REG_EXP.LAST_GO, function(match, p1, offset, string) {
+//         if (SETUP.options.last_go && match.trim() != 'GO') return match + '\n\nGO--Auto\n\n';
+//         else return match + '--End\n\n';
+//     })
+//     .pipe(function() {
+//         // console.log('___func__');
+//         return through.obj(function(file, enc, cb) {
+//             var result;
+//             var filePath = String(file.relative);
             
-            if (file.isNull()) {
-                // return empty file
-                return cb(null, file);
-            }else if(file.isBuffer()) {
-                result = String(file.contents);
-                SETUP.replace.forEach(function(value, index, arr) {
+//             if (file.isNull()) {
+//                 // return empty file
+//                 return cb(null, file);
+//             }else if(file.isBuffer()) {
+//                 result = String(file.contents);
+//                 SETUP.replace.forEach(function(value, index, arr) {
                     
-                    // REVIEW:  !! JSON 파일은 정규식 지원 안함
-                    if ((value.src instanceof RegExp && filePath.search(value.src) > -1) ||
-                        value.src === filePath || value.src.length === 0) {
-                        result = result.replace(value.string, value.replacement);
-                    }
-                });
-            }
-            // if (file.isStream()) {
-            //   file.contents = file.contents.pipe(prefixStream(prefixText));
-            // }
+//                     // REVIEW:  !! JSON 파일은 정규식 지원 안함
+//                     if ((value.src instanceof RegExp && filePath.search(value.src) > -1) ||
+//                         value.src === filePath || value.src.length === 0) {
+//                         result = result.replace(value.string, value.replacement);
+//                     }
+//                 });
+//             }
+//             // if (file.isStream()) {
+//             //   file.contents = file.contents.pipe(prefixStream(prefixText));
+//             // }
             
-            // 파이프 파일에 저장
-            file.contents = new Buffer(result);
+//             // 파이프 파일에 저장
+//             file.contents = new Buffer(result);
 
-            cb(null, file);
-          });
-        // return through.obj();
-    });
+//             cb(null, file);
+//           });
+//         // return through.obj();
+//     });
 
 
 
 // ##################################################
 // Task Excute
+gulp.task('default', function() {
+    console.log('-default-');
+});
 
 // gulp.task('default', ['install-excute']);    // 설치 실행
 // gulp.task('default', ['install-before']);    // 실치 작업전
 // gulp.task('default', ['init']);              // 초기화 (설정 파일 초기화, 배치폴더 제거)
 // gulp.task('default', ['install']);           // 통합 실행
-gulp.task('default', ['handlebars']);           // 핸들바
+// gulp.task('default', ['handlebars']);           // 핸들바
 
 // console.log('-default-');
 
@@ -477,38 +483,50 @@ gulp.task('default', ['handlebars']);           // 핸들바
  * 핸들바 테스트 
  * https://cloudfour.com/thinks/the-hidden-power-of-handlebars-partials/
  */
-gulp.task('handlebars', function () {
-    return gulp.src('./src/**/*.hbs')
-        .pipe(hb({debug: true})
-            .partials('./src/assets/partials/**/*.hbs')
-            .partials({
-                layout: '{{#*inline \"nav\"}} My Nav {{/inline}}',
-                far: 'ㄻㄻㄻㄹ'
-            })            
-            .helpers('./src/assets/helpers/*.js')
-            .helpers({
-                bold: function(person) {
-                    return person.id + " " + person.name;
-                },
-                list: function(items, options) {
-                    var out = "<ul>";
+// gulp.task('handlebars', function () {
+//     return gulp.src('./src/**/*.hbs')
+//         .pipe(hb({debug: true})
+//             .partials('./src/assets/partials/**/*.hbs')
+//             .partials({
+//                 layout: '{{#*inline \"nav\"}} My Nav {{/inline}}',
+//                 far: 'ㄻㄻㄻㄹ'
+//             })            
+//             .helpers('./src/assets/helpers/*.js')
+//             .helpers({
+//                 bold: function(person) {
+//                     return person.id + " " + person.name;
+//                 },
+//                 list: function(items, options) {
+//                     var out = "<ul>";
                   
-                    // for(var i=0, l=items.length; i<l; i++) {
-                    //   out = out + "<li>" + options.fn(items[i]) + "</li>";
-                    // }
-                    out = out + "<li>" + options.fn(items) + "</li>";
-                    return out + "</ul>";
-                  }
-            })
-            .data(
-                {
-                    title: "My First Blog Post!",
-                    author: {
-                        id: 47,
-                        name: "Yehuda Katz"
-                    },
-                    body: "My first post. Wheeeee!"
-              })
-        )
-        .pipe(gulp.dest('./web'));
-});
+//                     // for(var i=0, l=items.length; i<l; i++) {
+//                     //   out = out + "<li>" + options.fn(items[i]) + "</li>";
+//                     // }
+//                     out = out + "<li>" + options.fn(items) + "</li>";
+//                     return out + "</ul>";
+//                   }
+//             })
+//             .data(
+//                 {
+//                     title: "My First Blog Post!",
+//                     author: {
+//                         id: 47,
+//                         name: "Yehuda Katz"
+//                     },
+//                     body: "My first post. Wheeeee!"
+//               })
+//         )
+//         .pipe(gulp.dest('./web'));
+// });
+
+// module.exports = function(prefixPath, distPath, task) {
+    
+//     PATH.base   = prefixPath ? prefixPath: PATH.base;
+//     PATH.dist   = distPath ? distPath: PATH.dist;
+//     var _task = task ? task : 'default';
+
+//     gulp.run(_task);
+// };
+
+
+console.log('-default-');
