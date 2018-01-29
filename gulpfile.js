@@ -54,6 +54,7 @@ gulp.task('handlebar', function () {
                     },
                     body: "My first post. Wheeeee!"
               })
+            .data('package.json')
         )
         .pipe(rename({
             extname: ".html"

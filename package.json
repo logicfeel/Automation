@@ -1,0 +1,37 @@
+{
+  "name": "auto_gulp_hp",
+  "version": "1.0.0",
+  "description": "- gulp 를 활용",
+  "main": "gulpfile.js",
+  "dependencies": {
+    "gulp": "^3.9.1",
+    "gulp-clean": "^0.4.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-contains": "^1.1.0",
+    "gulp-group-concat": "^1.1.6",
+    "gulp-hb": "^7.0.1",
+    "gulp-json-sort": "^1.0.0",
+    "gulp-if": "^2.0.2",
+    "gulp-sourcemaps": "^2.6.3",
+    "gulp-search": "^1.0.0",
+    "gulp-sync": "^0.1.4",
+    "gulp-rename": "^1.2.2",
+    "gulp-replace": "^0.6.1",
+    "lazypipe": "^1.0.1",
+    "sort-json": "^1.6.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/logicfeel/Automation.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/logicfeel/Automation/issues"
+  },
+  "homepage": "https://github.com/logicfeel/Automation#readme"
+}
