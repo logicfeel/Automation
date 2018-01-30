@@ -19,8 +19,7 @@
 6. 핸들바 연동 지원
 
 7. 중복의 처리
-    - 모듈의 중복 : 설정의 _overlap  표시함
-    - 파일의 중복 : 설정의 _overlap  표시함   
+    - 모듈과 모듈의 중복 : 설정의 _overlap  표시함
 
 8. 공용 설정의 제공 : public = {} 
     - 모듈 기준의 공용 설정
@@ -31,6 +30,33 @@
 1. 설정파일
     - 기본(.setup) > 공용설정(public) > 전용설정
     - 템플릿 파일은 
+
+
+### 기능
+
+- 종속된 모듈과 인스턴스모듈 검색
+    + 대상 모듈 검색
+
+- i모듈의 preinstall
+    + 모듈 : preinstall 실행후 결과 가져옴
+    + i모듈 : 설정파일의 가져옴
+
+- i모듈의 install
+    + 설정파일 > 모듈의 install 후킹 처리 : 데이터, 메소드
+        * [base 설정 *생략가능] + public 설정 + private 설정 넘김
+            - 이미 가져왔으므로..
+
+### 정의
+
+- 모듈명에 "-" 있는 것은 종속 서브 모듈
+    + 단독실행 : 문자로 구성 
+        * 예> install, init, preinstall
+    + 종속실행 : 문자 + "-" + 문자 
+
+- MODULE_SCHEMA : gulp_module.json 구조 버전명
+
+- MODULE_I_SCHEMA : gulp_i_module.json 구조 버전명
+
 
 ### 이슈
 

@@ -7,8 +7,16 @@ var gulp        = require('gulp');
 // var gulp        = require('gulp'); 
 
 require('gulp-submodule')(gulp);
-var mod = gulp.submodule('modules/M1/');
-console.log('Mod returns ' + mod);
+// var mod = gulp.submodule('modules/M1/');
+var mod = gulp.submodule('node_modules/M3/');
+
+console.log('1.path: ' + mod.getPath());
+var modPath = './modules/M1/';
+mod.setPath(modPath, "install/", "default");
+
+
+
+// console.log('Mod returns ' + mod);
 
 // var gulpModule = require('gulp-module');
 
@@ -72,9 +80,10 @@ gulp.task('default3', function() {
     console.log('-default-');
 });
 
-gulp.task('default', ['modules/M1/:default'], function() {
+gulp.task('default', ['node_modules/M3/:default'], function() {
     console.log('-default-');
     
+    console.log('2.path: ' + mod.getPath());
     // var sub =  require('sub-gulp/gulpfile.js'); 
     // sub();
 
@@ -83,9 +92,10 @@ gulp.task('default', ['modules/M1/:default'], function() {
 
     // var sub2 =  require('./modules/M1/gulpfile.js'); 
     // sub2();
-    var modPath = 'modules/M1/';
-    var modPathfile = './modules/M1/gulpfile.js';
-    var mod;
+    // var mod = gulp.submodule('modules/M1/');
+    // var modPath = 'modules/M1/';
+    // var modPathfile = './modules/M1/gulpfile.js';
+    // var mod;
     
     // modPath = './modules/M1/';
     // mod = require(modPathfile); 

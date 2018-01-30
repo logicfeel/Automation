@@ -29,3 +29,10 @@ function objSearch(obj, name, value){
 
 // objSearch(obj, "aa");
 objSearch(obj, "", "c");
+
+console.log('module name ?');
+process.stdin.resume();
+
+process.stdin.on('data', function(data) {
+    console.log(String(data));
+});

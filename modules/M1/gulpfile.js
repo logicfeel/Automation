@@ -1,7 +1,7 @@
 'use strict';
 
 var gulp        = require('gulp'); 
-var Gulp        = require('gulp').Gulp; 
+// var Gulp        = require('gulp').Gulp; 
 // var g = new Gulp();
 // gulp = g;
 
@@ -45,15 +45,15 @@ gulp.task('default', function () {
 //     gulp.run('defaultss');
 // };
 
-// module.exports = function(prefixPath, distPath, task) {
-//     console.log('module/M1/gulpfile.js  run');
+module.exports = function(prefixPath, distPath, task) {
+    console.log('module/M1/gulpfile.js ');
     
-//     PATH.base   = prefixPath ? prefixPath: PATH.base;
-//     PATH.dist   = distPath ? distPath: PATH.dist;
-//     var _task = task ? task : 'default';
+    PATH.base   = prefixPath ? prefixPath: PATH.base;
+    PATH.dist   = distPath ? distPath: PATH.dist;
+    var _task = task ? task : 'default';
 
-//     gulp.run(_task);
-// };
+    // gulp.run(_task);
+};
 
 // module.exports = require('gulp-module').define('moduleName', function (gulp, runSequence) {
 //     // Regular gulpfile here. 
@@ -106,4 +106,4 @@ gulp.task('default', function () {
 
 // module.exports = gulp;
 
-module.exports = "for giggles!";
+// module.exports = "for giggles!";
