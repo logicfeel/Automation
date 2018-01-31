@@ -1,0 +1,101 @@
+{
+    "version": "",
+    "public": {
+        "obj_name": "DB_OBJ_NAME",
+        "prefix_name": "",
+        "suffix_name": "",
+        "module": "",
+        "clear": {
+          "comment": false,
+          "use": true
+        },
+        "options": {
+          "obj_type": 1,
+          "obj_fnc_type": 3,
+          "ddl_create": true,
+          "log": true,
+          "last_go": true,
+          "intall_group": true,
+          "intall_unit": true
+        },
+        "replace": [
+          {
+            "string": "",
+            "src": "",
+            "replacement": ""
+          }
+        ],
+        "install": "install/"
+    },
+    "modules": {
+        "M4": {
+            "obj_name": "OBJ2",
+            "options": {
+                "ddl_create": false
+            },
+            "template": {},
+            "replace": [
+                {
+                  "string": "",
+                  "src": "",
+                  "replacement": ""
+                }
+              ],            
+            "_replace": [
+                {
+                    "string": "",
+                    "src": "",
+                    "replacement": ""
+                }                
+            ],
+            "_install": {
+                "source": "dist/",
+                "target": "install/",
+                "file": {
+                    "ALL.sql": "all.sql",
+                    "U.sql": ""
+                },
+                "path": [
+                    {
+                        "source": "dist/U/",
+                        "target": "install/table/",
+                        "file": {
+                            "SP.sql": "talbe.sql"
+                        }
+                    }
+                ]
+            }
+        },
+        "M5": {
+            "obj_name": "OBJ3",
+            "install": "install/"
+        },
+        "iM1": {
+            "public": {
+                "page_name": "OBJ1",
+                "dist": "page/"
+            },
+            "modules": {
+                "M5": {
+                    "obj_name": "중복.OBJ4"
+                },
+                "M6": {
+                    "obj_name": "OBJ4"
+                }
+            }
+        }
+    },
+    "_overlap": {
+        "module": [
+            ["M4", "modules.M4", "modules.iM1.modules.M4"],
+            ["M3", "modules.M4"]
+        ],
+        "file": [
+            {
+                "string": "install/all.sql",
+                "modules": ["M4", "modules.M4"]
+            }
+        ]
+
+    }
+}
