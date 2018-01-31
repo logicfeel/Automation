@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/logicfeel/Automation/issues"
   },
-  "homepage": "https://github.com/logicfeel/Automation#readme"
+  "homepage": "https://github.com/logicfeel/Automation#readme",
+  "dependencies": {
+    "module_m": "git+https://github.com/logicfeel/Automation.git#Module_M"
+  }
 }
