@@ -12,22 +12,26 @@ var through     = require('through2');
 var groupConcat = require('gulp-group-concat');
 var clean       = require('gulp-clean');
 var rename      = require('gulp-rename');
+
+// TODO: 핸들바 추가 해야함
 var hb          = require('gulp-hb');
 
-// 미사용 플러그인
+// 사용전 플러그인
 // var gulpif      = require('gulp-if');
 // var sourcemaps  = require('gulp-sourcemaps');
+
+
 
 // #########################################################
 // 전역 변수
 
 var MODULE_VISION   = "1.0.0";
-var MODULE_NAME     = "gulp_module";
+var MODULE_NAME     = "gulp-module";
 
-// gulp_module.json 로딩 전역 설정
+// gulp-setup.json 로딩 전역 설정
 var CONFIG      = null;
-var LOG_FLAG    = false;     // 로그 표시
-var DEBUG_HBS   = false;     // 템플릿 디버깅 로그 표시
+var LOG_FLAG    = true;     // 로그 표시
+var DEBUG_HBS   = true;     // 템플릿 디버깅 로그 표시
 
 // 기본 경로 (필수)
 var PATH = {
@@ -35,12 +39,12 @@ var PATH = {
     src: "src/**/*.sql",
     dist: "dist/",
     template: {
-        ext: ".sql",                    // 기본 변환 확장자
-        dist: "publish/",               // 템플릿 배포 폴더 template_overlap = true 기본폴더로 지정(덮어씀)
+        ext: ".sql",        // 기본 변환 확장자
+        dist: "dist/",      // 덮어씀 
         src: "src/**/*.hbs",
-        partials: "template/**/*.hbs",  // partical명 : 파일명
-        helpers: "template/*.js",       // helper(메소드)명 : export 객체명
-        data: "template/*.json"         // data명 : 파일명.객체명
+        partials: "template/**/*.hbs",
+        helpers: "template/*.js",
+        data: "template/*.json"
     }
 };
 
@@ -56,7 +60,7 @@ var FILE_GROUP = {
     'ETC.sql': "src/*ETC/*.sql"
 };
 
-var CONFIG_FILE  = 'gulp_module.json';   // 설정 파일명
+var CONFIG_FILE  = 'gulp-module.json';   // 설정 파일명
 /**  설정 파일 설명
     {
         "_replace": [],             @summary 사전 컴파일 자료 
@@ -85,7 +89,8 @@ var CONFIG_FILE  = 'gulp_module.json';   // 설정 파일명
                 "src": "",          @summary 사용자 대상파일, *''공백은 제한 없음
                 "replacement": ""   @summary 사용자 교체 이름
             }
-        ]
+        ],
+        "task": "default"
     }
  */
 
@@ -145,19 +150,57 @@ var REG_EXP = {
 
 
 // ##################################################
+// 공통 함수
+
+/** 
+ * --------------------------------------------------
+ * 객체명 교체
+ * @param fullName:     (*필수) 원본이름 
+ * @param prefix:       (*선택) 객체명 + 접두사(.) + 타겟명
+ * @param suffix:       (*선택) 객체명 + 접미사(.)
+ * @param obj:          (*선택) 객체명 
+ * @param replacement:  (*필수) 교체할 객체명 
+ * @param flag:         (*필수) 0:유지, 1: 제거, 2: 교체,  3:교체(있을때만) * FN 에서 사용
+ * 
+ * @return 변경된 fullName
+ */
+function objNameReplace(fullName, prefix, suffix, obj, replacement, flag) {
+    var _fullName;
+
+    if (flag === 1 ) {          // 제거
+        _fullName = fullName.replace(suffix, '');
+    } else if (flag === 2) {    // 교체(일괄)
+        if (typeof obj === 'undefined' || obj.trim() === '') {
+            _fullName = replacement + '.' + prefix;
+            _fullName = fullName.replace(prefix, _fullName);
+        } else {
+            _fullName = suffix.replace(obj, replacement);
+            _fullName = fullName.replace(suffix, _fullName);
+        }        
+    } else if (flag === 3) {    // 3:교체(있을때만)
+        if (typeof obj !== 'undefined') {
+            _fullName = suffix.replace(obj, replacement);
+            _fullName = fullName.replace(suffix, _fullName);
+        }
+    }
+    return _fullName;
+}
+
+
+// ##################################################
 // task 목록
 
 /** 
  * --------------------------------------------------
  * default 태스크
  */
-gulp.task('default', gulpsync.sync(['preinstall', 'install']));
+// gulp.task('default', gulpsync.sync(['preinstall', 'install']));
 
 // 디버깅 시
 // gulp.task('default', ['init']);              // 초기화 (설정 파일 초기화, 배치폴더 제거)
 // gulp.task('default', ['preinstall']);        // 통합 실행
 // gulp.task('default', ['install']);           // 배포
-// gulp.task('default', ['template']);          // 템플릿
+gulp.task('default', ['template']);          // 템플릿
 
 /** 
  * --------------------------------------------------
@@ -274,8 +317,10 @@ gulp.task('install', ['load-config'], function() {
                 .pipe(gulp.dest(PATH.base + PATH.dist));
         }
 
-        // 템플릿 REVIEW 배치 이후에 실행 (덮어쓰기 기능 때문에)
-        template_hbs();
+        // 템플릿 *덮기
+        if (CONFIG.options.template_overlap) {
+            template_hbs();
+        }
     }
 );
 
@@ -302,47 +347,10 @@ gulp.task('init', ['clean-dist'], function () {
  * 설치 폴더(dist) 제거
  */
 gulp.task('clean-dist', function () {
-    gulp.src([PATH.base + PATH.dist, PATH.base + PATH.template.dist], {read: false})
+    return gulp.src(PATH.base + PATH.dist, {read: false})
       .pipe(clean());
 });
 
-
-// ##################################################
-// 공통 함수
-
-/** 
- * --------------------------------------------------
- * 객체명 교체
- * @param fullName:     (*필수) 원본이름 
- * @param prefix:       (*선택) 객체명 + 접두사(.) + 타겟명
- * @param suffix:       (*선택) 객체명 + 접미사(.)
- * @param obj:          (*선택) 객체명 
- * @param replacement:  (*필수) 교체할 객체명 
- * @param flag:         (*필수) 0:유지, 1: 제거, 2: 교체,  3:교체(있을때만) * FN 에서 사용
- * 
- * @return 변경된 fullName
- */
-function objNameReplace(fullName, prefix, suffix, obj, replacement, flag) {
-    var _fullName;
-
-    if (flag === 1 ) {          // 제거
-        _fullName = fullName.replace(suffix, '');
-    } else if (flag === 2) {    // 교체(일괄)
-        if (typeof obj === 'undefined' || obj.trim() === '') {
-            _fullName = replacement + '.' + prefix;
-            _fullName = fullName.replace(prefix, _fullName);
-        } else {
-            _fullName = suffix.replace(obj, replacement);
-            _fullName = fullName.replace(suffix, _fullName);
-        }        
-    } else if (flag === 3) {    // 3:교체(있을때만)
-        if (typeof obj !== 'undefined') {
-            _fullName = suffix.replace(obj, replacement);
-            _fullName = fullName.replace(suffix, _fullName);
-        }
-    }
-    return _fullName;
-}
 
 /** 
  * --------------------------------------------------
@@ -476,29 +484,61 @@ var _install_common = lazypipe()
     });
 
 
-/** 
- * --------------------------------------------------
- * 핸들바 템플릿 처리
- */
 function template_hbs() {
-    var _dist = PATH.template.dist;
-
-    if (CONFIG.options.template_overlap) _dist = PATH.dist;
-
     return gulp.src(PATH.base + PATH.template.src)
         .pipe(hb({debug: DEBUG_HBS})
             .partials(PATH.base + PATH.template.partials)
             .helpers(PATH.base + PATH.template.helpers)
             .data(PATH.base + PATH.template.data)
-            .data(PATH.base + 'package.json')               // 패키지 정보
         )
         .pipe(rename({extname: PATH.template.ext}))
-        .pipe(gulp.dest(PATH.base + _dist));    
+        .pipe(gulp.dest(PATH.base + PATH.template.dist));    
 }
 
 
-// ##################################################
-// export
+/** 
+ * --------------------------------------------------
+ * 핸들바 테스트 
+ * https://cloudfour.com/thinks/the-hidden-power-of-handlebars-partials/
+ */
+
+
+ gulp.task('handlebars', function () {
+    return gulp.src(PATH.base + './src/**/*.hbs')
+        .pipe(hb({debug: true})
+            .partials('./src/assets/partials/**/*.hbs')
+            .partials({
+                layout: '{{#*inline \"nav\"}} My Nav {{/inline}}',
+                far: 'ㄻㄻㄻㄹ'
+            })            
+            .helpers('./src/assets/helpers/*.js')
+            .helpers({
+                bold: function(person) {
+                    return person.id + " " + person.name;
+                },
+                list: function(items, options) {
+                    var out = "<ul>";
+                  
+                    // for(var i=0, l=items.length; i<l; i++) {
+                    //   out = out + "<li>" + options.fn(items[i]) + "</li>";
+                    // }
+                    out = out + "<li>" + options.fn(items) + "</li>";
+                    return out + "</ul>";
+                  }
+            })
+            .data(
+                {
+                    title: "My First Blog Post!",
+                    author: {
+                        id: 47,
+                        name: "Yehuda Katz"
+                    },
+                    body: "My first post. Wheeeee!"
+              })
+        )
+        .pipe(gulp.dest('./web'));
+});
+
 
 module.exports = {
     setPath: function(basePath, distPath) {

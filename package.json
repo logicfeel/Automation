@@ -9,6 +9,7 @@
     "gulp-clean": "^0.4.0",
     "gulp-concat": "^2.6.1",
     "gulp-group-concat": "^1.1.6",
+    "gulp-hb": "^7.0.1",
     "gulp-json-sort": "^1.0.0",
     "gulp-rename": "^1.2.2",
     "gulp-replace": "^0.6.1",
@@ -19,7 +20,7 @@
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "install": "gulp init" 
+    "install": "gulp init"
   },
   "repository": {
     "type": "git",

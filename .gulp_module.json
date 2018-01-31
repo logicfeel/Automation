@@ -16,7 +16,8 @@
     "log": true,
     "last_go": true,
     "intall_group": true,
-    "intall_unit": true
+    "intall_unit": true,
+    "template_overlap": true
   },
   "replace": [
     {
@@ -24,7 +25,5 @@
       "src": "",
       "replacement": ""
     }
-  ],
-  "task": "default"
-  
+  ]
 }

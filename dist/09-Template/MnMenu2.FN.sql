@@ -41,47 +41,31 @@ END
 	SELECT sstory40.MnAuth_FN_AuthChk2('777')
 
 <div class="entry">
-  <h1>{{name.title}}</h1>
-  <h2>By {{name.author.name}}</h2>
+  <h1>My First Blog Post!</h1>
+  <h2>By Yehuda Katz</h2>
 
   <div class="body">
-    {{name.body}}
+    My first post. Wheeeee!
   </div>
 </div>
 
-{{bold name.author}}
+47 Yehuda Katz
 
-{{#list name.author}}{{id}}: {{name}}{{/list}}
+<ul><li>47: Yehuda Katz</li></ul>
 
-{{./list}}
 
-{{#*inline "myPartial"}}
-  My Content 부분 파트 로딩 성공
-{{/inline}}
 
-\{{escaped}}
+
+{{escaped}}
 
 
 <div class="nav">
-{{!-- 
-  {{> far }}
---}}  
 </div>
 
 <div class="content">
-  {{> myPartial }}
+    My Content 부분 파트 로딩 성공
 </div>
 
-{{!-- 
-{{#> layouts}}
-  {{#*inline "nav"}}
-    My Nav
-  {{/inline}}
-  {{#*inline "content"}}
-    My Content
-  {{/inline}}
-{{/layouts}}
---}}  
 
 */
 

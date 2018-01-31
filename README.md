@@ -1,11 +1,42 @@
 # Automation
 
-## 구성
-- gulp 를 활용
+## 실행
+
+1. `gulp init`  : 초기화 (*설치시 자동 실행됨)
+
+2. `gulp preinstall` : 설정파일 구성  **(설정파일을 수정하며 조정)**
+
+3. `gulp install` : 배포
+
+4. `gulp templace` : 템플릿만 단독 배포 **(테스트시 template_overlap= false로 폴더 분리)**
+
+5. `gulp` preinstll + install + template 실행
+
+## 폴더 및 파일 구조
+
+- /src  : 대상소스, 템플릿(.hbs)
+
+- /dist : 배포
+
+- /tempalte
+    + 템플릿데이터.json
+    + 템플릿헬퍼(함수).js
+    + 템플릿조각.hbs : 하위에 폴더를 구성 가능
+
+- /public : 템플릿 독립 배포 경로
+
+- .gulp_module.json : 모듈템플릿 기본 설정파일 (base)
+- gulp_module.json : 모듈템플릿 설정파일 (instance)
+- gulpfile.js : gulp 자동화 실행 파일
+
+## 수정 방법
+
+- npm 설치시
+    + npm install `모듈명` --save   : 종속성 추가하기 (*설치시 gulp init 실행 때문)
 
 
-## TODO
-- Model : 모델 모듈
+## TODO:
+- Model : 모델 모듈  => 완료
 - Control : 컨트롤 모듈
 - View : 뷰 모듈
 
