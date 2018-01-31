@@ -51,7 +51,7 @@ var FILE_GROUP = {
     'ETC.sql': "src/*ETC/*.sql"
 };
 
-var CONFIG_FILE  = 'gulp-setup.json';   // 설정 파일명
+var CONFIG_FILE  = 'gulp-module.json';   // 설정 파일명
 /**  설정 파일 설명
     {
         "_replace": [],             @summary 사전 컴파일 자료 
@@ -185,10 +185,10 @@ function objNameReplace(fullName, prefix, suffix, obj, replacement, flag) {
  * --------------------------------------------------
  * default 태스크
  */
-gulp.task('default', gulpsync.sync(['preinstall', 'install']));
+// gulp.task('default', gulpsync.sync(['preinstall', 'install']));
 
 // 테스트용
-// gulp.task('default', ['init']);              // 초기화 (설정 파일 초기화, 배치폴더 제거)
+gulp.task('default', ['init']);              // 초기화 (설정 파일 초기화, 배치폴더 제거)
 // gulp.task('default', ['preinstall']);        // 통합 실행
 // gulp.task('default', ['install']);           // 핸들바
 
