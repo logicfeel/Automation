@@ -2,7 +2,7 @@
   "name": "module_m",
   "version": "1.0.0",
   "description": "- gulp 를 활용",
-  "main": "gulpfile.js",
+  "main": "index.js",
   "dependencies": {
     "fs": "0.0.1-security",
     "gulp": "^3.9.1",
@@ -18,8 +18,7 @@
   },
   "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "install": "gulp init"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
