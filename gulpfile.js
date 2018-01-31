@@ -12,6 +12,7 @@ var concat      = require('gulp-concat');
 var through     = require('through2');
 var groupConcat = require('gulp-group-concat');
 var clean       = require('gulp-clean');
+var rename      = require('gulp-rename');
 
 // TODO: 핸들바 추가 해야함
 // var hb          = require('gulp-hb');
@@ -19,7 +20,7 @@ var clean       = require('gulp-clean');
 // 사용전 플러그인
 var gulpif      = require('gulp-if');
 var sourcemaps  = require('gulp-sourcemaps');
-var rename      = require('gulp-rename');
+
 
 
 // #########################################################
