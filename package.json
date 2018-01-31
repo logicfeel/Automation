@@ -1,5 +1,5 @@
 {
-  "name": "automation_t1",
+  "name": "module_m",
   "version": "1.0.0",
   "description": "- gulp 를 활용",
   "main": "gulpfile.js",
@@ -17,7 +17,8 @@
     "lazypipe": "^1.0.1"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "install": "gulp init"
   },
   "repository": {
     "type": "git",
