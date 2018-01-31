@@ -1,7 +1,6 @@
 'use strict';
 // gulp 3.9 기준
 
-
 var gulp        = require('gulp'); 
 var fs          = require('fs');
 var sortJSON    = require('gulp-json-sort').default;
