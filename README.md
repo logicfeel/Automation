@@ -10,24 +10,28 @@
 
 4. `gulp templace` : 템플릿만 단독 배포 **(테스트시 template_overlap= false로 폴더 분리)**
 
-5. `gulp` preinstll + install + template 실행
+5. `gulp` : preinstll + install + template 실행
 
 ## 폴더 및 파일 구조
 
-- /src  : 대상소스, 템플릿(.hbs)
+- `/src`  : 대상소스, 템플릿(.hbs)
 
-- /dist : 배포
+- `/dist` : 배포
 
-- /tempalte
+- `/tempalte`
     + 템플릿데이터.json
     + 템플릿헬퍼(함수).js
     + 템플릿조각.hbs : 하위에 폴더를 구성 가능
 
-- /public : 템플릿 독립 배포 경로
+- `/public` : 템플릿 독립 배포 경로
 
-- .gulp_module.json : 모듈템플릿 기본 설정파일 (base)
-- gulp_module.json : 모듈템플릿 설정파일 (instance)
-- gulpfile.js : gulp 자동화 실행 파일
+- `.gulp_module.json` : 모듈템플릿 기본 설정파일 (base)
+
+- `gulp_module.json` : 모듈템플릿 설정파일 (instance)
+
+- `gulpfile.js` : gulp 자동화 실행 파일
+
+- `package.json` : NPM 설정 파일 (종속성관리에 필요함)
 
 ## 수정 방법
 
