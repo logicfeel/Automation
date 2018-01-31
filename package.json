@@ -4,8 +4,9 @@
   "description": "- gulp 를 활용",
   "main": "gulpfile.js",
   "dependencies": {
-    "gulp": "^3.9.1",
     "fs": "0.0.1-security",
+    "gulp": "^3.9.1",
+    "gulp-clean": "^0.4.0",
     "gulp-concat": "^2.6.1",
     "gulp-group-concat": "^1.1.6",
     "gulp-json-sort": "^1.0.0",
