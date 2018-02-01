@@ -17,6 +17,8 @@
   },
   "homepage": "https://github.com/logicfeel/Automation#readme",
   "dependencies": {
+    "fs": "0.0.1-security",
+    "glob": "^7.1.2",
     "module_m": "git+https://github.com/logicfeel/Automation.git#Module_M"
   }
 }
