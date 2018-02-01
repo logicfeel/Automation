@@ -163,16 +163,10 @@ gulp.task('default', gulpsync.sync(['preinstall', 'install']));
  * --------------------------------------------------
  * preinstall 설정파일 구성
  */
-gulp.task('preinstall', gulpsync.sync(['load-config', 'build-config-replace']), function() {
+gulp.task('preinstall', gulpsync.sync(['load-config', 'build-config-replace', 'save-config']), function() {
 
-        fs.writeFileSync(CONFIG_FILE, JSON.stringify(CONFIG));
-        
         // 저장후 초기화
         CONFIG = null;
-
-        return gulp.src(PATH.base + CONFIG_FILE)
-            .pipe(sortJSON({ space: 2 }))
-            .pipe(gulp.dest(PATH.base + './'));    
 });
 
 /** 
@@ -256,9 +250,23 @@ gulp.task('build-config-replace', function() {
 
 /** 
  * --------------------------------------------------
+ * 설정 저장
+ */
+gulp.task('save-config', function() {
+    
+    fs.writeFileSync(CONFIG_FILE, JSON.stringify(CONFIG));
+        
+    return gulp.src(PATH.base + CONFIG_FILE)
+        .pipe(sortJSON({ space: 2 }))
+        .pipe(gulp.dest(PATH.base + './'));    
+});
+
+
+/** 
+ * --------------------------------------------------
  * 설치
  */
-gulp.task('install', gulpsync.sync(['load-config', 'install-group', 'install-unit', '']), function() {
+gulp.task('install', gulpsync.sync(['load-config', 'install-group', 'install-unit', 'template-hbs']), function() {
 
     // 설치후 초기화
     CONFIG = null;
