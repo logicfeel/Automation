@@ -22,7 +22,7 @@ var hb          = require('gulp-hb');
 // 전역 변수
 
 var MODULE_VISION   = "1.0.0";
-var MODULE_NAME     = "gulp_module";
+var MODULE_NAME     = "gulp_module_m";
 
 // gulp_module.json 로딩 전역 설정
 var CONFIG      = null;
@@ -166,12 +166,14 @@ gulp.task('default', gulpsync.sync(['preinstall', 'install']));
 gulp.task('preinstall', gulpsync.sync(['load-config', 'build-config-replace']), function() {
 
         fs.writeFileSync(CONFIG_FILE, JSON.stringify(CONFIG));
-    
+        
+        // 저장후 초기화
+        CONFIG = null;
+
         return gulp.src(PATH.base + CONFIG_FILE)
             .pipe(sortJSON({ space: 2 }))
             .pipe(gulp.dest(PATH.base + './'));    
-    }
-);
+});
 
 /** 
  * --------------------------------------------------
@@ -184,12 +186,11 @@ gulp.task('load-config', function() {
     
         // 설정객체가 없는 경우
         if (!CONFIG) {
-            setup = fs.readFileSync(CONFIG_FILE);
+            setup = fs.readFileSync(PATH.base + CONFIG_FILE);
 
             CONFIG = JSON.parse(setup);
         }
-    }
-);
+});
 
 /** 
  * --------------------------------------------------
@@ -231,59 +232,97 @@ gulp.task('build-config-replace', function() {
                 if (p1.toUpperCase().trim() === 'TABLE' || p1.toUpperCase().trim() === 'FUNCTION' ||
                     p1.toUpperCase().trim() === 'REFERENCES') {
                     return  match;
-                } else {
-                    //  CONFIG.options.obj_fnc_type (* fn은 있을 경우만 교체)
-                    _match = objNameReplace(match, p2, p3, p4, CONFIG.obj_name, CONFIG.options.obj_fnc_type);
-                    
-                    if (CONFIG.prefix_name.length > 0 ||  CONFIG.suffix_name.length > 0) {
-                        _match = _match.replace(p5, CONFIG.prefix_name + p5 + CONFIG.suffix_name);
-                    }
-
-                    objData = {
-                        src: this.file.relative,
-                        string: match,
-                        replacement: _match
-                    };
-                    CONFIG._replace.push(objData);
                 }
+
+                //  CONFIG.options.obj_fnc_type (* fn은 있을 경우만 교체)
+                _match = objNameReplace(match, p2, p3, p4, CONFIG.obj_name, CONFIG.options.obj_fnc_type);
+                
+                if (CONFIG.prefix_name.length > 0 ||  CONFIG.suffix_name.length > 0) {
+                    _match = _match.replace(p5, CONFIG.prefix_name + p5 + CONFIG.suffix_name);
+                }
+
+                objData = {
+                    src: this.file.relative,
+                    string: match,
+                    replacement: _match
+                };
+                CONFIG._replace.push(objData);
+
                 return match;
             })
         );
-    }
-);
+});
 
 
 /** 
  * --------------------------------------------------
  * 설치
  */
-gulp.task('install', ['load-config'], function() {
+gulp.task('install', gulpsync.sync(['load-config', 'install-group', 'install-unit', '']), function() {
 
-        // 개별 그룹별 배치 (전체 포함)
-        if (CONFIG.options.intall_group) {
-            gulp.src(PATH.base + PATH.src)
-                .pipe(_install_common())
-                .pipe(groupConcat(FILE_GROUP))          // REVEIW: 이전에 gulp.dest 하면 없어짐
-                .pipe(gulp.dest(PATH.base + PATH.dist));
-        }
-        
-        // 개별 파일 배치
-        if (CONFIG.options.intall_unit) {
-            gulp.src(PATH.base + PATH.src)
-                .pipe(_install_common())
-                .pipe(gulp.dest(PATH.base + PATH.dist));
-        }
+    // 설치후 초기화
+    CONFIG = null;
+});
 
-        // 템플릿 REVIEW 배치 이후에 실행 (덮어쓰기 기능 때문에)
-        template_hbs();
-    }
-);
+
+/** 
+ * --------------------------------------------------
+ * install-group
+ */
+gulp.task('install-group', function() {
+
+    if (!CONFIG.options.intall_group)  return;
+
+    return gulp.src(PATH.base + PATH.src)
+        .pipe(_install_common())
+        .pipe(groupConcat(FILE_GROUP))          // REVEIW: 이전에 gulp.dest 하면 없어짐
+        .pipe(gulp.dest(PATH.base + PATH.dist));
+});
+
+/** 
+ * --------------------------------------------------
+ * install-unit
+ */
+gulp.task('install-unit', function() {
+
+    if (!CONFIG.options.intall_unit) return;
+
+    return gulp.src(PATH.base + PATH.src)
+        .pipe(_install_common())
+        .pipe(gulp.dest(PATH.base + PATH.dist));
+});
+
 
 /** 
  * --------------------------------------------------
  * 템플릿
  */
-gulp.task('template', ['load-config'], template_hbs);
+gulp.task('template', gulpsync.sync(['load-config', 'template-hbs']), function() {
+    
+    // 설치후 초기화
+    CONFIG = null;
+});
+
+
+/** 
+ * --------------------------------------------------
+ * install-unit
+ */
+gulp.task('template-hbs', function() {
+    var _dist = PATH.template.dist;
+
+    if (CONFIG.options.template_overlap) _dist = PATH.dist;
+
+    return gulp.src(PATH.base + PATH.template.src)
+        .pipe(hb({debug: DEBUG_HBS})
+            .partials(PATH.base + PATH.template.partials)
+            .helpers(PATH.base + PATH.template.helpers)
+            .data(PATH.base + PATH.template.data)
+            .data(PATH.base + 'package.json')               // 패키지 정보
+        )
+        .pipe(rename({extname: PATH.template.ext}))
+        .pipe(gulp.dest(PATH.base + _dist));    
+});
 
 
 /** 
@@ -423,16 +462,16 @@ var _install_common = lazypipe()
         var _match;
 
         if (CONFIG.clear.use) return '';
-        else {
-            // 객체명 있는 경우 교체함
-            _match = objNameReplace(match, null, p1, p2, CONFIG.obj_name, 3); 
-            return _match;
-        }
+
+        // 객체명 있는 경우 교체함
+        _match = objNameReplace(match, null, p1, p2, CONFIG.obj_name, 3); 
+        return _match;
     })
     // 주석 /** **/ 
     .pipe(replace, REG_EXP.COMMENT, function(match, p1, offset, string) {
+        
         if (CONFIG.clear.comment) return '';
-        else return match;
+        return match;
     })
     // 첫 빈줄 제거
     .pipe(replace, REG_EXP.FIST_SPACE, '')    
@@ -475,26 +514,6 @@ var _install_common = lazypipe()
         // return through.obj();
     });
 
-
-/** 
- * --------------------------------------------------
- * 핸들바 템플릿 처리
- */
-function template_hbs() {
-    var _dist = PATH.template.dist;
-
-    if (CONFIG.options.template_overlap) _dist = PATH.dist;
-
-    return gulp.src(PATH.base + PATH.template.src)
-        .pipe(hb({debug: DEBUG_HBS})
-            .partials(PATH.base + PATH.template.partials)
-            .helpers(PATH.base + PATH.template.helpers)
-            .data(PATH.base + PATH.template.data)
-            .data(PATH.base + 'package.json')               // 패키지 정보
-        )
-        .pipe(rename({extname: PATH.template.ext}))
-        .pipe(gulp.dest(PATH.base + _dist));    
-}
 
 
 // ##################################################
