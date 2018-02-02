@@ -36,16 +36,18 @@ var MODULE_VISION   = "1.0.0";
 var MODULE_NAME     = "gulp_module_m";
 
 // gulp_module.json 로딩 전역 설정
-var CONFIG      = null;
-var LOG_FLAG    = false;     // 로그 표시
+var CONFIG          = null;
+var LOG_FLAG        = false;     // 로그 표시
+var I_MODULE_PASS   = false;     // 인스턴스 모듈 제외
 
 var CONFIG_FILE  = 'gulp_i_module.json';   // 설정 파일명
 
 // 기본 경로 (필수)
 var PATH = {
     base: "",
-    module: "node_modules/**/gulp_module.json",
-    i_module: "node_modules/**/gulp_i_module.json",
+    nodes: "node_modules/**/",
+    modules: "node_modules/**/gulp_module.json",
+    i_modules: "node_modules/**/gulp_i_module.json",
     dist: "install/",
     map: "map/"
 };
@@ -61,12 +63,13 @@ var PATH = {
 
 // 디버깅 시
 // gulp.task('default', ['init']);              // 초기화 (설정 파일 초기화, 배치폴더 제거)
+gulp.task('default', ['update']);            // 목록 갱신
 // gulp.task('default', ['preinstall']);        // 통합 실행
 // gulp.task('default', ['install']);           // 배포
-// gulp.task('default', ['update']);            // 템플릿
+
 
 // gulp.task('default', ['default2']);            // 임시
-gulp.task('default', ['default3']);            // 임시
+// gulp.task('default', ['default3']);            // 임시
 
 
 /** 
@@ -100,15 +103,15 @@ gulp.task('clean-dist', function() {
  *      + 모듈 
  *      + 모듈 실행
  */
-gulp.task('update', ['load-config'], function() {
-    var _prop;
-    var _setup = getConfig();
+gulp.task('update', ['load-config', 'update-check'], function() {
+    // var _prop;
+    // var _setup = getConfig();
     
-    getModules();
+    // getModules();
 
-    for(prop in _setup.modules) {
+    // for(prop in _setup.modules) {
 
-    }
+    // }
 });
 
 function getPackage(){
@@ -204,9 +207,43 @@ gulp.task('install', function() {
  * 설정 로딩
  */
 gulp.task('load-config', function() {
-    var setup;
 
     if (LOG_FLAG) console.log('___loading '+ CONFIG_FILE + '___');
+
+    // 설정객체가 없는 경우
+    if (!CONFIG) {
+        CONFIG = JSON.parse(fs.readFileSync(PATH.base + CONFIG_FILE));
+    }
+});
+
+
+/** 
+ * --------------------------------------------------
+ * 설정 로딩
+ */
+gulp.task('update-check', function() {
+    var _package_file = 'package.json';
+    var _package = fs.readFileSync(PATH.base + _package_file);
+    var _temp = [];
+
+    // TODO: 처리 종료 에러 처리 추가
+    if (!_package) console.log('___error file 없음: '+ _package + '___');
+
+    // 모듈 + i모듈 목록 가져옴
+    _temp = _temp.concat(glob.sync(PATH.modules));
+    if (!I_MODULE_PASS) _temp = _temp.concat(glob.sync(PATH.i_modules));
+
+    // fs.statSync(PATH.base + _package_file)
+
+    // 작업중
+    // fs.stat(PATH.base + _package_file, function(err, stats) {
+    //     if(err) { return callback(err); }
+    //     if(stats.isFile() && file == searchFile) {
+    //       callback(undefined, path+'/'+file);
+    //     } else if(stats.isDirectory()) {
+    //       findFile(path+'/'+file, searchFile, callback);
+    //     }
+    // });
 
     // 설정객체가 없는 경우
     if (!CONFIG) {
@@ -215,6 +252,7 @@ gulp.task('load-config', function() {
         CONFIG = JSON.parse(setup);
     }
 });
+
 
 // ###########################################
 
@@ -249,19 +287,28 @@ function getModuleDirName(){
 // objSearch(require, "M1", "M1");
 
 var load_task = "";
-// var load_task = "node_modules/M3/:default";
+var load_task = "node_modules/M3/:default";
 
 gulp.task('default-set', function() {
     console.log('-default-set');
     load_task = "node_modules/M3/:default";
-    gulp.task('default2', [load_task], function() {
-        console.log('-default-');
+    // gulp.task('default2', [load_task], function() {
+    //     console.log('-default-');
         
-        console.log('2.path: ' + mod.getPath());
-    });
+    //     console.log('2.path: ' + mod.getPath());
+    // });
 });
 gulp.task('default3', gulpsync.sync(['default-set', 'default2']));
 
+gulp.task('default2', function() {
+    console.log('-2-');
+
+    var modPath = './modules/M1/';
+    var mod = require(modPath); 
+    mod(modPath, "install/", "default");
+
+    console.log('-2.2-');
+});
 
 gulp.task('default222', [load_task], function() {
     console.log('-default-');

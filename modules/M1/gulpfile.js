@@ -20,6 +20,23 @@ var PATH = {
 // file can be a vinyl file object or a string
 // when a string it will construct a new one
 
+gulp.task('default-sub', function () {
+    console.log('module/M1/gulpfile.js  task.default ' + SETUP);
+    
+    // var _src = PATH.base + PATH.src;
+    // var _src =  'modules/M1/src/**/*.js';
+    var _src =  'modules/M1/' + PATH.src;
+
+
+    // return gulp.src('src/*.js', { base: 'src/' })
+    // return gulp.src('src/*.js', { base: 'modules/M1/src' })
+    // var path = PATH.base + PATH.src;
+    
+    return gulp.src(_src)
+        .pipe(gulp.dest(PATH.dist));
+});
+
+
 gulp.task('default', function () {
     console.log('module/M1/gulpfile.js  task.default ' + SETUP);
     
@@ -52,7 +69,7 @@ module.exports = function(prefixPath, distPath, task) {
     PATH.dist   = distPath ? distPath: PATH.dist;
     var _task = task ? task : 'default';
 
-    // gulp.run(_task);
+    gulp.run(_task);
 };
 
 // module.exports = require('gulp-module').define('moduleName', function (gulp, runSequence) {
