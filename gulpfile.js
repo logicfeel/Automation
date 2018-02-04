@@ -2,7 +2,7 @@
 // gulp 3.9 기준
 
 var gulp        = require('gulp'); 
-require('gulp-submodule')(gulp);
+// require('gulp-submodule')(gulp);
 
 var gulpsync    = require('gulp-sync')(gulp);
 var fs          = require('fs');
@@ -12,7 +12,7 @@ var path        = require('path');
 
 
 // var mod = gulp.submodule('modules/M1/');
-var mod = gulp.submodule('node_modules/M3/');
+// var mod = gulp.submodule('node_modules/M3/');
 
 // console.log('1.path: ' + mod.getPath());
 // var modPath = './modules/M1/';
@@ -45,7 +45,7 @@ var CONFIG_FILE  = 'gulp_i_module.json';   // 설정 파일명
 // 기본 경로 (필수)
 var PATH = {
     base: "",
-    nodes: "node_modules/**/",
+    nodes: "node_modules/",
     modules: "node_modules/**/gulp_module.json",
     i_modules: "node_modules/**/gulp_i_module.json",
     dist: "install/",
@@ -219,19 +219,39 @@ gulp.task('load-config', function() {
 
 /** 
  * --------------------------------------------------
- * 설정 로딩
+ * 모듈 검사
  */
 gulp.task('update-check', function() {
     var _package_file = 'package.json';
     var _package = fs.readFileSync(PATH.base + _package_file);
+    var _dep;
     var _temp = [];
+    
 
     // TODO: 처리 종료 에러 처리 추가
-    if (!_package) console.log('___error file 없음: '+ _package + '___');
+    if (_package) {
+        _package = JSON.parse(String(_package));
+    } else {
+        console.log('___error file 없음: '+ _package + '___');
+    }
+
+    try {
+        for (_dep in _package.dependencies) {
+            var stats = fs.statSync(PATH.nodes + _dep + '/' + _package_file);
+            if (!stats.isFile()) {
+                console.log('error 모듈이 설치되지 않았음:'+_dep);
+                // TODO: gulp 중지 예외 처리해야함
+            }   
+        }
+    } catch(err) {
+        console.log(err);
+        // TODO: gulp 중지 예외 처리해야함
+    }
 
     // 모듈 + i모듈 목록 가져옴
     _temp = _temp.concat(glob.sync(PATH.modules));
     if (!I_MODULE_PASS) _temp = _temp.concat(glob.sync(PATH.i_modules));
+
 
     // fs.statSync(PATH.base + _package_file)
 
@@ -245,13 +265,32 @@ gulp.task('update-check', function() {
     //     }
     // });
 
-    // 설정객체가 없는 경우
-    if (!CONFIG) {
-        setup = fs.readFileSync(PATH.base + CONFIG_FILE);
+    // // 설정객체가 없는 경우
+    // if (!CONFIG) {
+    //     setup = fs.readFileSync(PATH.base + CONFIG_FILE);
 
-        CONFIG = JSON.parse(setup);
-    }
+    //     CONFIG = JSON.parse(setup);
+    // }
 });
+
+
+/** 
+ * --------------------------------------------------
+ * 설정 로딩
+ */
+gulp.task('update-remove', function() {
+
+});
+
+
+function getUpateModules(){
+    var _return = {};
+
+
+    _return.modules = _temp.concat(glob.sync(PATH.modules));
+    _return.i_modules = _temp.concat(glob.sync(PATH.i_modules));
+    return _return;
+}
 
 
 // ###########################################
