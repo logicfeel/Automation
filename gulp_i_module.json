@@ -1,101 +1,111 @@
 {
-    "version": "1.1.0",
-    "public": {
-        "obj_name": "DB_OBJ_NAME",
-        "prefix_name": "",
-        "suffix_name": "",
-        "module": "",
-        "clear": {
-          "comment": false,
-          "use": true
+  "_overlap": {
+    "file": [
+      {
+        "modules": [
+          "M4",
+          "modules.M4"
+        ],
+        "string": "install/all.sql"
+      }
+    ],
+    "module": [
+      [
+        "M4",
+        "modules.M4",
+        "modules.iM1.modules.M4"
+      ],
+      [
+        "M3",
+        "modules.M4"
+      ]
+    ]
+  },
+  "modules": {
+    "M4": {
+      "_install": {
+        "file": {
+          "ALL.sql": "all.sql",
+          "U.sql": ""
         },
-        "options": {
-          "obj_type": 1,
-          "obj_fnc_type": 3,
-          "ddl_create": true,
-          "log": true,
-          "last_go": true,
-          "intall_group": true,
-          "intall_unit": true
-        },
-        "replace": [
+        "path": [
           {
-            "string": "",
-            "src": "",
-            "replacement": ""
+            "file": {
+              "SP.sql": "talbe.sql"
+            },
+            "source": "dist/U/",
+            "target": "install/table/"
           }
         ],
-        "install": "install/"
-    },
-    "modules": {
-        "M4": {
-            "obj_name": "OBJ2",
-            "options": {
-                "ddl_create": false
-            },
-            "template": {},
-            "replace": [
-                {
-                  "string": "",
-                  "src": "",
-                  "replacement": ""
-                }
-              ],            
-            "_replace": [
-                {
-                    "string": "",
-                    "src": "",
-                    "replacement": ""
-                }                
-            ],
-            "_install": {
-                "source": "dist/",
-                "target": "install/",
-                "file": {
-                    "ALL.sql": "all.sql",
-                    "U.sql": ""
-                },
-                "path": [
-                    {
-                        "source": "dist/U/",
-                        "target": "install/table/",
-                        "file": {
-                            "SP.sql": "talbe.sql"
-                        }
-                    }
-                ]
-            }
-        },
-        "M5": {
-            "obj_name": "OBJ3",
-            "install": "install/"
-        },
-        "iM1": {
-            "public": {
-                "page_name": "OBJ1",
-                "dist": "page/"
-            },
-            "modules": {
-                "M5": {
-                    "obj_name": "중복.OBJ4"
-                },
-                "M6": {
-                    "obj_name": "OBJ4"
-                }
-            }
+        "source": "dist/",
+        "target": "install/"
+      },
+      "_replace": [
+        {
+          "replacement": "",
+          "src": "",
+          "string": ""
         }
+      ],
+      "obj_name": "OBJ2",
+      "options": {
+        "ddl_create": false
+      },
+      "replace": [
+        {
+          "replacement": "",
+          "src": "",
+          "string": ""
+        }
+      ],
+      "template": {
+      }
     },
-    "_overlap": {
-        "module": [
-            ["M4", "modules.M4", "modules.iM1.modules.M4"],
-            ["M3", "modules.M4"]
-        ],
-        "file": [
-            {
-                "string": "install/all.sql",
-                "modules": ["M4", "modules.M4"]
-            }
-        ]
-
+    "M5": {
+      "install": "install/",
+      "obj_name": "OBJ3"
+    },
+    "iM1": {
+      "modules": {
+        "M5": {
+          "obj_name": "중복.OBJ4"
+        },
+        "M6": {
+          "obj_name": "OBJ4"
+        }
+      },
+      "public": {
+        "dist": "page/",
+        "page_name": "OBJ1"
+      }
     }
+  },
+  "public": {
+    "clear": {
+      "comment": false,
+      "use": true
+    },
+    "install": "install/",
+    "module": "",
+    "obj_name": "DB_OBJ_NAME",
+    "options": {
+      "ddl_create": true,
+      "intall_group": true,
+      "intall_unit": true,
+      "last_go": true,
+      "log": true,
+      "obj_fnc_type": 3,
+      "obj_type": 1
+    },
+    "prefix_name": "",
+    "replace": [
+      {
+        "replacement": "",
+        "src": "",
+        "string": ""
+      }
+    ],
+    "suffix_name": ""
+  },
+  "version": "1.1.0"
 }
