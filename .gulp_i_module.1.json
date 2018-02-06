@@ -28,7 +28,7 @@
         "install": "install/"
     },
     "modules": {
-        "module_m": {
+        "M4": {
             "obj_name": "OBJ2",
             "options": {
                 "ddl_create": false
@@ -66,7 +66,11 @@
                 ]
             }
         },
-        "module_im": {
+        "M5": {
+            "obj_name": "OBJ3",
+            "install": "install/"
+        },
+        "iM1": {
             "public": {
                 "page_name": "OBJ1",
                 "dist": "page/"

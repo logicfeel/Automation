@@ -22,35 +22,26 @@
     ]
   },
   "modules": {
-    "M4": {
-      "_install": {
-        "file": {
-          "ALL.sql": "all.sql",
-          "U.sql": ""
-        },
-        "path": [
-          {
-            "file": {
-              "SP.sql": "talbe.sql"
-            },
-            "source": "dist/U/",
-            "target": "install/table/"
-          }
-        ],
-        "source": "dist/",
-        "target": "install/"
-      },
+    "module_m": {
       "_replace": [
-        {
-          "replacement": "",
-          "src": "",
-          "string": ""
-        }
       ],
-      "obj_name": "OBJ2",
-      "options": {
-        "ddl_create": false
+      "clear": {
+        "comment": false,
+        "use": true
       },
+      "module": "",
+      "obj_name": "DB_OBJ_NAME_SUB",
+      "options": {
+        "ddl_create": true,
+        "intall_group": true,
+        "intall_unit": true,
+        "last_go": true,
+        "log": true,
+        "obj_fnc_type": 3,
+        "obj_type": 1,
+        "template_overlap": true
+      },
+      "prefix_name": "",
       "replace": [
         {
           "replacement": "",
@@ -58,26 +49,8 @@
           "string": ""
         }
       ],
-      "template": {
-      }
-    },
-    "M5": {
-      "install": "install/",
-      "obj_name": "OBJ3"
-    },
-    "iM1": {
-      "modules": {
-        "M5": {
-          "obj_name": "중복.OBJ4"
-        },
-        "M6": {
-          "obj_name": "OBJ4"
-        }
-      },
-      "public": {
-        "dist": "page/",
-        "page_name": "OBJ1"
-      }
+      "suffix_name": "",
+      "version": "1.0.0"
     }
   },
   "public": {

@@ -11,6 +11,11 @@ var glob        = require('glob');
 
 var path        = require('path'); 
 
+var gutil = require("gulp-util");
+var rename      = require('gulp-rename');
+
+var chug = require('gulp-chug');
+
 
 // var mod = gulp.submodule('modules/M1/');
 // var mod = gulp.submodule('node_modules/M3/');
@@ -42,6 +47,7 @@ var PACKAGE         = null;
 var MODULES         = null;
 
 var LOG_FLAG        = false;     // 로그 표시
+var ERR_LEVEL       = 0;         // 에러 레벨 : 0 자세히, 1 간단히    
 var I_MODULE_PASS   = false;     // 인스턴스 모듈 제외
 
 var CONFIG_FILE     = 'gulp_i_module.json';   // 설정 파일명
@@ -68,8 +74,8 @@ var PATH = {
 
 // 디버깅 시
 // gulp.task('default', ['init']);              // 초기화 (설정 파일 초기화, 배치폴더 제거)
-gulp.task('default', ['update']);            // 목록 갱신
-// gulp.task('default', ['preinstall']);        // 통합 실행
+// gulp.task('default', ['update']);            // 목록 갱신
+gulp.task('default', ['preinstall']);        // 통합 실행
 // gulp.task('default', ['install']);           // 배포
 
 
@@ -118,6 +124,18 @@ gulp.task('update', gulpsync.sync(['load-config', 'update-check', 'update-build'
 
     // }
 });
+
+/** 
+ * --------------------------------------------------
+ * preinstall 태스크
+ * 
+  */
+ gulp.task('preinstall', gulpsync.sync(['load-config', 'preinstall-sub']), function() {
+  // gulp.task('preinstall', gulpsync.sync(['load-config', 'preinstall-sub', 'save-config']), function() {
+
+});
+
+
 
 function getPackage(){
     var _package;
@@ -185,19 +203,6 @@ function getModules(){
 }
 
 
-
-
-/** 
- * --------------------------------------------------
- * preinstall 태스크
- * >
- * TODO:
- * 
- */
-gulp.task('preinstall', function() {
-
-});
-
 /** 
  * --------------------------------------------------
  * default 태스크
@@ -243,6 +248,9 @@ gulp.task('load-config', function() {
         _modName = value.replace(/node_modules.([^\/]+)(?:\S+)/ig, '$1');
         MODULES[_modName]  = value;
     })
+
+
+
 });
 
 
@@ -251,59 +259,38 @@ gulp.task('load-config', function() {
  * 모듈 검사
  */
 gulp.task('update-check', function() {
-    var _dep;
+    var _prop;
+    var _stat;
+    var _path;
 
-    // TODO: 처리 종료 에러 처리 추가
-    try {
-
-        // if (_package) _package = JSON.parse(String(_package));
-        // else console.log('___error file 없음: '+ _package + '___');
-
-        // 패키지 기준 모듈 검사
-        for (_dep in PACKAGE.dependencies) {
-            var stats = fs.statSync(PATH.nodes + _dep + '/' + PACKAGE_FILE);
-            if (!stats.isFile()) {
-                console.log('error 모듈이 설치되지 않았음:'+_dep);
-                // TODO: gulp 중지 예외 처리해야함
-            }   
+    // 패키지 기준 모듈 검사
+    for (_prop in PACKAGE.dependencies) {
+        _path = PATH.nodes + _prop + '/' + PACKAGE_FILE;
+        try {
+            _stat = fs.statSync(PATH.nodes + _prop + '/' + PACKAGE_FILE);
+        } catch(err) {
+            gulpError('error 모듈이 설치되지 않았음 (package 기준) :' + _prop, 'update-check');
         }
-        
-        // 설정 기준 모듈 검사
 
-    } catch(err) {
-        console.log(err);
-        throw new Error("에러!");
-        // TODO: gulp 중지 예외 처리해야함
+        if (!_stat.isFile()) {
+            gulpError('error 모듈이 설치되지 않았음 (package 기준) :' + _prop, 'update-check');
+        }
+    
     }
+    
+    // 설정 기준 모듈 검사
+    for (_prop in CONFIG.modules) {
+        _path = PATH.nodes + _prop + '/' + PACKAGE_FILE;
+        try {
+            _stat = fs.statSync(PATH.nodes + _prop + '/' + PACKAGE_FILE);
+        } catch(err) {
+            gulpError(" 에러(파일 읽기) : " + _path, "update-check");
+        }
 
-    /**
-     * TODO:
-     * 설치 모듈중 > i_모듈 & 모듈  속셩 유무 검사
-     */
-
-    // 모듈 + i모듈 목록 가져옴
-    // _temp = _temp.concat(glob.sync(PATH.modules));
-    // if (!I_MODULE_PASS) _temp = _temp.concat(glob.sync(PATH.i_modules));
-
-
-    // fs.statSync(PATH.base + _package_file)
-
-    // 작업중
-    // fs.stat(PATH.base + _package_file, function(err, stats) {
-    //     if(err) { return callback(err); }
-    //     if(stats.isFile() && file == searchFile) {
-    //       callback(undefined, path+'/'+file);
-    //     } else if(stats.isDirectory()) {
-    //       findFile(path+'/'+file, searchFile, callback);
-    //     }
-    // });
-
-    // // 설정객체가 없는 경우
-    // if (!CONFIG) {
-    //     setup = fs.readFileSync(PATH.base + CONFIG_FILE);
-
-    //     CONFIG = JSON.parse(setup);
-    // }
+        if (!_stat.isFile()) {
+            gulpError(" 에러(파일 없음) : " + _path, "update-check");
+        }
+    }
 });
 
 
@@ -312,38 +299,34 @@ gulp.task('update-check', function() {
  * update remove + add 처리
  */
 gulp.task('update-build', function() {
+    var _prop;
     var _dep;    
     var _config = {};
     var _mod = '';
     var b_pkg;
     var b_conf;
+    var _mod;
 
-    try {
+    for (var _prop in MODULES) {
 
-        for (var prop in MODULES) {
-             if(PACKAGE.dependencies[prop]) b_pkg = true;
-             else b_pkg = false;
-             
-             if(CONFIG.modules[prop]) b_conf = true;
-             else b_conf = false;
+        if(PACKAGE.dependencies[_prop]) b_pkg = true;
+        else b_pkg = false;
+        
+        if(CONFIG.modules[_prop]) b_conf = true;
+        else b_conf = false;
 
-            // 설정에 추가 
-            if (b_pkg && !b_conf) {
-
-            }
-            
-            // 설정에서 제거
-            if (!b_pkg && b_conf) {
-                delete CONFIGmodules[prop];
-            }
+        // 설정에 추가
+        if (b_pkg && !b_conf) {
+            _mod = JSON.parse(fs.readFileSync(PATH.base + MODULES[_prop]));
+            CONFIG.modules[_prop] = _mod;
+            // TODO: public 으로 모듈 덮어쓰기
         }
-
-    } catch(err) {
-        console.log(err);
-        throw new Error("에러!");
-        // TODO: gulp 중지 예외 처리해야함
+        
+        // 설정에서 제거
+        if (!b_pkg && b_conf) {
+            delete CONFIG.modules[_prop];
+        }
     }
-
 });
 
 
@@ -360,6 +343,55 @@ gulp.task('save-config', function() {
         .pipe(sortJSON({ space: 2 }))
         .pipe(gulp.dest(PATH.base + './'));    
 });
+
+
+/** 
+ * --------------------------------------------------
+ * 하위 preinstall 실행
+ * !병렬처리
+ */
+gulp.task('preinstall-sub', function() {
+    var p = 'node_modules/module_m/gulpfile';
+
+    gulp.src( './node_modules/module_m/gulpfile.js' )
+        .pipe( chug(
+            {
+                tasks: [ 'template'],
+                args: [ '--my-arg-1', '--my-arg-2' ]
+            }) );
+
+    // var mod = require(p);
+    // var mod = require('module_m');
+    // var mod = require('node_modules/module_m/gulpfile.js');
+    // mod.setPath('node_modules/module_m/')
+    // mod.taskRun('template');
+    // gulpfile.js
+
+    console.log('222222222222');
+});
+
+
+
+// ##################################################
+// 공통 함수
+
+/**
+ * gulp 오류 출력
+ * @param {*} errName 오류 구분 명칭
+ * @param {*} message 오류 메세지
+ */
+function gulpError(message, errName) {
+    // 제사한 오류 출력
+    if (ERR_LEVEL === 1) {
+        throw new gutil.PluginError({
+            plugin: errName,
+            message: message
+        });                
+    } else {
+        throw new Error(message);
+    }
+}
+
 
 
 

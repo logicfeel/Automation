@@ -1,0 +1,30 @@
+{
+  "_replace": [
+  ],
+  "clear": {
+    "comment": false,
+    "use": true
+  },
+  "module": "",
+  "obj_name": "DB_OBJ_NAME_SUB",
+  "options": {
+    "ddl_create": true,
+    "intall_group": true,
+    "intall_unit": true,
+    "last_go": true,
+    "log": true,
+    "obj_fnc_type": 3,
+    "obj_type": 1,
+    "template_overlap": false
+  },
+  "prefix_name": "",
+  "replace": [
+    {
+      "replacement": "",
+      "src": "",
+      "string": ""
+    }
+  ],
+  "suffix_name": "",
+  "version": "1.0.0"
+}
