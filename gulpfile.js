@@ -15,7 +15,8 @@ var gutil = require("gulp-util");
 var rename      = require('gulp-rename');
 
 var chug = require('gulp-chug');
-
+var deepmerge = require('deepmerge');
+var writeJsonFile = require('write-json-file');
 
 // var mod = gulp.submodule('modules/M1/');
 // var mod = gulp.submodule('node_modules/M3/');
@@ -48,7 +49,7 @@ var MODULES         = null;
 
 var LOG_FLAG        = false;     // 로그 표시
 var ERR_LEVEL       = 0;         // 에러 레벨 : 0 자세히, 1 간단히    
-var I_MODULE_PASS   = false;     // 인스턴스 모듈 제외
+var I_MODULE_IGNORE   = false;     // 인스턴스 모듈 제외
 
 var CONFIG_FILE     = 'gulp_i_module.json';   // 설정 파일명
 var PACKAGE_FILE    = 'package.json';
@@ -240,17 +241,24 @@ gulp.task('load-config', function() {
     }
     
     // 설치 모듈 로딩
-    _mod = _mod.concat(glob.sync(PATH.modules));
-    if (!I_MODULE_PASS) _mod = _mod.concat(glob.sync(PATH.i_modules));    
+    MODULES = {
+        m: {},
+        i: {}
+    };
 
-    MODULES = {};
+    _mod = glob.sync(PATH.modules);
     _mod.forEach(function(value, index, arr) {
         _modName = value.replace(/node_modules.([^\/]+)(?:\S+)/ig, '$1');
-        MODULES[_modName]  = value;
-    })
+        MODULES.m[_modName]  = value;
+    });
 
-
-
+    if (!I_MODULE_IGNORE) {
+        _mod = glob.sync(PATH.i_modules);
+        _mod.forEach(function(value, index, arr) {
+            _modName = value.replace(/node_modules.([^\/]+)(?:\S+)/ig, '$1');
+            MODULES.i[_modName]  = value;
+        });
+    } 
 });
 
 
@@ -298,7 +306,7 @@ gulp.task('update-check', function() {
  * --------------------------------------------------
  * update remove + add 처리
  */
-gulp.task('update-build', function() {
+ gulp.task('update-build', function() {
     var _prop;
     var _dep;    
     var _config = {};
@@ -307,7 +315,34 @@ gulp.task('update-build', function() {
     var b_conf;
     var _mod;
 
-    for (var _prop in MODULES) {
+    // TODO: 반복 부분 공통화 처리 필요
+    for (var _prop in MODULES.m) {
+
+        if(PACKAGE.dependencies[_prop]) b_pkg = true;
+        else b_pkg = false;
+        
+        if(CONFIG.modules[_prop]) b_conf = true;
+        else b_conf = false;
+
+        function overwriteMerge(destinationArray, sourceArray, options) {
+            return sourceArray
+        }
+        // 설정에 추가 (병합)
+        if (b_pkg && !b_conf) {
+            _mod = JSON.parse(fs.readFileSync(PATH.base + MODULES.m[_prop]));
+            _mod = deepmerge(_mod, CONFIG.public, { arrayMerge: overwriteMerge });
+            
+            CONFIG.modules[_prop] = _mod;
+            writeJsonFile.sync(PATH.base + MODULES.m[_prop], _mod);
+        }
+        
+        // 설정에서 제거
+        if (!b_pkg && b_conf) {
+            delete CONFIG.modules[_prop];
+        }
+    }
+
+    for (var _prop in MODULES.i) {
 
         if(PACKAGE.dependencies[_prop]) b_pkg = true;
         else b_pkg = false;
@@ -317,9 +352,8 @@ gulp.task('update-build', function() {
 
         // 설정에 추가
         if (b_pkg && !b_conf) {
-            _mod = JSON.parse(fs.readFileSync(PATH.base + MODULES[_prop]));
+            _mod = JSON.parse(fs.readFileSync(PATH.base + MODULES.i[_prop]));
             CONFIG.modules[_prop] = _mod;
-            // TODO: public 으로 모듈 덮어쓰기
         }
         
         // 설정에서 제거
@@ -349,25 +383,34 @@ gulp.task('save-config', function() {
  * --------------------------------------------------
  * 하위 preinstall 실행
  * !병렬처리
+ * 모듈 => default
+ * i모듈 => preinstall
+ * 
  */
 gulp.task('preinstall-sub', function() {
-    var p = 'node_modules/module_m/gulpfile';
+    // console.log('222222222222');
+    var _prop;
+    var _dirname;
 
-    gulp.src( './node_modules/module_m/gulpfile.js' )
-        .pipe( chug(
-            {
-                tasks: [ 'template'],
-                args: [ '--my-arg-1', '--my-arg-2' ]
-            }) );
+    for(_prop in MODULES.m) {
+        _dirname = path.dirname(MODULES.m[_prop]);
+        gulp.src( _dirname + '/gulpfile.js' )
+            .pipe(chug({tasks: ['default']}, function() {
+                console.log('LOAD.. OK');
+            })
+        );
+    }
 
-    // var mod = require(p);
-    // var mod = require('module_m');
-    // var mod = require('node_modules/module_m/gulpfile.js');
-    // mod.setPath('node_modules/module_m/')
-    // mod.taskRun('template');
-    // gulpfile.js
-
-    console.log('222222222222');
+    if (!I_MODULE_IGNORE) {
+        for(_prop in MODULES.i) {
+            _dirname = path.dirname(MODULES.i[_prop]);
+            gulp.src( _dirname + '/gulpfile.js' )
+                .pipe(chug({tasks: ['preinstall']}, function() {
+                    console.log('LOAD.. OK');
+                })
+            );
+        }
+    }
 });
 
 

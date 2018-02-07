@@ -29,8 +29,9 @@
         "comment": false,
         "use": true
       },
+      "install": "install/",
       "module": "",
-      "obj_name": "DB_OBJ_NAME_SUB",
+      "obj_name": "DB_OBJ_NAME_P",
       "options": {
         "ddl_create": true,
         "intall_group": true,
@@ -39,7 +40,7 @@
         "log": true,
         "obj_fnc_type": 3,
         "obj_type": 1,
-        "template_overlap": true
+        "template_overlap": false
       },
       "prefix_name": "",
       "replace": [
@@ -60,7 +61,7 @@
     },
     "install": "install/",
     "module": "",
-    "obj_name": "DB_OBJ_NAME",
+    "obj_name": "DB_OBJ_NAME_P",
     "options": {
       "ddl_create": true,
       "intall_group": true,
