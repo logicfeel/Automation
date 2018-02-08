@@ -49,7 +49,7 @@ var MODULES         = null;
 
 var LOG_FLAG        = false;     // 로그 표시
 var ERR_LEVEL       = 0;         // 에러 레벨 : 0 자세히, 1 간단히    
-var I_MODULE_IGNORE   = false;     // 인스턴스 모듈 제외
+var I_MODULE_IGNORE = true;      // 인스턴스 모듈 제외
 
 var CONFIG_FILE     = 'gulp_i_module.json';   // 설정 파일명
 var PACKAGE_FILE    = 'package.json';
@@ -131,8 +131,8 @@ gulp.task('update', gulpsync.sync(['load-config', 'update-check', 'update-build'
  * preinstall 태스크
  * 
   */
- gulp.task('preinstall', gulpsync.sync(['load-config', 'preinstall-sub']), function() {
-  // gulp.task('preinstall', gulpsync.sync(['load-config', 'preinstall-sub', 'save-config']), function() {
+ gulp.task('preinstall', gulpsync.sync(['load-config', 'preinstall-submodule', 'preinstall-build', 'save-config']), function() {
+  // gulp.task('preinstall', gulpsync.sync(['load-config', 'preinstall-submodule', 'save-config']), function() {
 
 });
 
@@ -240,25 +240,28 @@ gulp.task('load-config', function() {
         }
     }
     
-    // 설치 모듈 로딩
-    MODULES = {
-        m: {},
-        i: {}
-    };
+    // 설치 모듈 로딩 : 경로
+    MODULES = {};
 
     _mod = glob.sync(PATH.modules);
     _mod.forEach(function(value, index, arr) {
         _modName = value.replace(/node_modules.([^\/]+)(?:\S+)/ig, '$1');
-        MODULES.m[_modName]  = value;
+        MODULES[_modName] = {
+            path: value,
+            type: 'm'
+        };
     });
 
     if (!I_MODULE_IGNORE) {
         _mod = glob.sync(PATH.i_modules);
         _mod.forEach(function(value, index, arr) {
             _modName = value.replace(/node_modules.([^\/]+)(?:\S+)/ig, '$1');
-            MODULES.i[_modName]  = value;
+            MODULES[_modName] = {
+                path: value,
+                type: 'i'
+            };
         });
-    } 
+    }
 });
 
 
@@ -316,7 +319,7 @@ gulp.task('update-check', function() {
     var _mod;
 
     // TODO: 반복 부분 공통화 처리 필요
-    for (var _prop in MODULES.m) {
+    for (var _prop in MODULES) {
 
         if(PACKAGE.dependencies[_prop]) b_pkg = true;
         else b_pkg = false;
@@ -329,31 +332,13 @@ gulp.task('update-check', function() {
         }
         // 설정에 추가 (병합)
         if (b_pkg && !b_conf) {
-            _mod = JSON.parse(fs.readFileSync(PATH.base + MODULES.m[_prop]));
-            _mod = deepmerge(_mod, CONFIG.public, { arrayMerge: overwriteMerge });
+            _mod = JSON.parse(fs.readFileSync(PATH.base + MODULES[_prop].path));
+            if (MODULES[_prop].type === 'm') {
+                _mod = deepmerge(_mod, CONFIG.public, { arrayMerge: overwriteMerge });
+            }
             
             CONFIG.modules[_prop] = _mod;
-            writeJsonFile.sync(PATH.base + MODULES.m[_prop], _mod);
-        }
-        
-        // 설정에서 제거
-        if (!b_pkg && b_conf) {
-            delete CONFIG.modules[_prop];
-        }
-    }
-
-    for (var _prop in MODULES.i) {
-
-        if(PACKAGE.dependencies[_prop]) b_pkg = true;
-        else b_pkg = false;
-        
-        if(CONFIG.modules[_prop]) b_conf = true;
-        else b_conf = false;
-
-        // 설정에 추가
-        if (b_pkg && !b_conf) {
-            _mod = JSON.parse(fs.readFileSync(PATH.base + MODULES.i[_prop]));
-            CONFIG.modules[_prop] = _mod;
+            writeJsonFile.sync(PATH.base + MODULES[_prop].path, _mod);
         }
         
         // 설정에서 제거
@@ -387,32 +372,150 @@ gulp.task('save-config', function() {
  * i모듈 => preinstall
  * 
  */
-gulp.task('preinstall-sub', function() {
-    // console.log('222222222222');
+gulp.task('preinstall-submodule', function() {
+    console.log('____ preinstall-submodule ____');
     var _prop;
     var _dirname;
 
-    for(_prop in MODULES.m) {
-        _dirname = path.dirname(MODULES.m[_prop]);
-        gulp.src( _dirname + '/gulpfile.js' )
-            .pipe(chug({tasks: ['default']}, function() {
-                console.log('LOAD.. OK');
-            })
-        );
-    }
-
-    if (!I_MODULE_IGNORE) {
-        for(_prop in MODULES.i) {
-            _dirname = path.dirname(MODULES.i[_prop]);
+    for ( _prop in CONFIG.modules) {
+        _dirname = path.dirname(MODULES[_prop].path);
+        
+        if (MODULES[_prop].type === 'm') {
             gulp.src( _dirname + '/gulpfile.js' )
-                .pipe(chug({tasks: ['preinstall']}, function() {
-                    console.log('LOAD.. OK');
+            .pipe(chug({tasks: ['default']}, function() {
+                    console.log('LOAD MODULE...' + _prop + ' OK');
+                })
+            );
+        } else if (MODULES[_prop].type === 'i' && !I_MODULE_IGNORE) {
+            gulp.src( _dirname + '/gulpfile.js' )
+            .pipe(chug({tasks: ['preinstall']}, function() {
+                    console.log('LOAD I_MODULE...' + _prop + ' OK');
                 })
             );
         }
     }
 });
 
+
+/** 
+ * --------------------------------------------------
+ * preinstall 후 설정 가져와 구성
+ * 
+ */
+gulp.task('preinstall-build', function() {
+    var _prop;
+    var _mod;
+    var _install;
+    
+    // 임시
+    var _t = glob.sync('node_modules/module_m/dist/**/*.*');    // 전체 파일
+    var _t2 = glob.sync('node_modules/module_m/dist/**/');      // 전체 디렉토리
+    var _t3 = glob.sync('node_modules/module_m/dist/**');       // 전체 디렉토리 + 파일
+
+    for (var _prop in MODULES) {
+        _mod = JSON.parse(fs.readFileSync(PATH.base + MODULES[_prop].path));
+        CONFIG.modules[_prop] = _mod;
+    }
+
+    _install = installPathBuild(_t, 'node_modules/module_m/', 'dist/', 'install/');
+
+});
+
+
+function installPathBuild(arr, basePath, source, target) {
+    var obj = {
+        source: source,
+        target: target,
+        file: {},
+        path: []
+    };
+    var _dirname;
+    var _filename;
+    var _path;
+
+    for (var i = 0; i < arr.length; i++) {
+        _path = arr[i].replace(basePath + source, '');   // 기본경로 제거
+        _dirname = path.dirname(_path);
+        _filename = path.basename(_path);
+    }
+    
+    // test
+    // var a = "/foo/bar/baz/asdf";
+    var a = "foo/bar/baz/asdf";
+    var arr2 = a.split('/');
+    var org2 = {abc: "", org: {}};
+    var d = {};
+    
+    for (var i = 0; i < arr2.length; i++) {
+        if (arr2[i] != '') {
+            if (!org2.org[arr2[i]]) {
+                org2.org[arr2[i]] = {};
+            }
+            org2.org = org2.org[arr2[i]];
+        }
+    }
+
+    console.log('aa');
+
+    // var object = {};
+
+    // function namespace(ns, _object) {
+    //     var parts = ns.split('/');
+    //     var i, len;
+    //     var obj = _object;;
+
+    //     for (i = 0, len = parts.length; i < len; i++) {
+    //         if(!obj[parts[i]]) {
+    //             obj[parts[i]] = {};
+    //         }
+    //         obj = obj[parts[i]];
+    //     }
+    //     return obj;
+    // }
+
+    // org2 = namespace(a, object);
+
+    
+
+
+    // for (var ii = 0; ii < b.length; ii++) {
+        
+    //     if (b[ii] !='' && typeof c[b[ii]] === 'undefined') {
+    //         d = b[ii];
+    //     } else {
+
+    //     }
+    // }
+    // function recurPath(arr, org) {
+    //     var o;
+
+    //     for (var i = 0; i < arr.length; i++) {
+    //         if (!org[arr[i]]) {
+    //             org[arr[i]] = {};
+    //         }
+    //         org = obj[arr[i]];
+    //     }
+        
+    //     if (typeof org[arr[0]] === 'undefined' && arr[0] != '') {
+    //         org[arr[0]] = {};
+    //     }
+    //     if (arr.length > 1) {
+    //         var tt = arr.splice(1);
+            
+    //         org = recurPath(tt, org[arr[0]]);
+    //     }
+
+    //     return org;
+    // }
+
+    // var e = recurPath(b, c);
+
+
+    
+    // console.log('aa');
+
+    return obj;
+}
 
 
 // ##################################################
