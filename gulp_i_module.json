@@ -39,15 +39,6 @@
               "table.2.sql": ""
             },
             "path": [
-              {
-                "file": {
-                  "table.1.sql": ""
-                },
-                "path": [
-                ],
-                "source": "dist/01-Table/dd",
-                "target": ""
-              }
             ],
             "source": "dist/01-Table",
             "target": ""
@@ -71,6 +62,27 @@
             ],
             "source": "dist/03-SP",
             "target": ""
+          },
+          {
+            "file": {
+              "MnMenu1.FN.sql": "",
+              "MnMenu2.FN.sql": ""
+            },
+            "path": [
+            ],
+            "source": "dist/09-Template",
+            "target": ""
+          },
+          {
+            "file": {
+              "page-one.sql": "",
+              "page-tree.sql": "",
+              "page-two.sql": ""
+            },
+            "path": [
+            ],
+            "source": "dist/pages",
+            "target": ""
           }
         ],
         "source": "dist",
@@ -78,54 +90,54 @@
       },
       "_replace": [
         {
-          "replacement": "SELECT DB_OBJ_NAME_P.MnAuth_FN_AuthChk('1')",
-          "src": "02-FN\\MnMenu1.FN.sql",
-          "string": "SELECT sstory40.MnAuth_FN_AuthChk('1')"
-        },
-        {
-          "replacement": "SELECT DB_OBJ_NAME_P.MnAuth_FN_AuthChk('777')",
-          "src": "02-FN\\MnMenu1.FN.sql",
-          "string": "SELECT sstory40.MnAuth_FN_AuthChk('777')"
-        },
-        {
-          "replacement": "SELECT DB_OBJ_NAME_P.MnAuth_FN_AuthChk2('1')",
-          "src": "02-FN\\MnMenu2.FN.sql",
-          "string": "SELECT sstory40.MnAuth_FN_AuthChk2('1')"
-        },
-        {
-          "replacement": "SELECT DB_OBJ_NAME_P.MnAuth_FN_AuthChk2('777')",
-          "src": "02-FN\\MnMenu2.FN.sql",
-          "string": "SELECT sstory40.MnAuth_FN_AuthChk2('777')"
-        },
-        {
-          "replacement": "exec DB_OBJ_NAME_P.[MnAcct_Account_SP_C]",
-          "src": "03-SP\\MnMenu1.SP.sql",
+          "replacement": "exec DB_OBJ_NAME.[MnAcct_Account_SP_C]",
+          "src": "03-SP/MnMenu1.SP.sql",
           "string": "exec abc.[MnAcct_Account_SP_C]"
         },
         {
-          "replacement": "excute [DB_OBJ_NAME_P].[MnAcct_Account_SP_C]",
-          "src": "03-SP\\MnMenu1.SP.sql",
+          "replacement": "excute [DB_OBJ_NAME].[MnAcct_Account_SP_C]",
+          "src": "03-SP/MnMenu1.SP.sql",
           "string": "excute [abc].[MnAcct_Account_SP_C]"
         },
         {
-          "replacement": "exec  @abc =  DB_OBJ_NAME_P.[MnAcct_Account_SP_C]",
-          "src": "03-SP\\MnMenu1.SP.sql",
+          "replacement": "exec  @abc =  DB_OBJ_NAME.[MnAcct_Account_SP_C]",
+          "src": "03-SP/MnMenu1.SP.sql",
           "string": "exec  @abc =  abc.[MnAcct_Account_SP_C]"
         },
         {
-          "replacement": "exec @abc=DB_OBJ_NAME_P.[MnAcct_Account_SP_C]",
-          "src": "03-SP\\MnMenu1.SP.sql",
+          "replacement": "exec @abc=DB_OBJ_NAME.[MnAcct_Account_SP_C]",
+          "src": "03-SP/MnMenu1.SP.sql",
           "string": "exec @abc=abc.[MnAcct_Account_SP_C]"
         },
         {
-          "replacement": "SELECT DB_OBJ_NAME_P.MnAuth_FN_AuthChk3('1')",
-          "src": "03-SP\\MnMenu1.SP.sql",
+          "replacement": "SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk3('1')",
+          "src": "03-SP/MnMenu1.SP.sql",
           "string": "SELECT sstory40.MnAuth_FN_AuthChk3('1')"
         },
         {
-          "replacement": "SELECT DB_OBJ_NAME_P.MnAuth_FN_AuthChk3('777')",
-          "src": "03-SP\\MnMenu1.SP.sql",
+          "replacement": "SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk3('777')",
+          "src": "03-SP/MnMenu1.SP.sql",
           "string": "SELECT sstory40.MnAuth_FN_AuthChk3('777')"
+        },
+        {
+          "replacement": "SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk('1')",
+          "src": "02-FN/MnMenu1.FN.sql",
+          "string": "SELECT sstory40.MnAuth_FN_AuthChk('1')"
+        },
+        {
+          "replacement": "SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk('777')",
+          "src": "02-FN/MnMenu1.FN.sql",
+          "string": "SELECT sstory40.MnAuth_FN_AuthChk('777')"
+        },
+        {
+          "replacement": "SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk2('1')",
+          "src": "02-FN/MnMenu2.FN.sql",
+          "string": "SELECT sstory40.MnAuth_FN_AuthChk2('1')"
+        },
+        {
+          "replacement": "SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk2('777')",
+          "src": "02-FN/MnMenu2.FN.sql",
+          "string": "SELECT sstory40.MnAuth_FN_AuthChk2('777')"
         }
       ],
       "clear": {
@@ -133,9 +145,8 @@
         "use": true
       },
       "distPath": "dist/",
-      "install": "install/",
       "module": "",
-      "obj_name": "DB_OBJ_NAME_P",
+      "obj_name": "DB_OBJ_NAME",
       "options": {
         "ddl_create": true,
         "intall_group": true,
@@ -144,7 +155,7 @@
         "log": true,
         "obj_fnc_type": 3,
         "obj_type": 1,
-        "template_overlap": false
+        "template_overlap": true
       },
       "prefix_name": "",
       "replace": [

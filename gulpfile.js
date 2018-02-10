@@ -18,6 +18,8 @@ var chug = require('gulp-chug');
 var deepmerge = require('deepmerge');
 var writeJsonFile = require('write-json-file');
 
+var group = require('gulp-group-files');
+
 // var mod = gulp.submodule('modules/M1/');
 // var mod = gulp.submodule('node_modules/M3/');
 
@@ -77,8 +79,8 @@ var PATH = {
 // 디버깅 시
 // gulp.task('default', ['init']);              // 초기화 (설정 파일 초기화, 배치폴더 제거)
 // gulp.task('default', ['update']);            // 목록 갱신
-gulp.task('default', ['preinstall']);        // 통합 실행
-// gulp.task('default', ['install']);           // 배포
+// gulp.task('default', ['preinstall']);        // 통합 실행
+gulp.task('default', ['install']);           // 배포
 
 
 // gulp.task('default', ['default2']);            // 임시
@@ -142,12 +144,25 @@ gulp.task('update', gulpsync.sync(['load-config', 'update-check', 'update-build'
  * --------------------------------------------------
  * install 태스크
  * 1. 설정 로딩
- * 2. i모듈 : install 수행
+ * 2. i모듈 : install 수행  TODO: 이후 추가해야함
  * 3. 모듈 : 로딩 후 설치 (설치는 한개의 폴더 뒤에만)
  * 4. 각 모듈별 dist 경로 로딩 (소스맵)
  * 5. 모듈 배포 install
  */
-gulp.task('install', gulpsync.sync(['load-config', 'install-submodule']), function() {
+gulp.task('install', gulpsync.sync(['load-config', 'install-imodule', 'install-submodule']), function() {
+// gulp.task('install', gulpsync.sync(['load-config', 'install-imodule', 'install-group']), function() {
+
+});
+
+
+
+
+/** 
+ * --------------------------------------------------
+ * install-submodule 하위 모듈 설치
+ * 
+ */
+gulp.task('install-imodule', function() {
 
 });
 
@@ -157,7 +172,70 @@ gulp.task('install', gulpsync.sync(['load-config', 'install-submodule']), functi
  * install-submodule 하위 모듈 설치
  * 
  */
+// var scripts = {
+//     'modules_M1': [
+//         'modules/M1/src/test.1.js',
+//         'modules/M1/src/test.2.js',
+//     ],
+//     'modules_M2':[
+//         'modules/M1/src/test.3.js',
+//         'modules/M1/src/test.4.js'
+//     ]
+// };
+
+// gulp.task('install-group',group(scripts, function(name,files){
+//     return gulp.src(files)
+//             .pipe(gulp.dest("dist/js/"));
+// }));
+
+/** 
+ * --------------------------------------------------
+ * install-submodule 하위 모듈 설치
+ * 
+ */
 gulp.task('install-submodule', function() {
+    
+    var _prop;
+    var _dirname;
+    var _dist;
+
+    var scripts = {
+        'modules_M1': [
+            'modules/M1/src/test.1.js',
+            'modules/M1/src/test.2.js',
+        ],
+        'modules_M2':[
+            'modules/M1/src/test.3.js',
+            'modules/M1/src/test.4.js'
+        ]
+    };
+
+    for (_prop in scripts) {
+        gulp.src(scripts[_prop])
+            .pipe(gulp.dest("group/" + _prop));
+    }
+
+    // group(scripts, function(name,files){
+    //     console.log('___loading group___');
+    //     return gulp.src(files)
+    //             .pipe(gulp.dest("group/" + name));
+    // })
+
+    if (LOG_FLAG) console.log('___loading '+ CONFIG_FILE + '___');
+
+    // for ( _prop in CONFIG.modules) {
+    //     _dirname = path.dirname(MODULES[_prop].path);
+    //     _dist = CONFIG.modules[_prop].distPath;
+
+    //     if (MODULES[_prop].type === 'm') {
+    //         gulp.src( _dirname + _dist )
+    //             .pipe(gulp.dest(PATH.base + PATH.dist));
+
+    //     } else if (MODULES[_prop].type === 'i' && !I_MODULE_IGNORE) {
+    //         // TODO: 
+    //     }
+    // }    
+
     /**
      * 조건 :
      * - 소스맵 작동
@@ -342,7 +420,8 @@ gulp.task('save-config', function() {
  * 
  */
 gulp.task('preinstall-submodule', function() {
-    console.log('____ preinstall-submodule ____');
+    if (LOG_FLAG) console.log('____ preinstall-submodule ____');
+
     var _prop;
     var _dirname;
 

@@ -20,6 +20,8 @@
     "deepmerge": "^2.0.1",
     "fs": "0.0.1-security",
     "glob": "^7.1.2",
+    "gulp-chug": "^0.5.1",
+    "gulp-group-files": "^2.0.0",
     "gulp-sync": "^0.1.4",
     "module_m": "git+https://github.com/logicfeel/Automation.git#Module_M",
     "write-json-file": "^2.3.0"
