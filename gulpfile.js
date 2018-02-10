@@ -61,7 +61,8 @@ var PATH = {
     modules: "node_modules/**/gulp_module.json",
     i_modules: "node_modules/**/gulp_i_module.json",
     dist: "install/",
-    map: "map/"
+    map: "map/",
+    all_file: ""
 };
 
 // ##################################################
@@ -126,89 +127,57 @@ gulp.task('update', gulpsync.sync(['load-config', 'update-check', 'update-build'
     // }
 });
 
-/** 
+
+/**
  * --------------------------------------------------
  * preinstall 태스크
  * 
   */
  gulp.task('preinstall', gulpsync.sync(['load-config', 'preinstall-submodule', 'preinstall-build', 'save-config']), function() {
-  // gulp.task('preinstall', gulpsync.sync(['load-config', 'preinstall-submodule', 'save-config']), function() {
 
 });
 
 
+/** 
+ * --------------------------------------------------
+ * install 태스크
+ * 1. 설정 로딩
+ * 2. i모듈 : install 수행
+ * 3. 모듈 : 로딩 후 설치 (설치는 한개의 폴더 뒤에만)
+ * 4. 각 모듈별 dist 경로 로딩 (소스맵)
+ * 5. 모듈 배포 install
+ */
+gulp.task('install', gulpsync.sync(['load-config', 'install-submodule']), function() {
 
-function getPackage(){
-    var _package;
-
-    // TODO: 없을시 예외 처리
-    _package = fs.readFileSync(PATH.base + 'package.json');
-    return _package;
-}
-
-
-function getConfig(){
-    var _setup;
-
-    // TODO: 없을시 예외 처리
-    _setup = fs.readFileSync(PATH.base + CONFIG_FILE);
-    return _setup;
-}
-
-function getModules(){
-    var _modules = {};
-    var _mod;
-    var _path = [];
-    var _dirname = "";
-    var i = 0;
-    var _modName = "";
-    
-    var _temp;
-
-    // glob(['node_modules/**/gulp_module.json'], function (er, files) {
-    // // glob([PATH.base + PATH.module, PATH.base + PATH.i_module], function (er, files) {
-    //     _modules = files;
-    // });
-
-    /**
-     * [구조설계]
-     * > 사전에 SETUP 가져 와야함
-     * 모듈검색
-     * 설정 읽기
-     * 객체화
-     * 저장
-     */
-
-    _path =  glob.sync('node_modules/**/gulp_module.json');
-
-    for (i = 0; i < _path.length; i++) {
-        _dirname = path.dirname(_path[i]);      // TODO: 불필요 
-        _modName = _dirname.replace('node_modules/', '');
-
-        _mod = JSON.parse(fs.readFileSync(_path[i]));
-        _modules[_modName] = _mod;
-    }
-
-    _path =  glob.sync('node_modules/**/gulp_i_module.json');
-
-    for (i = 0; i < _path.length; i++) {
-        _dirname = path.dirname(_path[i]);      // TODO: 불필요 
-        _modName = _dirname.replace('node_modules/', '');
-
-        _mod = JSON.parse(fs.readFileSync(_path[i]));
-        _modules[_modName] = _mod;
-    }
-    
-    if (LOG_FLAG) console.log('__getModules__');
-
-}
+});
 
 
 /** 
  * --------------------------------------------------
- * default 태스크
+ * install-submodule 하위 모듈 설치
+ * 
  */
-gulp.task('install', function() {
+gulp.task('install-submodule', function() {
+    /**
+     * 조건 :
+     * - 소스맵 작동
+     * - 중복모듈, 중복 파일 기록
+     * - _install 기준으로 설치
+     * 
+     * 이슈 :
+     * - 하위의 i모듈의 경우?
+     * 
+     * for
+     *  모듈 or i모듈
+     * 
+     * 모듈의 경우
+     * 모듈 for
+     *      /dist 폴더 하위 src() ?
+     *      /파일 목록 추출 : CONFIG._install 기준
+     *          소스맵 작동
+     *      /
+     * 
+     */
 
 });
 
@@ -406,7 +375,9 @@ gulp.task('preinstall-build', function() {
     var _prop;
     var _mod;
     var _install;
-    
+    var _distPath;
+    var _arrDist;
+
     // 임시
     var _t = glob.sync('node_modules/module_m/dist/**/*.*');    // 전체 파일
     var _t2 = glob.sync('node_modules/module_m/dist/**/');      // 전체 디렉토리
@@ -414,386 +385,21 @@ gulp.task('preinstall-build', function() {
 
     for (var _prop in MODULES) {
         _mod = JSON.parse(fs.readFileSync(PATH.base + MODULES[_prop].path));
+        
+        // 일반모듈 일 경우
+        if (MODULES[_prop].type === 'm') {
+            
+            // glob 의 형식 : 전체 파일
+            _distPath = path.dirname(MODULES[_prop].path) + '/' + _mod.distPath + '/**/*.*';
+            _arrDist = glob.sync(_distPath);
+
+            _install = new InstallPath(_arrDist, 'dist', 'install', 'node_modules/module_m');
+            _mod['_install'] = _install.getObject();
+        }
+
         CONFIG.modules[_prop] = _mod;
     }
-
-    /**
-     * node_modules/module_m/ dist/01-Table/dd/table.1.sql
-     * node_modules/module_m/ dist/01-Table/MnMenu2.Table.sql
-     * 
-     * node_modules/module_m/ dist/01-Table/table.2.sql
-     * 
-     * node_modules/module_m/ dist/ALL.sql
-     */
-
-    // 기본경로는 제거후 검사함
-    
-    // _install = installPathBuild(_t, 'node_modules/module_m/', 'dist/', 'install/');
-    // _install = installPathBuild(_t[0], 'node_modules/module_m/', 'dist/', 'install/');
-
-    var _ori = _t;
-    // var _ori = 'node_modules/module_m/dist/01-Table/dd/table.2.sql';
-    // var _ori = 'node_modules/module_m/dist/01-Table/table.2.sql';
-    // var _ori = 'node_modules/module_m/dist/ALL.sql';
-
-    var i = new InstallPath(_ori, 'dist', 'install', 'node_modules/module_m');
-    
-    //var io = i.parse(); // 객체 직렬화 가져오기
-
-    console.log('bb');
 });
-
-// TODO: 폴더명 /폴더, 폴더/, 폴더  모두 통일해서 사용
-// TODO: string 명칭 변경 검토
-// TODO: 클래스로 검토
-
-/**
- * 인스톨 경로 객체 제작
- * 샘플
- * InstallPath('node_modules/module_m/dist/ALL.sql', 'dist', 'install', ''node_modules/module_m')
- * InstallPath('[...]', 'dist', 'install', ''node_modules/module_m')
- * @param {*} original  대상 경로 + 파일명 (타입 : Array, String)
- * @param {*} source    경로명
- * @param {*} target    (*선택) 타겟 경로명
- * @param {*} basePath  (*선택) 소스에서 제거 경로
- */
-function InstallPath(original, source, target, basePath) {
-    
-    this.source = source;
-    this.target = target ? target : '';
-    this.basePath = basePath ? basePath : '';
-    this.file = {};
-    this.path = [];
-
-    var _path;
-    var _dirname;
-    var _filename;
-
-    var _sursor;
-    var _next;
-    var _format;
-
-
-    if (Array.isArray(original)) {
-        for (var i = 0; i < original.length; i++) {
-            _format = this.pathFormat(original[i]);
-            this.add(_format);
-        }
-    } else {
-        _format = this.pathFormat(original);
-        this.add(_format);
-        
-        // // 경로명과 같고, 깊이가 마지막일때
-        // if (this.source + '/' + _format.filename === _format.path && _format.depth === 1) {
-        //     this.file[_format.filename] = '';
-        // } else {
-        //     this.add(_format);
-        // }
-    }
-
-    // **********************************************
-
-    // this.install = {
-    //     source: pathStr(source),
-    //     target: pathStr(target),
-    //     file: {},
-    //     path: []
-    // };
-    
-    
-    // // 배열인 경우
-    // if (Array.isArray(string)) {
-    
-    // // 문자열인 경우
-    // } else {
-    //     _path = string.replace(basePath, '');
-    //     _dirname = path.dirname(_path);
-    //     _filename = path.basename(_path);
-
-    //     if (source + '/' + _filename === _path) {
-    //         this.install.file[_filename] = ""
-    //     } else {
-            
-    //         _sursor = this.contains(source);
-    //         _next = this.nextSource(_path);
-
-    //         if (_sursor) {
-    //             // 찾아서 넣어야함
-    //             // this.install.path[_sursor] = new InstallPath();
-    //             // 여기서 클래스의 힘 활용
-    //         } else {
-    //             // 만들어서 넣어야함
-    //             this.install.path.push(new InstallPath(_next.string, '', _next.source, ''));
-    //         }
-    //     } 
-    // }
-}
-(function() {
-    
-    InstallPath.prototype._getFirstPath = function(source) {
-        var nextsource = source.split('/');
-        var nextString = nextsource.slice(1).join('/');
-        var nextPath = nextsource.slice(1, 2).toString();
-
-        return nextPath;
-    };
-
-    InstallPath.prototype._pathStr = function(path) {
-        return path.replace('/', '');
-    };
-
-    // TODO: dir 깊이 0 이하일 경우 예외 처리?
-    InstallPath.prototype.add = function(format) {
-
-        var _sursor;
-        var _next;
-        var _nextFormat;
-        var _install;
-
-        // 경로명과 같고, 깊이가 마지막일때
-        if (this.source === format.dirs[0] && format.depth === 1) {
-            this.file[format.filename] = '';
-        } else {
-            // 자식중 여부 확인
-            _sursor = this.contains(format.dirs[1]);
-            
-            // 자식 경로 
-            _next = this.nextSource(format.path);
-            _nextFormat = this.pathFormat(_next.string);
-
-            if (_sursor > -1) {
-                // 찾아서 넣어야함
-                this.path[_sursor].add(_nextFormat);
-                // 여기서 클래스의 힘 활용
-            } else {
-                // 만들어서 넣어야함
-                // 마지막을 경우
-                _install = new InstallPath(_next.string, _next.source, '', '');
-                
-                if (_next.depth > 1) {
-                    _install.add(_nextFormat);
-                } 
-                
-                this.path.push(_install);
-            }
-        }
-    };
-
-
-    InstallPath.prototype.addPath = function(string, soruce) {
-        
-        var i = new InstallPath();
-
-        this.path.push()
-    };
-    
-    // 파일 추가
-    InstallPath.prototype.modify = function(index, filename) {
-        
-        var i = new InstallPath();
-
-        this.path.push()
-    };
-
-    InstallPath.prototype.modify = function(index, filename) {
-        
-        var i = new InstallPath();
-
-        this.path.push()
-    };
-
-    InstallPath.prototype.contains = function(source) {
-
-        var sursor = -1;
-
-        for (var ii = 0; ii < this.path.length; ii++) {
-            if (this._pathStr(this.path[ii].source) === source) sursor = ii;
-        }
-        return sursor;
-    };
-
-    InstallPath.prototype.nextSource = function(string) {
-
-        var nextsource = string.split('/');
-
-        if (nextsource.length > 0 && nextsource[0] === '') {
-            nextsource = nextsource.slice(1);   // 공백일 경우 첫 배열 삭제
-        }
-
-        var nextString = nextsource.slice(1).join('/');
-        var nextPath = nextsource.slice(1, 2).toString();
-        
-        return {
-            string: nextString,
-            source: nextPath
-        };
-    };
-
-    InstallPath.prototype.pathFormat = function(_path) {
-        var _dir;
-        var _deep;
-
-        _path = _path.replace(this.basePath, '');   // 기본 경로 제거
-        _dir = _path.split('/');
-
-        if (_dir.length > 0 && _dir[0] === '') {
-            _dir = _dir.slice(1);   // 공백일 경우 첫 배열 삭제
-        }
-        // if (_dir[0] === this.source) {
-        //     _dir = _dir.slice(1);   // 자신 폴더일 경우 삭제
-        // }
-        _path = _dir.join('/');
-
-        return {
-            path: _path,
-            dirname: path.dirname(_path),
-            filename: path.basename(_path),
-            depth: _dir.length - 1,
-            dirs: _dir
-        };
-    };
-
-
-}());
-
-function installPathBuild(string, basePath, source, target) {
-    var obj = {
-        source: pathStr(source),
-        target: pathStr(target),
-        file: {},
-        path: []
-    };
-    var _dirname;
-    var _filename;
-    var _path;
-
-    // 경로 통일
-    source = pathStr(source);
-    target = pathStr(target);
-
-    function pathStr(path) {
-        return path.replace('/', '');
-    }
-
-    // 배열일 경우 와 1차원일 겨우 2가지 재작
-    if (Array.isArray(string)) {
-        for (var i = 0; i < string.length; i++) {
-            // TODO: 중복
-            _path = string[i].replace(basePath, '');   // 기본경로 제거
-            _dirname = path.dirname(_path);
-            _filename = path.basename(_path);
-            if (basePath + '/' + source === _path) {
-                obj.file[_filename] = "";
-            }
-        }
-    } else {
-        _path = string.replace(basePath, '');
-        _dirname = path.dirname(_path);
-        _filename = path.basename(_path);
-        var this_path = source + '/' + _filename;
-        if (this_path === _path) {
-            obj.file[_filename] = ""
-        } else {
-            // 배열내 유무 검사
-            var sursor;
-            for (var ii = 0; ii < obj.path.length; ii++) {
-                if (pathStr(obj.path[ii].source) === source) sursor = ii;
-            }
-            // var is = obj.path.some(function(value, index, array) {
-            //     return pathStr(value.source) === source;
-            // });
-
-            var nextsource = _path.split('/');
-            var next = nextsource.slice(1).join('/');
-            var nextPath = nextsource.slice(1, 2).toString();
-        
-            if (sursor) {
-                // 찾아서 넣어야함
-                obj.path[sursor] = installPathBuild(next, '', nextPath, '');
-            } else {
-                // 만들어서 넣어야함
-                obj.path.push(installPathBuild(next, '', nextPath, ''));
-            }
-        }
-    }
-    
-    // test
-    // var a = "/foo/bar/baz/asdf";
-    // var a = "foo/bar/baz/asdf";
-    // var arr2 = a.split('/');
-    // var org2 = {abc: "", org: {}};
-    // var d = {};
-    
-    // for (var i = 0; i < arr2.length; i++) {
-    //     if (arr2[i] != '') {
-    //         if (!org2.org[arr2[i]]) {
-    //             org2.org[arr2[i]] = {};
-    //         }
-    //         org2.org = org2.org[arr2[i]];
-    //     }
-    // }
-
-    console.log('aa');
-
-    // var object = {};
-
-    // function namespace(ns, _object) {
-    //     var parts = ns.split('/');
-    //     var i, len;
-    //     var obj = _object;;
-
-    //     for (i = 0, len = parts.length; i < len; i++) {
-    //         if(!obj[parts[i]]) {
-    //             obj[parts[i]] = {};
-    //         }
-    //         obj = obj[parts[i]];
-    //     }
-    //     return obj;
-    // }
-
-    // org2 = namespace(a, object);
-
-    
-
-
-    // for (var ii = 0; ii < b.length; ii++) {
-        
-    //     if (b[ii] !='' && typeof c[b[ii]] === 'undefined') {
-    //         d = b[ii];
-    //     } else {
-
-    //     }
-    // }
-    // function recurPath(arr, org) {
-    //     var o;
-
-    //     for (var i = 0; i < arr.length; i++) {
-    //         if (!org[arr[i]]) {
-    //             org[arr[i]] = {};
-    //         }
-    //         org = obj[arr[i]];
-    //     }
-        
-    //     if (typeof org[arr[0]] === 'undefined' && arr[0] != '') {
-    //         org[arr[0]] = {};
-    //     }
-    //     if (arr.length > 1) {
-    //         var tt = arr.splice(1);
-            
-    //         org = recurPath(tt, org[arr[0]]);
-    //     }
-
-    //     return org;
-    // }
-
-    // var e = recurPath(b, c);
-
-
-    
-    // console.log('aa');
-
-    return obj;
-}
 
 
 // ##################################################
@@ -817,6 +423,180 @@ function gulpError(message, errName) {
 }
 
 
+
+/**
+ * 인스톨 경로 객체 제작
+ * 샘플
+ * InstallPath('node_modules/module_m/dist/ALL.sql', 'dist', 'install', ''node_modules/module_m')
+ * InstallPath('[...]', 'dist', 'install', ''node_modules/module_m')
+ * @param {*} original  대상 경로 + 파일명 (타입 : Array, String)
+ * @param {*} source    경로명
+ * @param {*} target    (*선택) 타겟(설치) 경로명
+ * @param {*} basePath  (*선택) original 경로에서 제거되는 경로
+ */
+function InstallPath(original, source, target, basePath, parentInstallPath) {
+    
+    this.source = this._pathStr(source);
+    this.target = target ? this._pathStr(target) : '';
+    this.file = {};
+    this.path = [];
+    this._basePath = basePath ? basePath : '';
+    this._parent = parentInstallPath;
+
+    var _format;
+    
+    if (Array.isArray(original)) {
+        for (var i = 0; i < original.length; i++) {
+            _format = this.pathFormat(original[i]);
+            this.add(_format);
+        }
+    } else {
+        _format = this.pathFormat(original);
+        this.add(_format);
+    }
+}
+(function() {
+    
+    InstallPath.prototype._pathStr = function(path) {
+        return path.replace('/', '');
+    };
+
+    // TODO: dir 깊이 0 이하일 경우 예외 처리?
+    InstallPath.prototype.add = function(format) {
+
+        var _sursor;
+        var _next;
+        var _nextFormat;
+        var _install;
+
+        // 1. 현재 위치의 파일일 경우
+        if (this.source === format.dirs[0] && format.depth === 1) {
+            this.file[format.filename] = '';
+        } else {
+
+            if (format.depth < 1) gulpError('하위 폴더가 없습니다.'); 
+
+            _sursor     = this.contains(format.dirs[1]);
+            _next       = this.nextSource(format.path);
+            _nextFormat = this.pathFormat(_next.string);
+
+            // 2. 자식중에 위치가 있는 경우 (하위 재귀적 호출)
+            if (_sursor > -1) {
+                // 찾아서 넣어야함
+                this.path[_sursor].add(_nextFormat);
+
+            // 3. 자식에 없는 경우 (신규 생성)
+            } else {
+                _install = new InstallPath(_next.string, _next.source, '', '', this);
+                
+                // 4. 자식에 하위가 있는 경우 
+                if (_next.depth > 1) {
+                    _install.add(_nextFormat);
+                }
+                
+                this.path.push(_install);
+            }
+        }
+    };
+
+    // 자식에 유무 검사
+    InstallPath.prototype.contains = function(source) {
+
+        var sursor = -1;
+
+        for (var ii = 0; ii < this.path.length; ii++) {
+            if (this._pathStr(this.path[ii].source) === source) sursor = ii;
+        }
+
+        return sursor;
+    };
+
+    // 다음 폴더 조회 (리턴)
+    InstallPath.prototype.nextSource = function(pathStr) {
+
+        var arrPath = pathStr.split('/');
+        var nextString;
+        var nextPath;
+
+        if (arrPath.length > 0 && arrPath[0] === '') {
+            arrPath = arrPath.slice(1);   // 공백일 경우 첫 배열 삭제
+        }
+
+        nextString = arrPath.slice(1).join('/');
+        nextPath = arrPath.slice(1, 2).toString();
+        
+        return {
+            string: nextString,
+            source: nextPath
+        };
+    };
+
+    // path 포멧 리턴
+    InstallPath.prototype.pathFormat = function(pathStr) {
+
+        var _dir;
+
+        // 기본 경로 제거
+        pathStr = pathStr.replace(this._basePath, '');   
+        _dir = pathStr.split('/');
+
+        // 공백일 경우 첫 배열 삭제
+        if (_dir.length > 0 && _dir[0] === '') {
+            _dir = _dir.slice(1);   
+        }
+
+        pathStr = _dir.join('/');
+
+        return {
+            path: pathStr,
+            dirname: path.dirname(pathStr),
+            filename: path.basename(pathStr),
+            depth: _dir.length - 1,
+            dirs: _dir
+        };
+    };
+
+    // path 포멧 리턴
+    InstallPath.prototype.getObject = function() {
+        
+        var obj     = {};
+
+        for (var prop in this) {
+            if (typeof this[prop] !== "function") {
+
+                // path 는 배열 InstallPath 객체 
+                if (prop === 'path') {
+                    obj[prop] = [];
+                    for (var ii = 0; ii < this.path.length; ii++) {
+                        obj[prop].push(this.path[ii].getObject());
+                    }                
+                
+                // source 속성
+                } else if (prop === 'source') {                    
+                    obj[prop] = this.getSource();
+
+                // 내부 속성은 제외
+                } else if (prop.substr(0,1) != '_') {
+                    obj[prop] = this[prop];
+                }
+            }
+        }
+        return obj;
+
+    };
+
+    InstallPath.prototype.getSource = function() {
+        
+        var _source = this.source;
+
+        if (this._parent) {
+            _source = this._parent.getSource() + '/' + _source;
+        }
+
+        return _source;
+    };
+
+}());
 
 
 function getUpateModules(){

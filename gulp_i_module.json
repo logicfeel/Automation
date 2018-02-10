@@ -23,6 +23,59 @@
   },
   "modules": {
     "module_m": {
+      "_install": {
+        "file": {
+          "ALL.sql": "",
+          "FN.sql": "",
+          "SP.sql": "",
+          "U.sql": ""
+        },
+        "path": [
+          {
+            "file": {
+              "MnMenu2.Table.sql": "",
+              "MnMenu3.Table.sql": "",
+              "table.1.sql": "",
+              "table.2.sql": ""
+            },
+            "path": [
+              {
+                "file": {
+                  "table.1.sql": ""
+                },
+                "path": [
+                ],
+                "source": "dist/01-Table/dd",
+                "target": ""
+              }
+            ],
+            "source": "dist/01-Table",
+            "target": ""
+          },
+          {
+            "file": {
+              "MnMenu1.FN.sql": "",
+              "MnMenu2.FN.sql": ""
+            },
+            "path": [
+            ],
+            "source": "dist/02-FN",
+            "target": ""
+          },
+          {
+            "file": {
+              "MnMenu1.SP.sql": "",
+              "MnMenu2.SP.sql": ""
+            },
+            "path": [
+            ],
+            "source": "dist/03-SP",
+            "target": ""
+          }
+        ],
+        "source": "dist",
+        "target": "install"
+      },
       "_replace": [
         {
           "replacement": "SELECT DB_OBJ_NAME_P.MnAuth_FN_AuthChk('1')",
@@ -79,6 +132,7 @@
         "comment": false,
         "use": true
       },
+      "distPath": "dist/",
       "install": "install/",
       "module": "",
       "obj_name": "DB_OBJ_NAME_P",
