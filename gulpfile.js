@@ -66,7 +66,7 @@ var CONFIG_FILE  = 'gulp_module.json';   // 설정 파일명
         "suffix_name": "",          @summary 함수|프로시저|테이블명 접미사(뒤)
         "clear": {
             "comment": false,       @summary 자동 생성 주석 제거 유무
-            "use": true             @summary USE [DB] 제거 유무    
+            "use": true             @summary USE [DB] 제거 유무
         },
         "options": {
             "obj_type": 1,          @summary DDL문 객체명 옵션
@@ -193,6 +193,7 @@ gulp.task('load-config', function() {
 gulp.task('build-config-replace', function() {
 
     CONFIG._replace = [];
+    CONFIG.distPath = PATH.dist;
 
     return gulp.src(PATH.base + PATH.src)
         .pipe(replace(REG_EXP.DML_SP, function(match, p1, p2, p3, p4, offset, string) {
@@ -530,7 +531,7 @@ var _install_common = lazypipe()
 module.exports = {
     setPath: function(basePath, distPath) {
         PATH.base   = basePath ? basePath: PATH.base;
-        PATH.dist   = distPath ? distPath: PATH.dist;
+        CONFIG.distPath   = distPath ? distPath: CONFIG.distPath;
     },
     getConfig: function() {
         return CONFIG;

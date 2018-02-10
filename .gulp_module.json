@@ -5,6 +5,7 @@
   "prefix_name": "",
   "suffix_name": "",
   "module": "",
+  "distPath": "dist/",
   "clear": {
     "comment": false,
     "use": true
