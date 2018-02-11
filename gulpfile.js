@@ -196,24 +196,45 @@ gulp.task('install-imodule', function() {
 gulp.task('install-submodule', function() {
     
     var _prop;
-    var _dirname;
-    var _dist;
+    var install;
+    var arr = [];
+    var _path;
 
-    var scripts = {
-        'modules_M1': [
-            'modules/M1/src/test.1.js',
-            'modules/M1/src/test.2.js',
-        ],
-        'modules_M2':[
-            'modules/M1/src/test.3.js',
-            'modules/M1/src/test.4.js'
-        ]
-    };
+    var _installObj;
 
-    for (_prop in scripts) {
-        gulp.src(scripts[_prop])
-            .pipe(gulp.dest("group/" + _prop));
+    // var _dirname;
+    // var _dist;
+
+    for ( _prop in CONFIG.modules) {
+        if (MODULES[_prop].type === 'm') {
+            // _installObj = ;
+            install = new InstallPath();
+            install.load(CONFIG.modules[_prop]._install);
+            arr = install.getInstall()
+            arr.forEach(function(value, index, array) {
+                _path = path.dirname(value.dest);
+                fs.accessSync(_path, fs.constants.R_OK | fs.constants.W_OK);
+                
+                fs.copyFileSync(value.src, value.dest);
+            })
+        }
     }
+    console.log('stop');
+    // var scripts = {
+    //     'modules_M1': [
+    //         'modules/M1/src/test.1.js',
+    //         'modules/M1/src/test.2.js',
+    //     ],
+    //     'modules_M2':[
+    //         'modules/M1/src/test.3.js',
+    //         'modules/M1/src/test.4.js'
+    //     ]
+    // };
+
+    // for (_prop in scripts) {
+    //     gulp.src(scripts[_prop])
+    //         .pipe(gulp.dest("group/" + _prop));
+    // }
 
     // group(scripts, function(name,files){
     //     console.log('___loading group___');
@@ -451,6 +472,7 @@ gulp.task('preinstall-submodule', function() {
  * 
  */
 gulp.task('preinstall-build', function() {
+
     var _prop;
     var _mod;
     var _install;
@@ -478,6 +500,15 @@ gulp.task('preinstall-build', function() {
 
         CONFIG.modules[_prop] = _mod;
     }
+
+    // test
+    var tmp = new InstallPath();
+    tmp.load(_install);
+    var a = tmp.getInstall();
+    var c = tmp.rPathTrim('abcd/');
+    var d = tmp.rPathTrim('abcdef');
+    console.log('stop');
+
 });
 
 
@@ -515,28 +546,31 @@ function gulpError(message, errName) {
  */
 function InstallPath(original, source, target, basePath, parentInstallPath) {
     
-    this.source = this._pathStr(source);
-    this.target = target ? this._pathStr(target) : '';
+    this.source = source ? this._trimPath(source) : '';
+    this.target = target ? this._trimPath(target) : '';
     this.file = {};
     this.path = [];
-    this._basePath = basePath ? basePath : '';
+    this.basePath = basePath ? basePath : '';
     this._parent = parentInstallPath;
 
     var _format;
     
-    if (Array.isArray(original)) {
-        for (var i = 0; i < original.length; i++) {
-            _format = this.pathFormat(original[i]);
+    if (original) {
+        if (Array.isArray(original)) {
+            for (var i = 0; i < original.length; i++) {
+                _format = this.pathFormat(original[i]);
+                this.add(_format);
+            }
+        } else {
+            _format = this.pathFormat(original);
             this.add(_format);
         }
-    } else {
-        _format = this.pathFormat(original);
-        this.add(_format);
     }
 }
 (function() {
     
-    InstallPath.prototype._pathStr = function(path) {
+    // TODO: trimPath 명으로 변경
+    InstallPath.prototype._trimPath = function(path) {
         return path.replace('/', '');
     };
 
@@ -566,7 +600,7 @@ function InstallPath(original, source, target, basePath, parentInstallPath) {
 
             // 3. 자식에 없는 경우 (신규 생성)
             } else {
-                _install = new InstallPath(_next.string, _next.source, '', '', this);
+                _install = new InstallPath(_next.string, _next.source, _next.source, '', this);
                 
                 // 4. 자식에 하위가 있는 경우 
                 if (_next.depth > 1) {
@@ -584,7 +618,7 @@ function InstallPath(original, source, target, basePath, parentInstallPath) {
         var sursor = -1;
 
         for (var ii = 0; ii < this.path.length; ii++) {
-            if (this._pathStr(this.path[ii].source) === source) sursor = ii;
+            if (this._trimPath(this.path[ii].source) === source) sursor = ii;
         }
 
         return sursor;
@@ -616,7 +650,7 @@ function InstallPath(original, source, target, basePath, parentInstallPath) {
         var _dir;
 
         // 기본 경로 제거
-        pathStr = pathStr.replace(this._basePath, '');   
+        pathStr = pathStr.replace(this.basePath, '');   
         _dir = pathStr.split('/');
 
         // 공백일 경우 첫 배열 삭제
@@ -651,8 +685,9 @@ function InstallPath(original, source, target, basePath, parentInstallPath) {
                     }                
                 
                 // source 속성
-                } else if (prop === 'source') {                    
-                    obj[prop] = this.getSource();
+                } else if (prop === 'source') {    
+                    // REVIEW : 소스는 동적으로 실제 경로를 가져옴                
+                    obj[prop] = this.getSource();   
 
                 // 내부 속성은 제외
                 } else if (prop.substr(0,1) != '_') {
@@ -673,6 +708,120 @@ function InstallPath(original, source, target, basePath, parentInstallPath) {
         }
 
         return _source;
+    };
+
+    InstallPath.prototype.getTarget = function() {
+        
+        var _target = this.target;
+
+        if (this._parent) {
+            _target = this.rPathTrim(this._parent.getTarget()) + '/' + _target;
+        }
+
+        return _target;
+    };
+
+    InstallPath.prototype.rPathTrim = function(p_path) {
+        
+        if (typeof p_path === 'string') {
+            if (p_path.charAt(p_path.length - 1) === '/') {
+                p_path = p_path.substr(0, p_path.length - 1);
+            }
+        }
+        return p_path;
+    };
+
+
+
+    InstallPath.prototype.getBasePath = function() {
+        
+        var _base;
+
+        if (this.basePath) {
+            _base = this.basePath;
+        } else if (this._parent) {
+            _base = this._parent.getBasePath();
+        }
+
+        return _base;
+    };
+
+    InstallPath.prototype.getInstall = function() {
+        
+        var arr = [];
+        var target;
+    
+        for (var prop in this) {
+            if (typeof this[prop] !== "function") {
+ 
+                // file
+                if (prop === 'file') {
+
+                    for (var prop2 in this[prop]) {
+                        var obj = {};
+                        
+                        // REVIEW this.rPathTrim 공통으로 뽑아야 하는지?
+                        obj.src = this.rPathTrim(this.getBasePath()) + '/' + this.source + '/' + prop2;
+                        target = this[prop][prop2] != '' ? this[prop][prop2] : prop2;
+                        obj.dest = this.rPathTrim(this.getTarget()) + '/' + target;
+                        arr.push(obj);
+                    }
+                
+                // path
+                } else if (prop === 'path') {
+
+                    for (var ii = 0; ii < this.path.length; ii++) {
+                        arr = arr.concat(this.path[ii].getInstall());
+                    }
+                }
+            }
+        }
+
+        return arr;
+    };
+
+
+    InstallPath.prototype.reset = function() {
+
+        this.source = '';
+        this.target = '';
+        this.file = {};
+        this.path = [];
+        this.basePath = '';
+        this._parent = null;
+        
+    };
+
+    InstallPath.prototype.load = function(obj, parent) {
+        
+        var _obj;
+        var _install;
+
+        if (!(obj instanceof Object)) {
+            throw new Error('Object 객체가 아닙니다.');
+        }
+
+        if (parent && !(parent instanceof InstallPath)) {
+            throw new Error('InstallPath 객체가 아닙니다.');
+        }
+        // _obj = JSON.parse(JSON.stringify(obj));
+        // TODO: 참조 부분 끊게 만들어야 함
+
+        _obj = obj;
+
+        this.source     = _obj.source;
+        this.target     = _obj.target;
+        this.file       = _obj.file;
+        this.basePath  = _obj.basePath;
+        this._parent    = parent;
+
+        for (var i = 0; i < _obj.path.length; i++) {
+            _install = new InstallPath();
+            _install.load(_obj.path[i], this);
+            this.path.push(_install);
+        }
+
+        return this;
     };
 
 }());

@@ -24,6 +24,7 @@
   "modules": {
     "module_m": {
       "_install": {
+        "basePath": "node_modules/module_m",
         "file": {
           "ALL.sql": "",
           "FN.sql": "",
@@ -32,6 +33,7 @@
         },
         "path": [
           {
+            "basePath": "",
             "file": {
               "MnMenu2.Table.sql": "",
               "MnMenu3.Table.sql": "",
@@ -41,9 +43,10 @@
             "path": [
             ],
             "source": "dist/01-Table",
-            "target": ""
+            "target": "01-Table"
           },
           {
+            "basePath": "",
             "file": {
               "MnMenu1.FN.sql": "",
               "MnMenu2.FN.sql": ""
@@ -51,9 +54,10 @@
             "path": [
             ],
             "source": "dist/02-FN",
-            "target": ""
+            "target": "02-FN"
           },
           {
+            "basePath": "",
             "file": {
               "MnMenu1.SP.sql": "",
               "MnMenu2.SP.sql": ""
@@ -61,9 +65,10 @@
             "path": [
             ],
             "source": "dist/03-SP",
-            "target": ""
+            "target": "03-SP"
           },
           {
+            "basePath": "",
             "file": {
               "MnMenu1.FN.sql": "",
               "MnMenu2.FN.sql": ""
@@ -71,9 +76,10 @@
             "path": [
             ],
             "source": "dist/09-Template",
-            "target": ""
+            "target": "09-Template"
           },
           {
+            "basePath": "",
             "file": {
               "page-one.sql": "",
               "page-tree.sql": "",
@@ -82,13 +88,33 @@
             "path": [
             ],
             "source": "dist/pages",
-            "target": ""
+            "target": "pages"
           }
         ],
         "source": "dist",
         "target": "install"
       },
       "_replace": [
+        {
+          "replacement": "SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk('1')",
+          "src": "02-FN/MnMenu1.FN.sql",
+          "string": "SELECT sstory40.MnAuth_FN_AuthChk('1')"
+        },
+        {
+          "replacement": "SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk('777')",
+          "src": "02-FN/MnMenu1.FN.sql",
+          "string": "SELECT sstory40.MnAuth_FN_AuthChk('777')"
+        },
+        {
+          "replacement": "SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk2('1')",
+          "src": "02-FN/MnMenu2.FN.sql",
+          "string": "SELECT sstory40.MnAuth_FN_AuthChk2('1')"
+        },
+        {
+          "replacement": "SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk2('777')",
+          "src": "02-FN/MnMenu2.FN.sql",
+          "string": "SELECT sstory40.MnAuth_FN_AuthChk2('777')"
+        },
         {
           "replacement": "exec DB_OBJ_NAME.[MnAcct_Account_SP_C]",
           "src": "03-SP/MnMenu1.SP.sql",
@@ -118,26 +144,6 @@
           "replacement": "SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk3('777')",
           "src": "03-SP/MnMenu1.SP.sql",
           "string": "SELECT sstory40.MnAuth_FN_AuthChk3('777')"
-        },
-        {
-          "replacement": "SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk('1')",
-          "src": "02-FN/MnMenu1.FN.sql",
-          "string": "SELECT sstory40.MnAuth_FN_AuthChk('1')"
-        },
-        {
-          "replacement": "SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk('777')",
-          "src": "02-FN/MnMenu1.FN.sql",
-          "string": "SELECT sstory40.MnAuth_FN_AuthChk('777')"
-        },
-        {
-          "replacement": "SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk2('1')",
-          "src": "02-FN/MnMenu2.FN.sql",
-          "string": "SELECT sstory40.MnAuth_FN_AuthChk2('1')"
-        },
-        {
-          "replacement": "SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk2('777')",
-          "src": "02-FN/MnMenu2.FN.sql",
-          "string": "SELECT sstory40.MnAuth_FN_AuthChk2('777')"
         }
       ],
       "clear": {
