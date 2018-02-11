@@ -18,7 +18,7 @@ var chug = require('gulp-chug');
 var deepmerge = require('deepmerge');
 var writeJsonFile = require('write-json-file');
 
-var group = require('gulp-group-files');
+// var group = require('gulp-group-files');
 
 // var mod = gulp.submodule('modules/M1/');
 // var mod = gulp.submodule('node_modules/M3/');
@@ -212,10 +212,28 @@ gulp.task('install-submodule', function() {
             install.load(CONFIG.modules[_prop]._install);
             arr = install.getInstall()
             arr.forEach(function(value, index, array) {
-                _path = path.dirname(value.dest);
-                fs.accessSync(_path, fs.constants.R_OK | fs.constants.W_OK);
-                
-                fs.copyFileSync(value.src, value.dest);
+
+                // TODO: 읽어서 내용중 경로 관련된 부분 경우에 따라 수정 필요
+                // TODO: 스트림 타입 이미지 같은것 처리
+                fs.readFile(value.src, 'utf8', function(err, data) {
+                    if  (err) gulpError('파일 읽기 오류: ' + value.src);
+
+                    // 디렉토리 생성
+                    fs.mkdir(path.dirname(value.dest), function(err) {
+
+                        // 중복 에러는 무시함
+                        if (err && err.code != 'EEXIST') {
+                            gulpError('파일 읽기 오류: ' + value.src);
+                        }
+
+                        // 파일 쓰기
+                        fs.writeFile(value.dest, data, function(err3) {
+                            if (err3) throw err3;
+                            console.log('파일 설치 성공 !' + value.src);
+                        });                        
+                    });
+
+                });
             })
         }
     }
