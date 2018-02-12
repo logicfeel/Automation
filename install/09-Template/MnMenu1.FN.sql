@@ -1,11 +1,12 @@
+USE [sstory40]
+GO
 /****** Object:  UserDefinedFunction [sstory40].[_MnAuth_FN_AuthChk]    Script Date: 01/03/2018 06:10:26 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-/*ㅇㅇㅇㅇ
-*/
+
 
 -- ============================================= 
 -- Author		: 김영호
@@ -13,7 +14,7 @@ GO
 -- Update date	: 
 -- Description	: 문자열을 갯수의 문자열로 채움
 -- =============================================
-CREATE FUNCTION [MnAuth_FN_AuthChk2](@bt varchar(10))
+ALTER FUNCTION [sstory40].[MnAuth_FN_AuthChk](@bt varchar(10))
 	RETURNS char(10)
 AS
 BEGIN
@@ -35,9 +36,10 @@ END
 -- ###################################################
 -- ## 테스트 코드
 /*
-	SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk2('1')
-	SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk2('777')
+	SELECT sstory40.MnAuth_FN_AuthChk('1')
+	SELECT sstory40.MnAuth_FN_AuthChk('777')
 */
 
-GO--Auto
+GO
+
 

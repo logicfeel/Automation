@@ -85,18 +85,18 @@ END
 */
 
 /*
-	SELECT DB_OBJ_NAME_P.MnAuth_FN_AuthChk3('1')
-	SELECT DB_OBJ_NAME_P.MnAuth_FN_AuthChk3('777')
+	SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk3('1')
+	SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk3('777')
 */
 
 -- DML SP
 /*
-exec DB_OBJ_NAME_P.[MnAcct_Account_SP_C] 1, 'admin', 'admin', '관리자'
+exec DB_OBJ_NAME.[MnAcct_Account_SP_C] 1, 'admin', 'admin', '관리자'
 
-excute [DB_OBJ_NAME_P].[MnAcct_Account_SP_C] 1, 'admin', 'admin', '관리자'
+excute [DB_OBJ_NAME].[MnAcct_Account_SP_C] 1, 'admin', 'admin', '관리자'
 
-exec  @abc =  DB_OBJ_NAME_P.[MnAcct_Account_SP_C]
-exec @abc=DB_OBJ_NAME_P.[MnAcct_Account_SP_C]
+exec  @abc =  DB_OBJ_NAME.[MnAcct_Account_SP_C]
+exec @abc=DB_OBJ_NAME.[MnAcct_Account_SP_C]
 */
 
 GO--End

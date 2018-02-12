@@ -1,3 +1,5 @@
+USE [sstory40]
+GO
 /****** Object:  UserDefinedFunction [sstory40].[_MnAuth_FN_AuthChk]    Script Date: 01/03/2018 06:10:26 ******/
 SET ANSI_NULLS ON
 GO
@@ -13,7 +15,7 @@ GO
 -- Update date	: 
 -- Description	: 문자열을 갯수의 문자열로 채움
 -- =============================================
-CREATE FUNCTION [MnAuth_FN_AuthChk2](@bt varchar(10))
+ALTER FUNCTION [sstory40].[MnAuth_FN_AuthChk2](@bt varchar(10))
 	RETURNS char(10)
 AS
 BEGIN
@@ -35,9 +37,37 @@ END
 -- ###################################################
 -- ## 테스트 코드
 /*
-	SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk2('1')
-	SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk2('777')
+	SELECT sstory40.MnAuth_FN_AuthChk2('1')
+	SELECT sstory40.MnAuth_FN_AuthChk2('777')
+
+<div class="entry">
+  <h1>My First Blog Post!</h1>
+  <h2>By Yehuda Katz</h2>
+
+  <div class="body">
+    My first post. Wheeeee!
+  </div>
+</div>
+
+47 Yehuda Katz
+
+<ul><li>47: Yehuda Katz</li></ul>
+
+
+
+
+{{escaped}}
+
+
+<div class="nav">
+</div>
+
+<div class="content">
+    My Content 부분 파트 로딩 성공
+</div>
+
+
 */
 
-GO--Auto
+
 

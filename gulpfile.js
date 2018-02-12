@@ -1,42 +1,23 @@
 'use strict';
 // gulp 3.9 기준
 
-var gulp        = require('gulp'); 
-// require('gulp-submodule')(gulp);
+var gulp            = require('gulp'); 
+var gulpsync        = require('gulp-sync')(gulp);
+var fs              = require('fs');
+var sortJSON        = require('gulp-json-sort').default;
+var glob            = require('glob'); 
 
-var gulpsync    = require('gulp-sync')(gulp);
-var fs          = require('fs');
-var sortJSON    = require('gulp-json-sort').default;
-var glob        = require('glob'); 
+var path            = require('path'); 
 
-var path        = require('path'); 
+var gutil           = require("gulp-util");
+var rename          = require('gulp-rename');
 
-var gutil = require("gulp-util");
-var rename      = require('gulp-rename');
+var chug            = require('gulp-chug');
+var deepmerge       = require('deepmerge');
+var writeJsonFile   = require('write-json-file');
+var clean           = require('gulp-clean');
+var path            = require('path'); 
 
-var chug = require('gulp-chug');
-var deepmerge = require('deepmerge');
-var writeJsonFile = require('write-json-file');
-
-// var group = require('gulp-group-files');
-
-// var mod = gulp.submodule('modules/M1/');
-// var mod = gulp.submodule('node_modules/M3/');
-
-// console.log('1.path: ' + mod.getPath());
-// var modPath = './modules/M1/';
-// mod.setPath(modPath, "install/", "default");
-
-
-
-// console.log('Mod returns ' + mod);
-
-// var gulpModule = require('gulp-module');
-
-var path   = require('path'); 
-
-// var nodemodulespath   = require('node-modules-path'); 
-// var requiredPath = require('required-path');
 
 // #########################################################
 // 전역 변수
@@ -55,6 +36,7 @@ var I_MODULE_IGNORE = true;      // 인스턴스 모듈 제외
 
 var CONFIG_FILE     = 'gulp_i_module.json';   // 설정 파일명
 var PACKAGE_FILE    = 'package.json';
+var SOURCEMAP_FILE    = 'sourcemap.json';
 
 // 기본 경로 (필수)
 var PATH = {
@@ -74,17 +56,14 @@ var PATH = {
  * --------------------------------------------------
  * default 태스크
  */
-// gulp.task('default', function() {});
+gulp.task('default', gulpsync.sync(['update', 'preinstall', 'install']));
+
 
 // 디버깅 시
 // gulp.task('default', ['init']);              // 초기화 (설정 파일 초기화, 배치폴더 제거)
 // gulp.task('default', ['update']);            // 목록 갱신
 // gulp.task('default', ['preinstall']);        // 통합 실행
-gulp.task('default', ['install']);           // 배포
-
-
-// gulp.task('default', ['default2']);            // 임시
-// gulp.task('default', ['default3']);            // 임시
+// gulp.task('default', ['install']);           // 배포
 
 
 /** 
@@ -92,7 +71,7 @@ gulp.task('default', ['install']);           // 배포
  * init 태스크
  * i 모듈은 현재 폴더에서만 수행 가능함
  */
-gulp.task('init', function() {
+gulp.task('init', ['clean-dist'], function() {
     return gulp.src(PATH.base + '.' + CONFIG_FILE)
         .pipe(rename(CONFIG_FILE))
         .pipe(gulp.dest(PATH.base + './'));    
@@ -100,11 +79,11 @@ gulp.task('init', function() {
 
 /**
  * --------------------------------------------------
- * default 태스크
+ * clean-dist
  * dist, map 폴더 제거
  */
 gulp.task('clean-dist', function() {
-    gulp.src([PATH.base + PATH.dist, PATH.base + PATH.map], {read: false})
+    return gulp.src([PATH.base + PATH.dist, PATH.base + PATH.map], {read: false})
       .pipe(clean());
 });
 
@@ -194,23 +173,17 @@ gulp.task('install-imodule', function() {
  * 
  */
 gulp.task('install-submodule', function() {
-    
+
     var _prop;
     var install;
     var arr = [];
     var _path;
-
-    var _installObj;
-
     var SOURCEMAP = {};
 
-    // var _dirname;
-    // var _dist;
     CONFIG._overlap = {
         module: [],
         file: []
     };
-
 
     for ( _prop in CONFIG.modules) {
         
@@ -315,68 +288,12 @@ gulp.task('install-submodule', function() {
                     }
                 });
             }
+            console.log('모듈설치 완료 : ' + _prop);
         });
     }
-     
-    console.log('stop');
-    // var scripts = {
-    //     'modules_M1': [
-    //         'modules/M1/src/test.1.js',
-    //         'modules/M1/src/test.2.js',
-    //     ],
-    //     'modules_M2':[
-    //         'modules/M1/src/test.3.js',
-    //         'modules/M1/src/test.4.js'
-    //     ]
-    // };
-
-    // for (_prop in scripts) {
-    //     gulp.src(scripts[_prop])
-    //         .pipe(gulp.dest("group/" + _prop));
-    // }
-
-    // group(scripts, function(name,files){
-    //     console.log('___loading group___');
-    //     return gulp.src(files)
-    //             .pipe(gulp.dest("group/" + name));
-    // })
-
-    if (LOG_FLAG) console.log('___loading '+ CONFIG_FILE + '___');
-
-    // for ( _prop in CONFIG.modules) {
-    //     _dirname = path.dirname(MODULES[_prop].path);
-    //     _dist = CONFIG.modules[_prop].distPath;
-
-    //     if (MODULES[_prop].type === 'm') {
-    //         gulp.src( _dirname + _dist )
-    //             .pipe(gulp.dest(PATH.base + PATH.dist));
-
-    //     } else if (MODULES[_prop].type === 'i' && !I_MODULE_IGNORE) {
-    //         // TODO: 
-    //     }
-    // }    
-
-    /**
-     * 조건 :
-     * - 소스맵 작동
-     * - 중복모듈, 중복 파일 기록
-     * - _install 기준으로 설치
-     * 
-     * 이슈 :
-     * - 하위의 i모듈의 경우?
-     * 
-     * for
-     *  모듈 or i모듈
-     * 
-     * 모듈의 경우
-     * 모듈 for
-     *      /dist 폴더 하위 src() ?
-     *      /파일 목록 추출 : CONFIG._install 기준
-     *          소스맵 작동
-     *      /
-     * 
-     */
-
+    
+    // 소스맵 파일 저장
+    writeJsonFile.sync(PATH.map + SOURCEMAP_FILE, SOURCEMAP);
 });
 
 
@@ -632,9 +549,8 @@ function gulpError(message, errName) {
 }
 
 
-
 /**
- * 인스톨 경로 객체 제작
+ * 인스톨 경로 객체 제작 클래스
  * 샘플
  * InstallPath('node_modules/module_m/dist/ALL.sql', 'dist', 'install', ''node_modules/module_m')
  * InstallPath('[...]', 'dist', 'install', ''node_modules/module_m')
@@ -805,7 +721,6 @@ function InstallPath(original, source, target, basePath, parentInstallPath) {
         if (this._parent) {
             _source = this._parent.getSource() + '/' + _source;
         }
-
         return _source;
     };
 
@@ -816,7 +731,6 @@ function InstallPath(original, source, target, basePath, parentInstallPath) {
         if (this._parent) {
             _target = this.rPathTrim(this._parent.getTarget()) + '/' + _target;
         }
-
         return _target;
     };
 
@@ -841,7 +755,6 @@ function InstallPath(original, source, target, basePath, parentInstallPath) {
         } else if (this._parent) {
             _base = this._parent.getBasePath();
         }
-
         return _base;
     };
 
@@ -875,7 +788,6 @@ function InstallPath(original, source, target, basePath, parentInstallPath) {
                 }
             }
         }
-
         return arr;
     };
 
@@ -888,7 +800,6 @@ function InstallPath(original, source, target, basePath, parentInstallPath) {
         this.path = [];
         this.basePath = '';
         this._parent = null;
-        
     };
 
     InstallPath.prototype.load = function(obj, parent) {
@@ -925,112 +836,4 @@ function InstallPath(original, source, target, basePath, parentInstallPath) {
 
 }());
 
-
-function getUpateModules(){
-    var _return = {};
-
-    _return.modules = _temp.concat(glob.sync(PATH.modules));
-    _return.i_modules = _temp.concat(glob.sync(PATH.i_modules));
-    return _return;
-}
-
-
-// ###########################################
-
-var aaa = {abc: "aaa"};
-
-function objSearch(obj, name, value){
-    var prop;
-
-    for (prop in obj){
-        if (typeof obj[prop] === 'object'){
-            objSearch(obj[prop], name, value);
-        } else {
-            if (prop.indexOf(name) > -1 && name.length > 0 ) {
-                console.log('name:' + prop);
-                console.log('value:' + obj[prop]);
-            }
-            if (String(obj[prop]).indexOf(value) > -1 && value.length > 0 ) {
-                console.log('name:' + prop);
-                console.log('value:' + obj[prop]);
-            }
-        }
-    }
-}
-function getModuleDirName(){
-}
-
-
-// objSearch(process, "M1", "M1");
-// objSearch(process, "M1", "");
-// objSearch(process, "", "M1");
-// objSearch(aaa, "M1", "aa");
-// objSearch(require, "M1", "M1");
-
-var load_task = "";
-var load_task = "node_modules/M3/:default";
-
-gulp.task('default-set', function() {
-    console.log('-default-set');
-    load_task = "node_modules/M3/:default";
-    // gulp.task('default2', [load_task], function() {
-    //     console.log('-default-');
-        
-    //     console.log('2.path: ' + mod.getPath());
-    // });
-});
-gulp.task('default3', gulpsync.sync(['default-set', 'default2']));
-
-gulp.task('default2', function() {
-    console.log('-2-');
-
-    var modPath = './modules/M1/';
-    var mod = require(modPath); 
-    mod(modPath, "install/", "default");
-
-    console.log('-2.2-');
-});
-
-gulp.task('default222', [load_task], function() {
-    console.log('-default-');
-    
-    console.log('2.path: ' + mod.getPath());
-    // var sub =  require('sub-gulp/gulpfile.js'); 
-    // sub();
-
-    // var sub2 =  require('sub-gulp'); 
-    // sub2();
-
-    // var sub2 =  require('./modules/M1/gulpfile.js'); 
-    // sub2();
-    // var mod = gulp.submodule('modules/M1/');
-    // var modPath = 'modules/M1/';
-    // var modPathfile = './modules/M1/gulpfile.js';
-    // var mod;
-    
-    // modPath = './modules/M1/';
-    // mod = require(modPathfile); 
-    // mod(modPath, "install/", "default");
-
-
-    // modPath = './modules/M2/';
-    // mod = require(modPath); 
-    // mod(modPath, "install/sub/", "default");
-    // var namespace = require(modPathfile)(gulp);
-    // var namespace = require(modPathfile);
-
-    // gulpModule.load(modPath + 'gulpfile.js', gulp);
-
-
-    // mod(modPath, "install");
-    // mod(modPath);
-
-    // var aa = requiredPath(a);
-    
-    // eval('var sub2 = require(\''+ a + '\');sub2(11);');
-    eval('console.log(\'-eval-\');');
-    
-});
-
-// gulp.run();
-console.log('-default-');
+console.log('i 모듈 gulp');

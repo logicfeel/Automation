@@ -34,8 +34,8 @@ END
 -- ###################################################
 -- ## 테스트 코드
 /*
-	SELECT DB_OBJ_NAME_P.MnAuth_FN_AuthChk('1')
-	SELECT DB_OBJ_NAME_P.MnAuth_FN_AuthChk('777')
+	SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk('1')
+	SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk('777')
 */
 
 GO--End
@@ -77,8 +77,8 @@ END
 -- ###################################################
 -- ## 테스트 코드
 /*
-	SELECT DB_OBJ_NAME_P.MnAuth_FN_AuthChk2('1')
-	SELECT DB_OBJ_NAME_P.MnAuth_FN_AuthChk2('777')
+	SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk2('1')
+	SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk2('777')
 */
 
 GO--Auto
