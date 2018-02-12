@@ -3,21 +3,14 @@
     "file": [
       {
         "modules": [
-          "M4",
-          "modules.M4"
+          "module_m"
         ],
-        "string": "install/all.sql"
+        "string": "install/ALL.sql"
       }
     ],
     "module": [
       [
-        "M4",
-        "modules.M4",
-        "modules.iM1.modules.M4"
-      ],
-      [
-        "M3",
-        "modules.M4"
+        "module_m"
       ]
     ]
   },
@@ -35,22 +28,22 @@
           {
             "basePath": "",
             "file": {
+              "table.1.sql": "U.sql"
+            },
+            "path": [
+            ],
+            "source": "dist/01-Table/dd",
+            "target": ""
+          },
+          {
+            "basePath": "",
+            "file": {
               "MnMenu2.Table.sql": "",
               "MnMenu3.Table.sql": "",
               "table.1.sql": "",
               "table.2.sql": ""
             },
             "path": [
-              {
-                "basePath": "",
-                "file": {
-                  "table.1.sql": ""
-                },
-                "path": [
-                ],
-                "source": "dist/01-Table/dd",
-                "target": "dd"
-              }
             ],
             "source": "dist/01-Table",
             "target": "01-Table"

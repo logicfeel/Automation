@@ -1,4 +1,4 @@
-/****** Object:  Table [sstory40].[MnAcct_Group]    Script Date: 01/03/2018 06:08:40 ******/
+/****** Object:  Table [MnAuth_Base]    Script Date: 01/17/2018 14:47:52 ******/
 SET ANSI_NULLS ON
 GO
 
@@ -8,16 +8,14 @@ GO
 SET ANSI_PADDING ON
 GO
 
-CREATE TABLE [MnAcct_Group](
-	[group_ac_idx] [int] IDENTITY(1,1) NOT NULL,
-	[groupName] [varchar](50) NOT NULL,
-	[memo] [varchar](200) NULL,
+CREATE TABLE [MnAuth_Base](
+	[auth_idx] [int] IDENTITY(1,1) NOT NULL,
+	[onwer_bt] [char](10) NOT NULL,
+	[etc_bt] [char](10) NOT NULL,
 	[create_dt] [datetime] NOT NULL,
-	[del_yn] [char](1) NOT NULL,
-	[using_yn] [char](1) NOT NULL,
 PRIMARY KEY CLUSTERED 
 (
-	[group_ac_idx] ASC
+	[auth_idx] ASC
 )WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 
@@ -26,11 +24,15 @@ GO
 SET ANSI_PADDING OFF
 GO
 
-ALTER TABLE [MnAcct_Group] ADD  DEFAULT (getdate()) FOR [create_dt]
+ALTER TABLE [MnAuth_Base] ADD  DEFAULT ('0000000000') FOR [onwer_bt]
 GO
 
-ALTER TABLE [MnAcct_Group] ADD  DEFAULT ('N') FOR [del_yn]
+ALTER TABLE [MnAuth_Base] ADD  DEFAULT ('0000000000') FOR [etc_bt]
 GO
+
+ALTER TABLE [MnAuth_Base] ADD  DEFAULT (getdate()) FOR [create_dt]
+GO--End
+
 
 ALTER TABLE [MnAcct_Group] ADD  DEFAULT ('Y') FOR [using_yn]
 GO--End

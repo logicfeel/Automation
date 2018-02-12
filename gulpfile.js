@@ -149,7 +149,7 @@ gulp.task('update', gulpsync.sync(['load-config', 'update-check', 'update-build'
  * 4. 각 모듈별 dist 경로 로딩 (소스맵)
  * 5. 모듈 배포 install
  */
-gulp.task('install', gulpsync.sync(['load-config', 'install-imodule', 'install-submodule']), function() {
+gulp.task('install', gulpsync.sync(['load-config', 'install-imodule', 'install-submodule', 'save-config']), function() {
 // gulp.task('install', gulpsync.sync(['load-config', 'install-imodule', 'install-group']), function() {
 
 });
@@ -202,23 +202,40 @@ gulp.task('install-submodule', function() {
 
     var _installObj;
 
+    var SOURCEMAP = {};
+
     // var _dirname;
     // var _dist;
+    CONFIG._overlap = {
+        module: [],
+        file: []
+    };
+
 
     for ( _prop in CONFIG.modules) {
+        
+        var mod_map;
+
         if (MODULES[_prop].type === 'm') {
+            
+
             // _installObj = ;
             install = new InstallPath();
             install.load(CONFIG.modules[_prop]._install);
             arr = install.getInstall()
+
+            SOURCEMAP[_prop] = arr;
+             
             arr.forEach(function(value, index, array) {
 
                 // TODO: 읽어서 내용중 경로 관련된 부분 경우에 따라 수정 필요
                 // TODO: 스트림 타입 이미지 같은것 처리
+
+                // 1. 파일읽기
                 fs.readFile(value.src, 'utf8', function(err, data) {
                     if  (err) gulpError('파일 읽기 오류: ' + value.src);
 
-                    // 디렉토리 생성
+                    // 2. 디렉토리 생성
                     fs.mkdir(path.dirname(value.dest), function(err) {
 
                         // 중복 에러는 무시함
@@ -226,17 +243,81 @@ gulp.task('install-submodule', function() {
                             gulpError('파일 읽기 오류: ' + value.src);
                         }
 
-                        // 파일 쓰기
+                        // 3. 파일 쓰기
                         fs.writeFile(value.dest, data, function(err3) {
                             if (err3) throw err3;
-                            console.log('파일 설치 성공 !' + value.src);
+                            console.log('파일 설치 성공 ^.^ => ' + value.src);
                         });                        
                     });
 
                 });
             })
         }
+
+        /**
+         * 중복 모듈 찾기
+         */
+        var mod;
+
+        mod = CONFIG._overlap.module.find(function(value, index, array) {
+            return vaule[0] === _prop;
+        });
+
+        // TODO: 중복안되면 아무것도 없이 처리
+        if (mod) {
+            mod.push('TODO:상위주소 '+_prop);
+        } else {
+            CONFIG._overlap.module.push([_prop]);
+        }        
     }
+
+    /**
+     * 중복 파일 찾기
+     * REVIEW: 로직을 좀 깔끔한게 정리 필요 .. 작동은 됨
+     */
+    // var arrlist = [];
+
+    var arrIndex = [];
+
+    for (_prop in SOURCEMAP) {
+        SOURCEMAP[_prop].forEach(function(value, index, array) {
+ 
+            for(var _prop2 in SOURCEMAP) {
+                SOURCEMAP[_prop].forEach(function(_value, _index, _array) {
+
+                    var isOver;
+                    isOver = arrIndex.some(function(_v, _i, _a) {
+                        return index === _v;
+                    });
+                    isOver = arrIndex.length === 0 ? false : true;
+                    
+                    if (value.dest === _value.dest && !isOver) {
+                        
+                        // 인덱스 제외 키 삽입
+                        arrIndex.push(index);
+
+                        // REVIEW: 함수로 분리
+                        var _findFile;
+                        _findFile = CONFIG._overlap.file.find(function(__value, __index, __array) {
+                            return __value.string === __value.string;
+                        });
+
+                        if (_findFile) {
+                            _findFile.modules.push(_prop);
+
+                        } else {
+                            var _file = {
+                                string: value.dest,
+                                modules: [_prop],
+                            };
+                            CONFIG._overlap.file.push(_file);
+                        }
+                    }
+                });
+            }
+        });
+    }
+     
     console.log('stop');
     // var scripts = {
     //     'modules_M1': [
