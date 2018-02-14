@@ -1,27 +1,16 @@
 {
   "_overlap": {
     "file": [
-      {
-        "modules": [
-          "module_m"
-        ],
-        "string": "install/ALL.sql"
-      }
     ],
     "module": [
-      [
-        "module_m"
-      ]
     ]
   },
   "modules": {
     "module_m": {
       "_install": {
-        "basePath": "node_modules/module_m",
+        "basePath": "d:/PJ-Git/Automation_gulp-sub/node_modules/module_m",
         "file": {
           "ALL.sql": "",
-          "FN.sql": "",
-          "SP.sql": "",
           "U.sql": ""
         },
         "path": [
@@ -34,16 +23,6 @@
               "table.2.sql": ""
             },
             "path": [
-              {
-                "basePath": "",
-                "file": {
-                  "table.1.sql": ""
-                },
-                "path": [
-                ],
-                "source": "dist/01-Table/dd",
-                "target": "dd"
-              }
             ],
             "source": "dist/01-Table",
             "target": "01-Table"
@@ -56,9 +35,64 @@
             },
             "path": [
             ],
-            "source": "dist/02-FN",
-            "target": "02-FN"
+            "source": "dist/09-Template",
+            "target": "09-Template"
           },
+          {
+            "basePath": "",
+            "file": {
+              "page-one.sql": "",
+              "page-tree.sql": "",
+              "page-two.sql": ""
+            },
+            "path": [
+            ],
+            "source": "dist/pages",
+            "target": "pages"
+          }
+        ],
+        "source": "dist",
+        "target": "install"
+      },
+      "_replace": [
+      ],
+      "clear": {
+        "comment": false,
+        "use": true
+      },
+      "distPath": "dist/",
+      "install": "install/",
+      "module": "",
+      "obj_name": "DB_OBJ_NAME",
+      "options": {
+        "ddl_create": true,
+        "intall_group": true,
+        "intall_unit": true,
+        "last_go": true,
+        "log": true,
+        "obj_fnc_type": 3,
+        "obj_type": 1,
+        "template_overlap": true
+      },
+      "prefix_name": "",
+      "replace": [
+        {
+          "replacement": "",
+          "src": "",
+          "string": ""
+        }
+      ],
+      "suffix_name": "",
+      "version": "1.0.0"
+    },
+    "module_m3": {
+      "_install": {
+        "basePath": "d:/PJ-Git/Automation_gulp-sub/node_modules/module_m3",
+        "file": {
+          "ALL.sql": "",
+          "SP.sql": ""
+        },
+        "path": [
           {
             "basePath": "",
             "file": {
@@ -98,26 +132,6 @@
         "target": "install"
       },
       "_replace": [
-        {
-          "replacement": "SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk('1')",
-          "src": "02-FN\\MnMenu1.FN.sql",
-          "string": "SELECT sstory40.MnAuth_FN_AuthChk('1')"
-        },
-        {
-          "replacement": "SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk('777')",
-          "src": "02-FN\\MnMenu1.FN.sql",
-          "string": "SELECT sstory40.MnAuth_FN_AuthChk('777')"
-        },
-        {
-          "replacement": "SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk2('1')",
-          "src": "02-FN\\MnMenu2.FN.sql",
-          "string": "SELECT sstory40.MnAuth_FN_AuthChk2('1')"
-        },
-        {
-          "replacement": "SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk2('777')",
-          "src": "02-FN\\MnMenu2.FN.sql",
-          "string": "SELECT sstory40.MnAuth_FN_AuthChk2('777')"
-        },
         {
           "replacement": "exec DB_OBJ_NAME.[MnAcct_Account_SP_C]",
           "src": "03-SP\\MnMenu1.SP.sql",
