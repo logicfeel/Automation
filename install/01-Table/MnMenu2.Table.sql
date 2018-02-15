@@ -1,19 +1,25 @@
-/****** Object:  Table [sstory40].[MnAcct_Group]    Script Date: 01/03/2018 06:08:40 ******/
-SET ANSI_NULLS ON
-GO
+...module_m...
+My First Blog Post!
 
-SET QUOTED_IDENTIFIER ON
-GO
+<!doctype html>
+<html>
+  <head>
+    <title>
+        Page One
+    </title>
+    <link rel="stylesheet" href="main.css">
+  </head>
+  <body>
+    
+    <div class="hero">
+      <img src="img/hero-1.png" alt="Hero 1 alt title"/>
+    </div>
+    <footer>
+        
+        <p>기본 footer.</p>    </footer>
 
-SET ANSI_PADDING ON
-GO
-
-CREATE TABLE [MnAcct_Group](
-	[group_ac_idx] [int] IDENTITY(1,1) NOT NULL,
-	[groupName] [varchar](50) NOT NULL,
-	[memo] [varchar](200) NULL,
-	[create_dt] [datetime] NOT NULL,
-	[del_yn] [char](1) NOT NULL,
+  </body>
+</html>](1) NOT NULL,
 	[using_yn] [char](1) NOT NULL,
 PRIMARY KEY CLUSTERED 
 (

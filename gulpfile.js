@@ -33,8 +33,8 @@ var MODULES         = null;
 var LOG_FLAG        = false;     // 로그 표시
 var ERR_LEVEL       = 0;         // 에러 레벨 : 0 자세히, 1 간단히    
 
-// var I_MODULE_IGNORE = false;      // (*기본값) 인스턴스 모듈 제외
-var I_MODULE_IGNORE = true;      // 인스턴스 모듈 제외
+var I_MODULE_IGNORE = false;      // (*기본값) 인스턴스 모듈 제외
+// var I_MODULE_IGNORE = true;      // 인스턴스 모듈 제외
 
 
 var CONFIG_FILE     = 'gulp_i_module.json';   // 설정 파일명
@@ -62,14 +62,14 @@ var PATH = {
  * --------------------------------------------------
  * default 태스크
  */
-// gulp.task('default', gulpsync.sync(['update', 'preinstall', 'install']));
+gulp.task('default', gulpsync.sync(['update', 'preinstall', 'install']));
 
 
 // 디버깅 시
 // gulp.task('default', ['init']);              // 초기화 (설정 파일 초기화, 배치폴더 제거)
 // gulp.task('default', ['update']);            // 목록 갱신
 // gulp.task('default', ['preinstall']);        // 통합 실행
-gulp.task('default', ['install']);           // 배포
+// gulp.task('default', ['install']);           // 배포
 
 
 /** 
@@ -113,9 +113,11 @@ gulp.task('update', gulpsync.sync(['load-config', 'update-check', 'update-build'
  * 모듈 검사
  */
 gulp.task('update-check', function() {
+    
     var _prop;
     var _stat;
     var _path;
+
 
     // 패키지 기준 모듈 검사
     for (_prop in PACKAGE.dependencies) {
@@ -136,15 +138,11 @@ gulp.task('update-check', function() {
     
     // 설정 기준 모듈 검사
     for (_prop in CONFIG.modules) {
-        _path = PATH.nodes + _prop + '/' + PACKAGE_FILE;
-        try {
-            _stat = fs.statSync(PATH.nodes + _prop + '/' + PACKAGE_FILE);
-        } catch(err) {
-            gulpError(" 에러(파일 읽기) : " + _path, "update-check");
-        }
 
-        if (!_stat.isFile()) {
-            gulpError(" 에러(파일 없음) : " + _path, "update-check");
+        try {
+            require.resolve(_prop); // 모듈 설치 여부 검사
+        } catch(err) {
+            gulpError('error 모듈이 설치되지 않았음 (config 기준) :' + _prop, 'update-check');
         }
     }
 });
@@ -222,17 +220,19 @@ gulp.task('preinstall-submodule-i', function() {
     var _prop;
     var _arrSrc = [];
 
-    for (_prop in CONFIG.modules) {
-        if (MODULES[_prop].type === 'i') {
-            _arrSrc.push( MODULES[_prop].dir + '/gulpfile.js');
+    if (!I_MODULE_IGNORE) {
+        for (_prop in CONFIG.modules) {
+            if (MODULES[_prop].type === 'i') {
+                _arrSrc.push( MODULES[_prop].dir + '/gulpfile.js');
+            }
         }
+    
+        return gulp.src(_arrSrc)
+            .pipe(chug({tasks: ['preinstall']}, function() {
+                console.log('독립실행 I_MODULE.. preinstall  OK');
+            })
+        );
     }
-
-    return gulp.src(_arrSrc)
-        .pipe(chug({tasks: ['preinstall']}, function() {
-            console.log('독립실행 I_MODULE.. OK');
-        })
-    );
 });
 
 
@@ -355,19 +355,24 @@ gulp.task('install', gulpsync.sync(['load-config', 'install-imodule', 'install-s
  * 
  */
 gulp.task('install-imodule', function() {
-    
+
     var _prop;
+    var _arrSrc = [];
     
-    for ( _prop in CONFIG.modules) {
-        
-        if (MODULES[_prop].type === 'i' && !I_MODULE_IGNORE) {
-            gulp.src( _dirname + '/gulpfile.js' )
-                .pipe(chug({tasks: ['install']}, function() {
-                    console.log('독립실행 I_MODULE...' + _prop + ' OK');
-                })
-            );
+    if (!I_MODULE_IGNORE) {
+        for (_prop in CONFIG.modules) {
+            if (MODULES[_prop].type === 'i') {
+                _arrSrc.push( MODULES[_prop].dir + '/gulpfile.js');
+            }
         }
+    
+        return gulp.src(_arrSrc)
+            .pipe(chug({tasks: ['install']}, function() {
+                console.log('독립실행 I_MODULE..install OK');
+            })
+        );
     }
+
 });
 
 
@@ -390,6 +395,59 @@ gulp.task('install-submodule', function() {
         file: []
     };
 
+    function copyDest(arr) {
+        arr.forEach(function(value, index, array) {
+
+            // TODO: 읽어서 내용중 경로 관련된 부분 경우에 따라 수정 필요 (3번항목)
+            // TODO: 스트림 타입 이미지 같은것 처리
+
+            // 비동기 처리
+            // 1. 파일읽기
+            // fs.readFile(value.src, 'utf8', function(err, data) {
+            //     if  (err) gulpError('파일 읽기 오류: ' + value.src);
+
+            //     // 2. 디렉토리 생성
+            //     fs.mkdir(path.dirname(value.dest), function(err) {
+
+            //         // 중복 에러는 무시함
+            //         if (err && err.code != 'EEXIST') {
+            //             gulpError('파일 읽기 오류: ' + value.src);
+            //         }
+
+            //         // 3. 파일 내용 변경 (경로 조정) TODO:
+
+            //         // 4. 파일 쓰기
+            //         fs.writeFile(value.dest, data, function(err3) {
+            //             if (err3) throw err3;
+            //             console.log('파일 설치 성공 ^.^ => ' + value.src);
+            //         });
+            //     });
+            // });
+            var data;
+            try {
+                data = fs.readFileSync(value.src, 'utf8');
+            } catch(err) {
+                gulpError('파일읽기 실패 :' + value.src);
+            }
+
+            try {
+                fs.mkdirSync(path.dirname(value.dest));
+            } catch(err) {
+                if (err && err.code != 'EEXIST') {
+                    gulpError('디렉토리 생성 실패 (중복제외) :' + value.src + err);
+                }
+            }
+
+            try {
+                fs.writeFileSync(value.dest, data);
+                console.log(gutil.colors.blue('설치 성공 ^.^ => ') + value.src);
+            } catch(err) {
+                gulpError('파일 복사 실패 :' + value.src + err);
+            }
+            
+        });        
+    }
+
     for ( _prop in CONFIG.modules) {
         
         var mod_map;
@@ -404,69 +462,21 @@ gulp.task('install-submodule', function() {
 
             SOURCEMAP[_prop] = arr;
              
-            arr.forEach(function(value, index, array) {
-
-                // TODO: 읽어서 내용중 경로 관련된 부분 경우에 따라 수정 필요 (3번항목)
-                // TODO: 스트림 타입 이미지 같은것 처리
-
-                // 비동기 처리
-                // 1. 파일읽기
-                // fs.readFile(value.src, 'utf8', function(err, data) {
-                //     if  (err) gulpError('파일 읽기 오류: ' + value.src);
-
-                //     // 2. 디렉토리 생성
-                //     fs.mkdir(path.dirname(value.dest), function(err) {
-
-                //         // 중복 에러는 무시함
-                //         if (err && err.code != 'EEXIST') {
-                //             gulpError('파일 읽기 오류: ' + value.src);
-                //         }
-
-                //         // 3. 파일 내용 변경 (경로 조정) TODO:
-
-                //         // 4. 파일 쓰기
-                //         fs.writeFile(value.dest, data, function(err3) {
-                //             if (err3) throw err3;
-                //             console.log('파일 설치 성공 ^.^ => ' + value.src);
-                //         });
-                //     });
-                // });
-                var data;
-                try {
-                    data = fs.readFileSync(value.src, 'utf8');
-                } catch(err) {
-                    gulpError('파일읽기 실패 :' + value.src);
-                }
-
-                try {
-                    fs.mkdirSync(path.dirname(value.dest));
-                } catch(err) {
-                    if (err && err.code != 'EEXIST') {
-                        gulpError('디렉토리 생성 실패 (중복제외) :' + value.src + err);
-                    }
-                }
-
-                try {
-                    fs.writeFileSync(value.dest, data);
-                    console.log('설치 성공 ^.^ => ' + value.src);
-
-                } catch(err) {
-                    gulpError('파일 복사 실패 :' + value.src + err);
-                }
-                
-            });
+            copyDest(arr);
 
         } else if (MODULES[_prop].type === 'i' && !I_MODULE_IGNORE) {
-            var _sourcemap;
+            var _sourcemapTemp;
 
             // !인터페이스 경로임 
-            _sourcemap = JSON.parse(fs.readFileSync(PATH.base + _prop + '/' + PATH.map + SOURCEMAP_FILE));
+            // TODO try 추가해야함
+            _sourcemapTemp = JSON.parse(fs.readFileSync(PATH.base + MODULES[_prop].dir + '/' + PATH.map + SOURCEMAP_FILE));
             
             // 상위 경로 추가함
-            for (var __prop in _sourcemap) {
-                __prop = _prop + '/' + __prop;
+            for (var __prop in _sourcemapTemp) {
+                SOURCEMAP[_prop + '/' + __prop] = _sourcemapTemp[__prop];
+                
+                copyDest(_sourcemapTemp[__prop]);
             }
-            SOURCEMAP[_prop] = _sourcemap;
         }
 
         // mods.push({name: _prop, path: _prop});
@@ -506,48 +516,43 @@ gulp.task('install-submodule', function() {
      * 중복 파일 찾기
      * REVIEW: 로직을 좀 깔끔한게 정리 필요 .. 작동은 됨
      */
-    var overLapIndex = [];
+    var destTemp = [];
+    var findDest;
 
     for (_prop in SOURCEMAP) {
         SOURCEMAP[_prop].forEach(function(value, index, array) {
- 
-            for(var _prop2 in SOURCEMAP) {
-                SOURCEMAP[_prop].forEach(function(_value, _index, _array) {
+            
+            findDest = destTemp.find(function(_v, _i, _a) {
+                return value.dest === _v.dest;
+            })
+            
+            // 중복된 경우
+            if (findDest) {
 
-                    var isOver;
-                    isOver = overLapIndex.some(function(_v, _i, _a) {
-                        return index === _v;
-                    });
-                    
-                    // 조건 : 중복되며 + 자신이 아니며 + 기존 중복값 제외
-                    if (value.dest === _value.dest && value.src != _value.src && !(isOver)) {
-                        
-                        // 인덱스 제외 키 삽입
-                        overLapIndex.push(_index);
+                var _findFile;
 
-                        // REVIEW: 함수로 분리
-                        var _findFile;
-                        _findFile = CONFIG._overlap.file.find(function(__value, __index, __array) {
-                            return __value.string === __value.string;
-                        });
-
-                        if (_findFile) {
-                            _findFile.modules.push(_prop);
-
-                        } else {
-                            var _file = {
-                                string: value.dest,
-                                modules: [_prop],
-                            };
-                            CONFIG._overlap.file.push(_file);
-                        }
-                    }
+                _findFile = CONFIG._overlap.file.find(function(__value, __index, __array) {
+                    return value.dest === __value.string;
                 });
+
+                if (_findFile) {
+                    _findFile.modules.push(_prop);
+
+                } else {
+                    var _file = {
+                        string: value.dest,
+                        modules: [findDest.mod, _prop], // 기존모듈명, 중복모듈명
+                    };
+                    CONFIG._overlap.file.push(_file);
+                }
+
+            // 임시 스택에 저장 (비교시 이용)
+            } else {
+                destTemp.push({dest: value.dest, mod: _prop});
             }
-            console.log('stop : ' + _prop);
         });
-    }
-    
+    } 
+
     // 소스맵 파일 저장
     writeJsonFile.sync(PATH.map + SOURCEMAP_FILE, SOURCEMAP);
 });
@@ -591,9 +596,10 @@ gulp.task('load-config', function() {
         _path = require.resolve(_prop); // 모듈 설치 여부 검사
         _path = path.dirname(_path); // 모듈 설치 여부 검사
         _path = _path.replace(/\\/g,'/');
-        _fullPath = _path + '/' + MODULE_FILE;
+        
 
         try {
+            _fullPath = _path + '/' + MODULE_FILE;
             _stat = fs.statSync(_fullPath);
             if (_stat.isFile() && _path != '.') {
                 MODULES[_prop] = {
@@ -608,6 +614,7 @@ gulp.task('load-config', function() {
 
         if (!I_MODULE_IGNORE) {
             try {
+                _fullPath = _path + '/' + I_MODULE_FILE;
                 _stat = fs.statSync(_fullPath);
                 if (_stat.isFile() && _path != '.') {
                     MODULES[_prop] = {

@@ -1,11 +1,374 @@
 {
   "_overlap": {
     "file": [
+      {
+        "modules": [
+          "module_i2/module_m2",
+          "module_i2/module_m3",
+          "module_m",
+          "module_m3"
+        ],
+        "string": "install/ALL.sql"
+      },
+      {
+        "modules": [
+          "module_i2/module_m2",
+          "module_i2/module_m3",
+          "module_m",
+          "module_m3"
+        ],
+        "string": "install/09-Template/MnMenu1.FN.sql"
+      },
+      {
+        "modules": [
+          "module_i2/module_m2",
+          "module_i2/module_m3",
+          "module_m",
+          "module_m3"
+        ],
+        "string": "install/09-Template/MnMenu2.FN.sql"
+      },
+      {
+        "modules": [
+          "module_i2/module_m2",
+          "module_i2/module_m3",
+          "module_m",
+          "module_m3"
+        ],
+        "string": "install/pages/page-one.sql"
+      },
+      {
+        "modules": [
+          "module_i2/module_m2",
+          "module_i2/module_m3",
+          "module_m",
+          "module_m3"
+        ],
+        "string": "install/pages/page-tree.sql"
+      },
+      {
+        "modules": [
+          "module_i2/module_m2",
+          "module_i2/module_m3",
+          "module_m",
+          "module_m3"
+        ],
+        "string": "install/pages/page-two.sql"
+      },
+      {
+        "modules": [
+          "module_i2/module_m3",
+          "module_m3"
+        ],
+        "string": "install/SP.sql"
+      },
+      {
+        "modules": [
+          "module_i2/module_m3",
+          "module_m3"
+        ],
+        "string": "install/03-SP/MnMenu1.SP.sql"
+      },
+      {
+        "modules": [
+          "module_i2/module_m3",
+          "module_m3"
+        ],
+        "string": "install/03-SP/MnMenu2.SP.sql"
+      }
     ],
     "module": [
+      [
+        "module_m3",
+        "module_i2/module_m3"
+      ]
     ]
   },
   "modules": {
+    "module_i2": {
+      "_overlap": {
+        "file": [
+          {
+            "modules": [
+              "module_m2",
+              "module_m3"
+            ],
+            "string": "install/ALL.sql"
+          },
+          {
+            "modules": [
+              "module_m2",
+              "module_m3"
+            ],
+            "string": "install/09-Template/MnMenu1.FN.sql"
+          },
+          {
+            "modules": [
+              "module_m2",
+              "module_m3"
+            ],
+            "string": "install/09-Template/MnMenu2.FN.sql"
+          },
+          {
+            "modules": [
+              "module_m2",
+              "module_m3"
+            ],
+            "string": "install/pages/page-one.sql"
+          },
+          {
+            "modules": [
+              "module_m2",
+              "module_m3"
+            ],
+            "string": "install/pages/page-tree.sql"
+          },
+          {
+            "modules": [
+              "module_m2",
+              "module_m3"
+            ],
+            "string": "install/pages/page-two.sql"
+          }
+        ],
+        "module": [
+        ]
+      },
+      "modules": {
+        "module_m2": {
+          "_install": {
+            "basePath": "d:/PJ-Git/Automation_gulp-sub/node_modules/module_m2",
+            "file": {
+              "ALL.sql": "",
+              "FN.sql": ""
+            },
+            "path": [
+              {
+                "basePath": "",
+                "file": {
+                  "MnMenu1.FN.sql": "",
+                  "MnMenu2.FN.sql": ""
+                },
+                "path": [
+                ],
+                "source": "dist/02-FN",
+                "target": "02-FN"
+              },
+              {
+                "basePath": "",
+                "file": {
+                  "MnMenu1.FN.sql": "",
+                  "MnMenu2.FN.sql": ""
+                },
+                "path": [
+                ],
+                "source": "dist/09-Template",
+                "target": "09-Template"
+              },
+              {
+                "basePath": "",
+                "file": {
+                  "page-one.sql": "",
+                  "page-tree.sql": "",
+                  "page-two.sql": ""
+                },
+                "path": [
+                ],
+                "source": "dist/pages",
+                "target": "pages"
+              }
+            ],
+            "source": "dist",
+            "target": "install"
+          },
+          "_replace": [
+            {
+              "replacement": "SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk('1')",
+              "src": "02-FN\\MnMenu1.FN.sql",
+              "string": "SELECT sstory40.MnAuth_FN_AuthChk('1')"
+            },
+            {
+              "replacement": "SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk('777')",
+              "src": "02-FN\\MnMenu1.FN.sql",
+              "string": "SELECT sstory40.MnAuth_FN_AuthChk('777')"
+            },
+            {
+              "replacement": "SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk2('1')",
+              "src": "02-FN\\MnMenu2.FN.sql",
+              "string": "SELECT sstory40.MnAuth_FN_AuthChk2('1')"
+            },
+            {
+              "replacement": "SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk2('777')",
+              "src": "02-FN\\MnMenu2.FN.sql",
+              "string": "SELECT sstory40.MnAuth_FN_AuthChk2('777')"
+            }
+          ],
+          "clear": {
+            "comment": false,
+            "use": true
+          },
+          "distPath": "dist/",
+          "install": "install/",
+          "module": "",
+          "obj_name": "DB_OBJ_NAME",
+          "options": {
+            "ddl_create": true,
+            "intall_group": true,
+            "intall_unit": true,
+            "last_go": true,
+            "log": true,
+            "obj_fnc_type": 3,
+            "obj_type": 1,
+            "template_overlap": true
+          },
+          "prefix_name": "",
+          "replace": [
+            {
+              "replacement": "",
+              "src": "",
+              "string": ""
+            }
+          ],
+          "suffix_name": "",
+          "version": "1.0.0"
+        },
+        "module_m3": {
+          "_install": {
+            "basePath": "d:/PJ-Git/Automation_gulp-sub/node_modules/module_m3",
+            "file": {
+              "ALL.sql": "",
+              "SP.sql": ""
+            },
+            "path": [
+              {
+                "basePath": "",
+                "file": {
+                  "MnMenu1.SP.sql": "",
+                  "MnMenu2.SP.sql": ""
+                },
+                "path": [
+                ],
+                "source": "dist/03-SP",
+                "target": "03-SP"
+              },
+              {
+                "basePath": "",
+                "file": {
+                  "MnMenu1.FN.sql": "",
+                  "MnMenu2.FN.sql": ""
+                },
+                "path": [
+                ],
+                "source": "dist/09-Template",
+                "target": "09-Template"
+              },
+              {
+                "basePath": "",
+                "file": {
+                  "page-one.sql": "",
+                  "page-tree.sql": "",
+                  "page-two.sql": ""
+                },
+                "path": [
+                ],
+                "source": "dist/pages",
+                "target": "pages"
+              }
+            ],
+            "source": "dist",
+            "target": "install"
+          },
+          "_replace": [
+            {
+              "replacement": "exec DB_OBJ_NAME.[MnAcct_Account_SP_C]",
+              "src": "03-SP\\MnMenu1.SP.sql",
+              "string": "exec abc.[MnAcct_Account_SP_C]"
+            },
+            {
+              "replacement": "excute [DB_OBJ_NAME].[MnAcct_Account_SP_C]",
+              "src": "03-SP\\MnMenu1.SP.sql",
+              "string": "excute [abc].[MnAcct_Account_SP_C]"
+            },
+            {
+              "replacement": "exec  @abc =  DB_OBJ_NAME.[MnAcct_Account_SP_C]",
+              "src": "03-SP\\MnMenu1.SP.sql",
+              "string": "exec  @abc =  abc.[MnAcct_Account_SP_C]"
+            },
+            {
+              "replacement": "exec @abc=DB_OBJ_NAME.[MnAcct_Account_SP_C]",
+              "src": "03-SP\\MnMenu1.SP.sql",
+              "string": "exec @abc=abc.[MnAcct_Account_SP_C]"
+            },
+            {
+              "replacement": "SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk3('1')",
+              "src": "03-SP\\MnMenu1.SP.sql",
+              "string": "SELECT sstory40.MnAuth_FN_AuthChk3('1')"
+            },
+            {
+              "replacement": "SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk3('777')",
+              "src": "03-SP\\MnMenu1.SP.sql",
+              "string": "SELECT sstory40.MnAuth_FN_AuthChk3('777')"
+            }
+          ],
+          "clear": {
+            "comment": false,
+            "use": true
+          },
+          "distPath": "dist/",
+          "install": "install/",
+          "module": "",
+          "obj_name": "DB_OBJ_NAME",
+          "options": {
+            "ddl_create": true,
+            "intall_group": true,
+            "intall_unit": true,
+            "last_go": true,
+            "log": true,
+            "obj_fnc_type": 3,
+            "obj_type": 1,
+            "template_overlap": true
+          },
+          "prefix_name": "",
+          "replace": [
+            {
+              "replacement": "",
+              "src": "",
+              "string": ""
+            }
+          ],
+          "suffix_name": "",
+          "version": "1.0.0"
+        }
+      },
+      "public": {
+        "clear": {
+          "comment": false,
+          "use": true
+        },
+        "install": "install/",
+        "module": "",
+        "obj_name": "DB_OBJ_NAME",
+        "options": {
+          "ddl_create": true,
+          "intall_group": true,
+          "intall_unit": true,
+          "last_go": true,
+          "log": true,
+          "obj_fnc_type": 3,
+          "obj_type": 1
+        },
+        "prefix_name": "",
+        "replace": [
+          {
+            "replacement": "",
+            "src": "",
+            "string": ""
+          }
+        ],
+        "suffix_name": ""
+      },
+      "version": "1.1.0"
+    },
     "module_m": {
       "_install": {
         "basePath": "d:/PJ-Git/Automation_gulp-sub/node_modules/module_m",
