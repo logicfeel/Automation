@@ -3,70 +3,76 @@
     "file": [
       {
         "modules": [
+          "module_i2/module_m2",
+          "module_i2/module_m3",
           "module_m",
-          "module_m3",
-          "module_i2/module_m3"
+          "module_m3"
         ],
         "string": "install/ALL.sql"
       },
       {
         "modules": [
+          "module_i2/module_m2",
+          "module_i2/module_m3",
           "module_m",
-          "module_m3",
-          "module_i2/module_m3"
+          "module_m3"
         ],
         "string": "install/09-Template/MnMenu1.FN.sql"
       },
       {
         "modules": [
+          "module_i2/module_m2",
+          "module_i2/module_m3",
           "module_m",
-          "module_m3",
-          "module_i2/module_m3"
+          "module_m3"
         ],
         "string": "install/09-Template/MnMenu2.FN.sql"
       },
       {
         "modules": [
+          "module_i2/module_m2",
+          "module_i2/module_m3",
           "module_m",
-          "module_m3",
-          "module_i2/module_m3"
+          "module_m3"
         ],
         "string": "install/pages/page-one.sql"
       },
       {
         "modules": [
+          "module_i2/module_m2",
+          "module_i2/module_m3",
           "module_m",
-          "module_m3",
-          "module_i2/module_m3"
+          "module_m3"
         ],
         "string": "install/pages/page-tree.sql"
       },
       {
         "modules": [
+          "module_i2/module_m2",
+          "module_i2/module_m3",
           "module_m",
-          "module_m3",
-          "module_i2/module_m3"
+          "module_m3"
         ],
         "string": "install/pages/page-two.sql"
       },
       {
         "modules": [
-          "module_m3",
-          "module_i2/module_m3"
+          "module_i2/module_m3",
+          "module_m3"
         ],
         "string": "install/SP.sql"
       },
       {
         "modules": [
-          "module_m3",
-          "module_i2/module_m3"
+          "module_i2/module_m3",
+          "module_m3"
         ],
         "string": "install/03-SP/MnMenu1.SP.sql"
       },
       {
         "modules": [
-          "module_m3",
-          "module_i2/module_m3"
+          "module_i2/module_m3",
+          "module_m3"
         ],
         "string": "install/03-SP/MnMenu2.SP.sql"
       }
@@ -81,19 +87,79 @@
   "modules": {
     "module_i2": {
       "_overlap": {
+        "file": [
+        ],
+        "module": [
+        ]
       },
       "modules": {
         "module_m2": {
           "_install": {
             "basePath": "D:/PJ-Git/Automation_gulp-sub/node_modules/module_m2",
             "file": {
+              "ALL.sql": "",
+              "FN.sql": ""
             },
             "path": [
+              {
+                "basePath": "",
+                "file": {
+                  "MnMenu1.FN.sql": "",
+                  "MnMenu2.FN.sql": ""
+                },
+                "path": [
+                ],
+                "source": "dist/02-FN",
+                "target": "02-FN"
+              },
+              {
+                "basePath": "",
+                "file": {
+                  "MnMenu1.FN.sql": "",
+                  "MnMenu2.FN.sql": ""
+                },
+                "path": [
+                ],
+                "source": "dist/09-Template",
+                "target": "09-Template"
+              },
+              {
+                "basePath": "",
+                "file": {
+                  "page-one.sql": "",
+                  "page-tree.sql": "",
+                  "page-two.sql": ""
+                },
+                "path": [
+                ],
+                "source": "dist/pages",
+                "target": "pages"
+              }
             ],
             "source": "dist",
             "target": "install"
           },
           "_replace": [
+            {
+              "replacement": "SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk('1')",
+              "src": "02-FN\\MnMenu1.FN.sql",
+              "string": "SELECT sstory40.MnAuth_FN_AuthChk('1')"
+            },
+            {
+              "replacement": "SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk('777')",
+              "src": "02-FN\\MnMenu1.FN.sql",
+              "string": "SELECT sstory40.MnAuth_FN_AuthChk('777')"
+            },
+            {
+              "replacement": "SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk2('1')",
+              "src": "02-FN\\MnMenu2.FN.sql",
+              "string": "SELECT sstory40.MnAuth_FN_AuthChk2('1')"
+            },
+            {
+              "replacement": "SELECT DB_OBJ_NAME.MnAuth_FN_AuthChk2('777')",
+              "src": "02-FN\\MnMenu2.FN.sql",
+              "string": "SELECT sstory40.MnAuth_FN_AuthChk2('777')"
+            }
           ],
           "clear": {
             "comment": false,
