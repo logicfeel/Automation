@@ -6,18 +6,14 @@ var gulpsync        = require('gulp-sync')(gulp);
 var fs              = require('fs');
 var sortJSON        = require('gulp-json-sort').default;
 var glob            = require('glob'); 
-
 var path            = require('path'); 
-
 var gutil           = require("gulp-util");
 var rename          = require('gulp-rename');
-
 var chug            = require('gulp-chug');
 var deepmerge       = require('deepmerge');
 var writeJsonFile   = require('write-json-file');
 var clean           = require('gulp-clean');
 var path            = require('path'); 
-
 
 // #########################################################
 // 전역 변수
@@ -30,11 +26,13 @@ var CONFIG          = null;
 var PACKAGE         = null;
 var MODULES         = null;
 
-var LOG_FLAG        = false;     // 로그 표시
-var ERR_LEVEL       = 0;         // 에러 레벨 : 0 자세히, 1 간단히    
+var LOG_FLAG        = false;    // 로그 표시
+var LOG_LEVEL       = 0;        // 로그레벨 : 0 상세, 1 요약
+var ERR_LEVEL       = 0;        // 에러레벨 : 0 상세, 1 요약
 
-var I_MODULE_IGNORE = false;      // (*기본값) 인스턴스 모듈 제외
-// var I_MODULE_IGNORE = true;      // 인스턴스 모듈 제외
+
+var I_MODULE_IGNORE = false;    // (*기본값) 인스턴스 모듈 제외
+// var I_MODULE_IGNORE = true;     // 인스턴스 모듈 제외
 
 var CONFIG_FILE     = 'gulp_i_module.json';   // 설정 파일명
 var PACKAGE_FILE    = 'package.json';
@@ -425,7 +423,11 @@ gulp.task('install-submodule', function() {
 
             try {
                 fs.writeFileSync(value.dest, data);
-                console.log(gutil.colors.blue('설치 성공 ^.^ => ') + value.src);
+                var cursorPath = process.cwd().replace(/\\/g,'/');
+                console.log(gutil.colors.blue('설치 성공 : ') + value.src.replace(cursorPath, '') 
+                    + gutil.colors.blue(' >> ') + value.dest
+                );
+                // console.log(gutil.colors.blue('설치 성공 ^.^ => ') + value.src);
             } catch(err) {
                 gulpError('파일 복사 실패 :' + value.src + err);
             }
