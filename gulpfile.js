@@ -32,6 +32,9 @@ var ERR_LEVEL       = 0;        // 에러레벨 : 0 상세, 1 요약
 
 
 var I_MODULE_IGNORE = false;    // (*기본값) 인스턴스 모듈 제외
+// TODO: i 모듈의 preinstall 무시 하는 옵션을 넣어야함
+// 설정에 넣어야 맞을듯
+
 // var I_MODULE_IGNORE = true;     // 인스턴스 모듈 제외
 
 var CONFIG_FILE     = 'gulp_i_module.json';   // 설정 파일명
