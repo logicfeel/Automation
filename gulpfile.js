@@ -243,8 +243,32 @@ gulp.task('preinstall', gulpsync.sync(['load-config', 'preinstall-submodule', 'p
  * i모듈 => preinstall task 처리
  * 
  */
-gulp.task('preinstall-submodule', gulpsync.sync(['preinstall-submodule-i', 'preinstall-submodule-m']));
+gulp.task('preinstall-submodule', gulpsync.sync(['preinstall-submodule-m', 'preinstall-submodule-i']));
 
+
+gulp.task('preinstall-submodule-m', function() {
+    if (LOG_FLAG) console.log('____ preinstall-submodule  _m____');
+
+    var _prop;
+    var _arrSrc = [];
+
+    for (_prop in CONFIG.modules) {
+        if (MODULES[_prop].type === 'm') {
+            _arrSrc.push( MODULES[_prop].dir + '/gulpfile.js');
+        }
+    }
+
+    return gulp.src(_arrSrc)
+        .pipe(chug(
+            {
+                tasks: ['default']
+                ,args: ['--silent']      // gulp 로그 비활성화
+            }, 
+            function() {
+                if (LOG_FLAG) console.log('독립실행 MODULE.. OK');
+            })
+        );
+});
 
 gulp.task('preinstall-submodule-i', function() {
     if (LOG_FLAG) console.log('____ preinstall-submodule  _i__');
@@ -270,31 +294,6 @@ gulp.task('preinstall-submodule-i', function() {
                 })
             );
     }
-});
-
-
-gulp.task('preinstall-submodule-m', function() {
-    if (LOG_FLAG) console.log('____ preinstall-submodule  _m____');
-
-    var _prop;
-    var _arrSrc = [];
-
-    for (_prop in CONFIG.modules) {
-        if (MODULES[_prop].type === 'm') {
-            _arrSrc.push( MODULES[_prop].dir + '/gulpfile.js');
-        }
-    }
-
-    return gulp.src(_arrSrc)
-        .pipe(chug(
-            {
-                tasks: ['default']
-                ,args: ['--silent']      // gulp 로그 비활성화
-            }, 
-            function() {
-                if (LOG_FLAG) console.log('독립실행 MODULE.. OK');
-            })
-        );
 });
 
 
@@ -463,6 +462,12 @@ gulp.task('install-submodule', function() {
 
             // 상위 경로 추가함
             for (var __prop in _sourcemapTemp) {
+                
+                _sourcemapTemp[__prop].forEach(function(v, i, a) {
+                    v.src = v.src.replace('../', PATH.nodes);
+                });
+
+                
                 SOURCEMAP[_prop + '/' + __prop] = _sourcemapTemp[__prop];
                 
                 copyDest(_sourcemapTemp[__prop]);
@@ -584,18 +589,25 @@ gulp.task('load-config', function() {
         var _path;
         var _fullPath;
         var _stat;
+        var _relativePath;
 
         _path = require.resolve(_prop); // 모듈 설치 여부 검사
         _path = path.dirname(_path); // 모듈 설치 여부 검사
         _path = _path.replace(/\\/g,'/');
 
+        // 상대경로 변환
+        _relativePath = path.relative(process.cwd(), _path);
+        _relativePath = _relativePath.replace(/\\/g,'/'); 
+
         try {
             _fullPath = _path + '/' + MODULE_FILE;
+            
             _stat = fs.statSync(_fullPath);
+
             if (_stat.isFile() && _path != '.') {
                 MODULES[_prop] = {
-                    path: _fullPath,
-                    dir: _path,
+                    path: _relativePath + '/' + MODULE_FILE,
+                    dir: _relativePath,
                     type: 'm'
                 };
             }
@@ -609,8 +621,8 @@ gulp.task('load-config', function() {
                 _stat = fs.statSync(_fullPath);
                 if (_stat.isFile() && _path != '.') {
                     MODULES[_prop] = {
-                        path: _fullPath,
-                        dir: _path,
+                        path: _relativePath + '/' + I_MODULE_FILE,
+                        dir: _relativePath,
                         type: 'i'
                     };
                 }

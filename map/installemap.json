@@ -1,161 +1,161 @@
 {
-	"module_i2/module_m2": [
-		{
-			"src": "D:/PJ-Git/Automation_gulp-sub/node_modules/module_m2/dist/ALL.sql",
-			"dest": "install/ALL.sql"
-		},
-		{
-			"src": "D:/PJ-Git/Automation_gulp-sub/node_modules/module_m2/dist/FN.sql",
-			"dest": "install/FN.sql"
-		},
-		{
-			"src": "D:/PJ-Git/Automation_gulp-sub/node_modules/module_m2/dist/02-FN/MnMenu1.FN.sql",
-			"dest": "install/02-FN/MnMenu1.FN.sql"
-		},
-		{
-			"src": "D:/PJ-Git/Automation_gulp-sub/node_modules/module_m2/dist/02-FN/MnMenu2.FN.sql",
-			"dest": "install/02-FN/MnMenu2.FN.sql"
-		},
-		{
-			"src": "D:/PJ-Git/Automation_gulp-sub/node_modules/module_m2/dist/09-Template/MnMenu1.FN.sql",
-			"dest": "install/09-Template/MnMenu1.FN.sql"
-		},
-		{
-			"src": "D:/PJ-Git/Automation_gulp-sub/node_modules/module_m2/dist/09-Template/MnMenu2.FN.sql",
-			"dest": "install/09-Template/MnMenu2.FN.sql"
-		},
-		{
-			"src": "D:/PJ-Git/Automation_gulp-sub/node_modules/module_m2/dist/pages/page-one.sql",
-			"dest": "install/pages/page-one.sql"
-		},
-		{
-			"src": "D:/PJ-Git/Automation_gulp-sub/node_modules/module_m2/dist/pages/page-tree.sql",
-			"dest": "install/pages/page-tree.sql"
-		},
-		{
-			"src": "D:/PJ-Git/Automation_gulp-sub/node_modules/module_m2/dist/pages/page-two.sql",
-			"dest": "install/pages/page-two.sql"
-		}
-	],
-	"module_i2/module_m3": [
-		{
-			"src": "D:/PJ-Git/Automation_gulp-sub/node_modules/module_m3/dist/ALL.sql",
-			"dest": "install/ALL.sql"
-		},
-		{
-			"src": "D:/PJ-Git/Automation_gulp-sub/node_modules/module_m3/dist/SP.sql",
-			"dest": "install/SP.sql"
-		},
-		{
-			"src": "D:/PJ-Git/Automation_gulp-sub/node_modules/module_m3/dist/03-SP/MnMenu1.SP.sql",
-			"dest": "install/03-SP/MnMenu1.SP.sql"
-		},
-		{
-			"src": "D:/PJ-Git/Automation_gulp-sub/node_modules/module_m3/dist/03-SP/MnMenu2.SP.sql",
-			"dest": "install/03-SP/MnMenu2.SP.sql"
-		},
-		{
-			"src": "D:/PJ-Git/Automation_gulp-sub/node_modules/module_m3/dist/09-Template/MnMenu1.FN.sql",
-			"dest": "install/09-Template/MnMenu1.FN.sql"
-		},
-		{
-			"src": "D:/PJ-Git/Automation_gulp-sub/node_modules/module_m3/dist/09-Template/MnMenu2.FN.sql",
-			"dest": "install/09-Template/MnMenu2.FN.sql"
-		},
-		{
-			"src": "D:/PJ-Git/Automation_gulp-sub/node_modules/module_m3/dist/pages/page-one.sql",
-			"dest": "install/pages/page-one.sql"
-		},
-		{
-			"src": "D:/PJ-Git/Automation_gulp-sub/node_modules/module_m3/dist/pages/page-tree.sql",
-			"dest": "install/pages/page-tree.sql"
-		},
-		{
-			"src": "D:/PJ-Git/Automation_gulp-sub/node_modules/module_m3/dist/pages/page-two.sql",
-			"dest": "install/pages/page-two.sql"
-		}
-	],
 	"module_m": [
 		{
-			"src": "D:/PJ-Git/Automation_gulp-sub/node_modules/module_m/dist/ALL.sql",
+			"src": "node_modules/module_m/dist/ALL.sql",
 			"dest": "install/ALL.sql"
 		},
 		{
-			"src": "D:/PJ-Git/Automation_gulp-sub/node_modules/module_m/dist/U.sql",
+			"src": "node_modules/module_m/dist/U.sql",
 			"dest": "install/U.sql"
 		},
 		{
-			"src": "D:/PJ-Git/Automation_gulp-sub/node_modules/module_m/dist/01-Table/MnMenu2.Table.sql",
+			"src": "node_modules/module_m/dist/01-Table/MnMenu2.Table.sql",
 			"dest": "install/01-Table/MnMenu2.Table.sql"
 		},
 		{
-			"src": "D:/PJ-Git/Automation_gulp-sub/node_modules/module_m/dist/01-Table/MnMenu3.Table.sql",
+			"src": "node_modules/module_m/dist/01-Table/MnMenu3.Table.sql",
 			"dest": "install/01-Table/MnMenu3.Table.sql"
 		},
 		{
-			"src": "D:/PJ-Git/Automation_gulp-sub/node_modules/module_m/dist/01-Table/table.1.sql",
+			"src": "node_modules/module_m/dist/01-Table/table.1.sql",
 			"dest": "install/01-Table/table.1.sql"
 		},
 		{
-			"src": "D:/PJ-Git/Automation_gulp-sub/node_modules/module_m/dist/01-Table/table.2.sql",
+			"src": "node_modules/module_m/dist/01-Table/table.2.sql",
 			"dest": "install/01-Table/table.2.sql"
 		},
 		{
-			"src": "D:/PJ-Git/Automation_gulp-sub/node_modules/module_m/dist/09-Template/MnMenu1.FN.sql",
+			"src": "node_modules/module_m/dist/09-Template/MnMenu1.FN.sql",
 			"dest": "install/09-Template/MnMenu1.FN.sql"
 		},
 		{
-			"src": "D:/PJ-Git/Automation_gulp-sub/node_modules/module_m/dist/09-Template/MnMenu2.FN.sql",
+			"src": "node_modules/module_m/dist/09-Template/MnMenu2.FN.sql",
 			"dest": "install/09-Template/MnMenu2.FN.sql"
 		},
 		{
-			"src": "D:/PJ-Git/Automation_gulp-sub/node_modules/module_m/dist/pages/page-one.sql",
+			"src": "node_modules/module_m/dist/pages/page-one.sql",
 			"dest": "install/pages/page-one.sql"
 		},
 		{
-			"src": "D:/PJ-Git/Automation_gulp-sub/node_modules/module_m/dist/pages/page-tree.sql",
+			"src": "node_modules/module_m/dist/pages/page-tree.sql",
 			"dest": "install/pages/page-tree.sql"
 		},
 		{
-			"src": "D:/PJ-Git/Automation_gulp-sub/node_modules/module_m/dist/pages/page-two.sql",
+			"src": "node_modules/module_m/dist/pages/page-two.sql",
 			"dest": "install/pages/page-two.sql"
 		}
 	],
 	"module_m3": [
 		{
-			"src": "D:/PJ-Git/Automation_gulp-sub/node_modules/module_m3/dist/ALL.sql",
+			"src": "node_modules/module_m3/dist/ALL.sql",
 			"dest": "install/ALL.sql"
 		},
 		{
-			"src": "D:/PJ-Git/Automation_gulp-sub/node_modules/module_m3/dist/SP.sql",
+			"src": "node_modules/module_m3/dist/SP.sql",
 			"dest": "install/SP.sql"
 		},
 		{
-			"src": "D:/PJ-Git/Automation_gulp-sub/node_modules/module_m3/dist/03-SP/MnMenu1.SP.sql",
+			"src": "node_modules/module_m3/dist/03-SP/MnMenu1.SP.sql",
 			"dest": "install/03-SP/MnMenu1.SP.sql"
 		},
 		{
-			"src": "D:/PJ-Git/Automation_gulp-sub/node_modules/module_m3/dist/03-SP/MnMenu2.SP.sql",
+			"src": "node_modules/module_m3/dist/03-SP/MnMenu2.SP.sql",
 			"dest": "install/03-SP/MnMenu2.SP.sql"
 		},
 		{
-			"src": "D:/PJ-Git/Automation_gulp-sub/node_modules/module_m3/dist/09-Template/MnMenu1.FN.sql",
+			"src": "node_modules/module_m3/dist/09-Template/MnMenu1.FN.sql",
 			"dest": "install/09-Template/MnMenu1.FN.sql"
 		},
 		{
-			"src": "D:/PJ-Git/Automation_gulp-sub/node_modules/module_m3/dist/09-Template/MnMenu2.FN.sql",
+			"src": "node_modules/module_m3/dist/09-Template/MnMenu2.FN.sql",
 			"dest": "install/09-Template/MnMenu2.FN.sql"
 		},
 		{
-			"src": "D:/PJ-Git/Automation_gulp-sub/node_modules/module_m3/dist/pages/page-one.sql",
+			"src": "node_modules/module_m3/dist/pages/page-one.sql",
 			"dest": "install/pages/page-one.sql"
 		},
 		{
-			"src": "D:/PJ-Git/Automation_gulp-sub/node_modules/module_m3/dist/pages/page-tree.sql",
+			"src": "node_modules/module_m3/dist/pages/page-tree.sql",
 			"dest": "install/pages/page-tree.sql"
 		},
 		{
-			"src": "D:/PJ-Git/Automation_gulp-sub/node_modules/module_m3/dist/pages/page-two.sql",
+			"src": "node_modules/module_m3/dist/pages/page-two.sql",
+			"dest": "install/pages/page-two.sql"
+		}
+	],
+	"module_i2/module_m2": [
+		{
+			"src": "node_modules/module_m2/dist/ALL.sql",
+			"dest": "install/ALL.sql"
+		},
+		{
+			"src": "node_modules/module_m2/dist/FN.sql",
+			"dest": "install/FN.sql"
+		},
+		{
+			"src": "node_modules/module_m2/dist/02-FN/MnMenu1.FN.sql",
+			"dest": "install/02-FN/MnMenu1.FN.sql"
+		},
+		{
+			"src": "node_modules/module_m2/dist/02-FN/MnMenu2.FN.sql",
+			"dest": "install/02-FN/MnMenu2.FN.sql"
+		},
+		{
+			"src": "node_modules/module_m2/dist/09-Template/MnMenu1.FN.sql",
+			"dest": "install/09-Template/MnMenu1.FN.sql"
+		},
+		{
+			"src": "node_modules/module_m2/dist/09-Template/MnMenu2.FN.sql",
+			"dest": "install/09-Template/MnMenu2.FN.sql"
+		},
+		{
+			"src": "node_modules/module_m2/dist/pages/page-one.sql",
+			"dest": "install/pages/page-one.sql"
+		},
+		{
+			"src": "node_modules/module_m2/dist/pages/page-tree.sql",
+			"dest": "install/pages/page-tree.sql"
+		},
+		{
+			"src": "node_modules/module_m2/dist/pages/page-two.sql",
+			"dest": "install/pages/page-two.sql"
+		}
+	],
+	"module_i2/module_m3": [
+		{
+			"src": "node_modules/module_m3/dist/ALL.sql",
+			"dest": "install/ALL.sql"
+		},
+		{
+			"src": "node_modules/module_m3/dist/SP.sql",
+			"dest": "install/SP.sql"
+		},
+		{
+			"src": "node_modules/module_m3/dist/03-SP/MnMenu1.SP.sql",
+			"dest": "install/03-SP/MnMenu1.SP.sql"
+		},
+		{
+			"src": "node_modules/module_m3/dist/03-SP/MnMenu2.SP.sql",
+			"dest": "install/03-SP/MnMenu2.SP.sql"
+		},
+		{
+			"src": "node_modules/module_m3/dist/09-Template/MnMenu1.FN.sql",
+			"dest": "install/09-Template/MnMenu1.FN.sql"
+		},
+		{
+			"src": "node_modules/module_m3/dist/09-Template/MnMenu2.FN.sql",
+			"dest": "install/09-Template/MnMenu2.FN.sql"
+		},
+		{
+			"src": "node_modules/module_m3/dist/pages/page-one.sql",
+			"dest": "install/pages/page-one.sql"
+		},
+		{
+			"src": "node_modules/module_m3/dist/pages/page-tree.sql",
+			"dest": "install/pages/page-tree.sql"
+		},
+		{
+			"src": "node_modules/module_m3/dist/pages/page-two.sql",
 			"dest": "install/pages/page-two.sql"
 		}
 	]

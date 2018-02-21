@@ -3,76 +3,76 @@
     "file": [
       {
         "modules": [
-          "module_i2/module_m2",
-          "module_i2/module_m3",
           "module_m",
-          "module_m3"
+          "module_m3",
+          "module_i2/module_m2",
+          "module_i2/module_m3"
         ],
         "string": "install/ALL.sql"
       },
       {
         "modules": [
-          "module_i2/module_m2",
-          "module_i2/module_m3",
           "module_m",
-          "module_m3"
+          "module_m3",
+          "module_i2/module_m2",
+          "module_i2/module_m3"
         ],
         "string": "install/09-Template/MnMenu1.FN.sql"
       },
       {
         "modules": [
-          "module_i2/module_m2",
-          "module_i2/module_m3",
           "module_m",
-          "module_m3"
+          "module_m3",
+          "module_i2/module_m2",
+          "module_i2/module_m3"
         ],
         "string": "install/09-Template/MnMenu2.FN.sql"
       },
       {
         "modules": [
-          "module_i2/module_m2",
-          "module_i2/module_m3",
           "module_m",
-          "module_m3"
+          "module_m3",
+          "module_i2/module_m2",
+          "module_i2/module_m3"
         ],
         "string": "install/pages/page-one.sql"
       },
       {
         "modules": [
-          "module_i2/module_m2",
-          "module_i2/module_m3",
           "module_m",
-          "module_m3"
+          "module_m3",
+          "module_i2/module_m2",
+          "module_i2/module_m3"
         ],
         "string": "install/pages/page-tree.sql"
       },
       {
         "modules": [
-          "module_i2/module_m2",
-          "module_i2/module_m3",
           "module_m",
-          "module_m3"
+          "module_m3",
+          "module_i2/module_m2",
+          "module_i2/module_m3"
         ],
         "string": "install/pages/page-two.sql"
       },
       {
         "modules": [
-          "module_i2/module_m3",
-          "module_m3"
+          "module_m3",
+          "module_i2/module_m3"
         ],
         "string": "install/SP.sql"
       },
       {
         "modules": [
-          "module_i2/module_m3",
-          "module_m3"
+          "module_m3",
+          "module_i2/module_m3"
         ],
         "string": "install/03-SP/MnMenu1.SP.sql"
       },
       {
         "modules": [
-          "module_i2/module_m3",
-          "module_m3"
+          "module_m3",
+          "module_i2/module_m3"
         ],
         "string": "install/03-SP/MnMenu2.SP.sql"
       }
@@ -87,57 +87,11 @@
   "modules": {
     "module_i2": {
       "_overlap": {
-        "file": [
-          {
-            "modules": [
-              "module_m2",
-              "module_m3"
-            ],
-            "string": "install/ALL.sql"
-          },
-          {
-            "modules": [
-              "module_m2",
-              "module_m3"
-            ],
-            "string": "install/09-Template/MnMenu1.FN.sql"
-          },
-          {
-            "modules": [
-              "module_m2",
-              "module_m3"
-            ],
-            "string": "install/09-Template/MnMenu2.FN.sql"
-          },
-          {
-            "modules": [
-              "module_m2",
-              "module_m3"
-            ],
-            "string": "install/pages/page-one.sql"
-          },
-          {
-            "modules": [
-              "module_m2",
-              "module_m3"
-            ],
-            "string": "install/pages/page-tree.sql"
-          },
-          {
-            "modules": [
-              "module_m2",
-              "module_m3"
-            ],
-            "string": "install/pages/page-two.sql"
-          }
-        ],
-        "module": [
-        ]
       },
       "modules": {
         "module_m2": {
           "_install": {
-            "basePath": "D:/PJ-Git/Automation_gulp-sub/node_modules/module_m2",
+            "basePath": "../module_m2",
             "file": {
               "ALL.sql": "",
               "FN.sql": ""
@@ -208,6 +162,7 @@
             "use": true
           },
           "distPath": "dist/",
+          "install": "install/",
           "module": "",
           "obj_name": "DB_OBJ_NAME",
           "options": {
@@ -233,7 +188,7 @@
         },
         "module_m3": {
           "_install": {
-            "basePath": "D:/PJ-Git/Automation_gulp-sub/node_modules/module_m3",
+            "basePath": "../module_m3",
             "file": {
               "ALL.sql": "",
               "SP.sql": ""
@@ -370,7 +325,7 @@
     },
     "module_m": {
       "_install": {
-        "basePath": "D:/PJ-Git/Automation_gulp-sub/node_modules/module_m",
+        "basePath": "node_modules/module_m",
         "file": {
           "ALL.sql": "",
           "U.sql": ""
@@ -449,7 +404,7 @@
     },
     "module_m3": {
       "_install": {
-        "basePath": "D:/PJ-Git/Automation_gulp-sub/node_modules/module_m3",
+        "basePath": "node_modules/module_m3",
         "file": {
           "ALL.sql": "",
           "SP.sql": ""
