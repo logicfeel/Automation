@@ -14,6 +14,7 @@ var deepmerge       = require('deepmerge');
 var writeJsonFile   = require('write-json-file');
 var clean           = require('gulp-clean');
 var path            = require('path'); 
+var argv            = require('minimist')(process.argv.slice(2));
 
 // #########################################################
 // 전역 변수
@@ -21,14 +22,27 @@ var path            = require('path');
 var MODULE_VISION   = "1.0.0";
 var MODULE_NAME     = "gulp_module_m";
 
+// 디버깅용
+// *0: default, 1: init, 2: init-all, 3: update, 4:preinstall, 5:install
+var DEFUALT_TASK = 0;  
+
+// 로그 레벨
+var LOG = {
+    silent: true,      // gulp 로그 비활성화
+    notresult: false,   // 설치 모듈/파일 정보 (마지막)
+    debug: false,       // 디버깅시 상세 콘솔 로그 표시
+    sub: false,         // 서브 모듈 여부
+};
+
+// 에러 레벨
+// 0: 상세, 1: 요약
+var ERR_LEVEL       = 0;        
+
+
 // gulp_module.json 로딩 객체
 var CONFIG          = null;
 var PACKAGE         = null;
 var MODULES         = null;
-
-var LOG_FLAG        = false;    // 로그 표시
-var LOG_LEVEL       = 0;        // 로그레벨 : 0 상세, 1 요약
-var ERR_LEVEL       = 0;        // 에러레벨 : 0 상세, 1 요약
 
 
 var I_MODULE_IGNORE = false;    // (*기본값) 인스턴스 모듈 제외
@@ -43,6 +57,7 @@ var SOURCEMAP_FILE  = 'installemap.json';
 var MODULE_FILE     = 'gulp_module.json';
 var I_MODULE_FILE   = 'gulp_i_module.json';
 
+
 // 기본 경로 (필수)
 var PATH = {
     base: "",
@@ -55,6 +70,21 @@ var PATH = {
     map: "map/"
 };
 
+var ARGS = [];
+
+// 아규먼트 전달 설정
+if (argv.silent) LOG.silent = true;
+if (argv.notresult) LOG.notresult = true;
+if (argv.debug) LOG.debug = true;
+if (argv.sub) LOG.sub = true;
+
+ARGS.push('--sub');
+ARGS.push('--notresult');
+
+if (LOG.debug) ARGS.push('--debug');
+if (LOG.silent) ARGS.push('--silent');
+
+
 // ##################################################
 // task 목록
 
@@ -62,16 +92,26 @@ var PATH = {
  * --------------------------------------------------
  * default 태스크
  */
-gulp.task('default', gulpsync.sync(['update', 'preinstall', 'install']));
-
-
-// 디버깅 시
-// gulp.task('default', ['init']);              // 초기화 (설정 파일 초기화, 배치폴더 제거)
-// gulp.task('default', ['init-sub']);              // 초기화 (설정 파일 초기화, 배치폴더 제거)
-// gulp.task('default', ['update']);            // 목록 갱신
-// gulp.task('default', ['preinstall']);        // 통합 실행
-// gulp.task('default', ['install']);           // 배포
-
+switch (DEFUALT_TASK) {
+    case 1: 
+        gulp.task('default', ['init']);
+        break;
+    case 2: 
+        gulp.task('default', ['init-all']);
+        break;
+    case 3: 
+        gulp.task('default', ['update']);
+        break;
+    case 4: 
+        gulp.task('default', ['preinstall']);
+        break;
+    case 5: 
+        gulp.task('default', ['install']);
+        break;
+    default:
+    gulp.task('default', gulpsync.sync(['update', 'preinstall', 'install']));
+        break;
+}
 
 /** 
  * --------------------------------------------------
@@ -119,8 +159,8 @@ gulp.task('init-sub', ['load-config'], function() {
     return gulp.src(_arrSrc)
         .pipe(chug(
             {
-                tasks: ['init']
-                // ,args: ['--silent']      // gulp 로그 비활성화
+                tasks: ['init'],
+                args: ARGS      
             },
             function(a) {
                 if (LOG_FLAG) console.log('독립실행 MODULE / I Module ..init OK');
@@ -250,7 +290,7 @@ gulp.task('preinstall-submodule', gulpsync.sync(['preinstall-submodule-m', 'prei
 
 
 gulp.task('preinstall-submodule-m', function() {
-    if (LOG_FLAG) console.log('____ preinstall-submodule  _m____');
+    if (LOG.debug) console.log('____ preinstall-submodule  _m____');
 
     var _prop;
     var _arrSrc = [];
@@ -264,17 +304,17 @@ gulp.task('preinstall-submodule-m', function() {
     return gulp.src(_arrSrc)
         .pipe(chug(
             {
-                tasks: ['default']
-                ,args: ['--silent']      // gulp 로그 비활성화
+                tasks: ['default'],
+                args: ARGS
             }, 
             function() {
-                if (LOG_FLAG) console.log('독립실행 MODULE.. OK');
+                if (LOG.debug) console.log('독립실행 MODULE.. OK');
             })
         );
 });
 
 gulp.task('preinstall-submodule-i', function() {
-    if (LOG_FLAG) console.log('____ preinstall-submodule  _i__');
+    if (LOG.debug) console.log('____ preinstall-submodule  _i__');
 
     var _prop;
     var _arrSrc = [];
@@ -289,11 +329,11 @@ gulp.task('preinstall-submodule-i', function() {
         return gulp.src(_arrSrc)
             .pipe(chug(
                 {
-                    tasks: ['preinstall']
-                    ,args: ['--silent']      // gulp 로그 비활성화
+                    tasks: ['preinstall'],
+                    args: ARGS
                 }, 
                 function() {
-                    if (LOG_FLAG) console.log('독립실행 I_MODULE.. preinstall  OK');
+                    if (LOG.debug) console.log('독립실행 I_MODULE.. preinstall  OK');
                 })
             );
     }
@@ -374,11 +414,11 @@ gulp.task('install-imodule', function() {
         return gulp.src(_arrSrc)
             .pipe(chug(
                 {
-                    tasks: ['install']
-                    ,args: ['--silent']      // gulp 로그 비활성화
+                    tasks: ['install'],
+                    args: ARGS
                 },
                 function() {
-                    if (LOG_FLAG) console.log('독립실행 I_MODULE..install OK');
+                    if (LOG.debug) console.log('독립실행 I_MODULE..install OK');
                 })
             );
     }
@@ -404,7 +444,12 @@ gulp.task('install-submodule', function() {
         file: []
     };
 
-    function copyDest(arr) {
+    function copyDest(arr, mod) {
+        // 설치 모듈 목록
+        if (LOG.debug || (!LOG.notresult && !LOG.sub)) {
+            console.log(gutil.colors.green('설치 모듈 : '+ mod));
+        }
+
         arr.forEach(function(value, index, array) {
 
             var data;
@@ -426,10 +471,14 @@ gulp.task('install-submodule', function() {
             try {
                 fs.writeFileSync(value.dest, data);
                 var cursorPath = process.cwd().replace(/\\/g,'/');
-                console.log(gutil.colors.blue('설치 성공 : ') + value.src.replace(cursorPath, '') 
-                    + gutil.colors.blue(' >> ') + value.dest
-                );
-                // console.log(gutil.colors.blue('설치 성공 ^.^ => ') + value.src);
+                
+                if (LOG.debug || (!LOG.notresult && !LOG.sub)) {
+                    console.log(gutil.colors.blue('설치 성공 : ') + value.src.replace(cursorPath, '') 
+                        + gutil.colors.blue(' >> ') + value.dest
+                    );
+                    // console.log(gutil.colors.blue('설치 성공 ^.^ => ') + value.src);
+                }
+                
             } catch(err) {
                 gulpError('파일 복사 실패 :' + value.src + err);
             }
@@ -451,7 +500,7 @@ gulp.task('install-submodule', function() {
 
             SOURCEMAP[_prop] = arr;
              
-            copyDest(arr);
+            copyDest(arr, _prop);
 
         } else if (MODULES[_prop].type === 'i' && !I_MODULE_IGNORE) {
             var _sourcemapTemp;
@@ -473,10 +522,12 @@ gulp.task('install-submodule', function() {
                 
                 SOURCEMAP[_prop + '/' + __prop] = _sourcemapTemp[__prop];
                 
-                copyDest(_sourcemapTemp[__prop]);
+                copyDest(_sourcemapTemp[__prop], _prop + '/' + __prop);
             }
         }
     }
+
+
 
     /**
      * 중복 모듈 찾기
@@ -561,7 +612,7 @@ gulp.task('load-config', function() {
     var _mod = [];
     var _modName;
 
-    if (LOG_FLAG) console.log('___loading '+ CONFIG_FILE + '___');
+    if (LOG.debug) console.log('___loading '+ CONFIG_FILE + '___');
 
     // 설정객체가 없는 경우
     // REVIEW: 없을 때만 로딩인시 시점 확인
@@ -977,4 +1028,4 @@ function InstallPath(original, source, target, basePath, parentInstallPath) {
 
 }());
 
-if (LOG_FLAG) console.log('i모듈 gulp');
+if (LOG.debug) console.log('i모듈 gulp');
