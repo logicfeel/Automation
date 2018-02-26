@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "@types/lodash": "^4.14.104",
     "gulp": "github:gulpjs/gulp#4.0",
     "gulp-clean": "^0.4.0",
     "gulp-concat": "^2.6.1",
@@ -16,7 +17,10 @@
     "gulp-replace": "^0.6.1",
     "gulp-sourcemaps": "^2.6.3",
     "gulp-sync": "^0.1.4",
-    "lazypipe": "^1.0.1"
+    "lazypipe": "^1.0.1",
+    "module_m": "git+https://github.com/logicfeel/Automation.git#Module_M",
+    "ts-node": "^5.0.0",
+    "typescript": "^2.7.2"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

@@ -1,3 +1,6 @@
+// import * as _ from "lodash";
+// _.padStart("Hello TypeScript!", 20, " ");
+
 var schema;
 
 schema = {
@@ -40,3 +43,5 @@ gulp.task('default', gulp.series(default_pre, default_update));
 
 
 // console.log('End');
+
+var abc = require('test');
