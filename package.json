@@ -1,5 +1,5 @@
 {
-  "name": "@mod/master",
+  "name": "master",
   "version": "1.0.0",
   "description": "- gulp 를 활용",
   "main": "index.js",
