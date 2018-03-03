@@ -14,6 +14,9 @@ function AutoBase() {
 }
 util.inherits(AutoBase, EventEmitter);
 
+
+AutoBase.prototype.src = "전역속성";
+
 AutoBase.prototype.init = function() {
 };
 
