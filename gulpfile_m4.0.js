@@ -278,7 +278,7 @@ gulp.task('install-unit', function() {
  * --------------------------------------------------
  * install-unit
  */
-gulp.task('template-hbs', function() {
+ gulp.task('template-hbs', function() {
     var _dist = PATH.template.dist;
 
     if (CONFIG.options.template_overlap) _dist = PATH.dist;
