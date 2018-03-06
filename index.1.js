@@ -47,16 +47,25 @@ AutoBase.prototype.init = function(gulpInst) {
 
     var ABC = 3;
     console.log('init');
-    gulpInst.task('clean', function abc(done) {
-        console.log('clean..');
-        done();
-    });
-    gulpInst.task('clean2', this._clean_dist);
+    // gulpInst.task('clean', function abc(done) {
+    //     console.log('clean..');
+    //     done();
+    // });
+    // gulpInst.task('clean2', this._clean_dist);
+    gulpInst.task('clean2', gulpInst.series(this._clean_dist));
+    // gulpInst.task('clean3', this._clean_dist);
 
 }
-AutoBase.prototype.set  =function set(name, fn) {
+AutoBase.prototype.set  = function set(name, fn) {
     var task = this._tasks[name] = fn.bind(this);
     return task;
+}
+AutoBase.prototype.get  = function get(name) {
+    // var task = this._tasks[name] = fn.bind(this);
+    
+    // return this._tasks[name].bind(this);
+    return this._tasks[name];
+    // return this._tasks['clean3'];
 }
 
 AutoBase.prototype._clean_dist = function(a, b) {
@@ -152,9 +161,11 @@ gulp.registry(b);
 
 gulp.series('clean2')();
 
+// gulp.series('clean2').call(d);
+
 
 // 이벤트 성공 ^^
-gulp.emit('update', 1);
+// gulp.emit('update', 1);
 
 // gulp.series('clean2').call(a);
 // a.get('clean');

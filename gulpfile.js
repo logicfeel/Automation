@@ -1,16 +1,8 @@
 'use strict';
 
 // gulp 4.0
-var gulp        = require('gulp'); 
+var gulp        = require('gulp');
+var Auto        = require('.');
 
 
-
-
-
-// ******************
-function load_config(cb) {
-    return cb();
-}
-// ******************
-
-gulp.task('load-config', load_config);
+gulp.registry(new Auto.AutoInstance());
