@@ -38,3 +38,9 @@
 
 # Auto 최상위
 
+*브런치 이름 변경하기
+
+git branch -m 현재브런치명 변경할 브런치명
+
+
+출처: http://dolfalf.tistory.com/73 [악당잰의 연구실]
