@@ -46,3 +46,7 @@ _1.x.x
 
 
 출처: http://dolfalf.tistory.com/73 [악당잰의 연구실]
+
+깃 관련 참조 더 좋은 곳
+
+https://mylko72.gitbooks.io/git/content/branch/checkout.html
