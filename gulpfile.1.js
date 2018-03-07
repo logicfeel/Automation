@@ -5,4 +5,4 @@ var gulp        = require('gulp');
 var Auto        = require('.');
 
 
-gulp.registry(new Auto.AutoModModel());
+gulp.registry(new Auto.AutoInstance());

@@ -19,6 +19,7 @@ var hb              = require('gulp-hb');
 function AutoBase() {
     DefaultRegistry.call(this);
 
+    this.ERR_LEVEL = 1;
     this.CFG = null;
     this.PKG = null;
     this.PATH = {
@@ -27,6 +28,7 @@ function AutoBase() {
         module: '../**/@mod*/',
         i_module: '../**/@instance/'
     };
+    this.PREFIX_NM = '';
 }
 util.inherits(AutoBase, DefaultRegistry);
 
@@ -54,24 +56,17 @@ AutoBase.prototype.FILE = {
 AutoBase.prototype.init = function(gulpInst) {
     if (this.LOG.debug) console.log('AutoBase.prototype.init');
 
-    gulpInst.task('reset', gulpInst.series(this.reset, this._reset_dist));
+    gulpInst.task('reset', gulpInst.series(this.reset.bind(this), this._reset_dist.bind(this)));
+};
 
-    // 추상 태스크
-    gulpInst.task('update', gulpInst.series(this.update));
-    
-    // 추상 태스크
-    gulpInst.task('preinstall', gulpInst.series(this.preinstall));
-    
-    // 추상 태스크
-    gulpInst.task('install', gulpInst.series(this.install));
-    
-    // 추상 태스크
-    gulpInst.task('default', gulpInst.series(this.default));
+AutoBase.prototype.setTaskPrefix  = function(name) {
+    this.PREFIX_NM = name;
 };
 
 
 /**
  * 오버라이딩  overriding
+ * 테스크 설정
  * @param {*} name 테스트명
  * @param {*} fn 호출 함수, 내부 연결 함수, 또는 사용자 주입 함수
  */
@@ -80,8 +75,18 @@ AutoBase.prototype.set  =function set(name, fn) {
     return task;
 };
 
+/**
+ * 오버라이딩
+ * 이름으로 태스크 함수 얻기
+ * @param {*} name 
+ */
+AutoBase.prototype.get  =function get(name) {
+    var task = this._tasks[name];
+    return task;
+};
 
-AutoBase.prototype.reset = function(cb) {
+
+AutoBase.prototype.reset = function reset(cb) {
   if (this.LOG.debug) console.log('AutoBase.prototype.reset');
   
   return gulp.src(this.PATH.base + '.' + this.FILE.CFG)
@@ -90,7 +95,7 @@ AutoBase.prototype.reset = function(cb) {
 };
 
 
-AutoBase.prototype._reset_dist = function(cb) {
+AutoBase.prototype._reset_dist = function _reset_dist(cb) {
     if (this.LOG.debug) console.log('AutoBase.prototype._reset_dist');
 
     return gulp.src([this.PATH.base + this.PATH.dist, this.PATH.base + this.PATH.map], {read: false, allowEmpty :  true})
@@ -98,40 +103,15 @@ AutoBase.prototype._reset_dist = function(cb) {
 };
 
 
-AutoBase.prototype._save_cfg = function(cb) {
+AutoBase.prototype._save_cfg = function _save_cfg(cb) {
     if (this.LOG.debug) console.log('AutoBase.prototype._save_cfg');
 
     // TODO: gulp 사용 안하는 방식으로 변경
-    fs.writeFileSync(this.FILE.CFG, JSON.stringify(CONFIG));
+    fs.writeFileSync(this.FILE.CFG, JSON.stringify(this.CFG));
         
-    return gulp.src(PATH.base + this.FILE.CFG)
+    return gulp.src(this.PATH.base + this.FILE.CFG)
         .pipe(sortJSON({ space: 2 }))
-        .pipe(gulp.dest(PATH.base + './'));
-};
-
-
-AutoBase.prototype.update = function(cb) {
-    if (this.LOG.debug) console.log('AutoBase.prototype.update');
-    // TODO: 에러 처리 예외 추가
-    return cb();
-};
-
-AutoBase.prototype.preinstall = function(cb) {
-    if (this.LOG.debug) console.log('AutoBase.prototype.preinstall');
-    // TODO: 에러 처리 예외 추가
-    return cb();
-};
-
-AutoBase.prototype.install = function(cb) {
-    if (this.LOG.debug) console.log('AutoBase.prototype.install');
-    // TODO: 에러 처리 예외 추가
-    return cb();
-};
-
-AutoBase.prototype.default = function(cb) {
-    if (this.LOG.debug) console.log('AutoBase.prototype.default');
-    // TODO: 에러 처리 예외 추가
-    return cb();
+        .pipe(gulp.dest(this.PATH.base + './'));
 };
 
 
@@ -143,6 +123,8 @@ function AutoInstance() {
     // 오버라이딩
     this.PATH['dist'] = 'install/';
     this.PATH['map'] = 'map/';
+
+    this.MOD = null;
 }
 util.inherits(AutoInstance, AutoBase);
 
@@ -151,20 +133,20 @@ AutoInstance.prototype.init = function(gulpInst) {
     AutoBase.prototype.init.call(this, gulpInst);
     if (this.LOG.debug) console.log('AutoInstance.prototype.init');
 
-    gulpInst.task('update', gulpInst.series(this.reset, this._reset_dist));
+    gulpInst.task('update', gulpInst.series(this.subLoad.bind(this)));
 
-    gulpInst.task('reset_all', gulpInst.series(this.reset, this._reset_dist));
+    // 로딩테스트 후 주석 해제
+    // gulpInst.task('update', gulpInst.series(this._load_cfg.bind(this), this._update_check.bind(this), this._update_build.bind(this), this._save_cfg.bind(this)));
 
-    gulpInst.task('reset_sub', gulpInst.series(this.reset, this._reset_dist));
+    gulpInst.task('reset_all', gulpInst.series(this.reset.bind(this), this._reset_dist.bind(this)));
 
-    // 오버라이딩
-    gulpInst.task('preinstall', gulpInst.series(this.preinstall));
+    gulpInst.task('reset_sub', gulpInst.series(this.reset.bind(this), this._reset_dist.bind(this)));
+
+    gulpInst.task('preinstall', gulpInst.series(this.preinstall.bind(this)));
     
-    // 오버라이딩
-    gulpInst.task('install', gulpInst.series(this.install));
+    gulpInst.task('install', gulpInst.series(this.install.bind(this)));
     
-    // 오버라이딩
-    gulpInst.task('default', gulpInst.series(this.update, this.preinstall, this.install));
+    gulpInst.task('default', gulpInst.series(this.update.bind(this), this.preinstall.bind(this), this.install.bind(this)));
 };
 
 
@@ -175,81 +157,175 @@ AutoInstance.prototype.update = function update(cb) {
 };
 
 
-AutoInstance.prototype.reset_all = function(cb) {
+AutoInstance.prototype.reset_all = function reset_all(cb) {
     if (this.LOG.debug) console.log('AutoInstance.prototype.reset_all');
     return cb();
 };
 
 
-AutoInstance.prototype.reset_sub = function(cb) {
+AutoInstance.prototype.reset_sub = function reset_sub(cb) {
     if (this.LOG.debug) console.log('AutoInstance.prototype.reset_sub');
     return cb();
 };
 
 
-// 오버라이딩
-AutoInstance.prototype.default = function(cb) {
+
+AutoInstance.prototype.default = function (cb) {
     if (this.LOG.debug) console.log('AutoInstance.prototype.default');
     return cb();
 };
 
-// 오버라이딩
-AutoInstance.prototype.preinstall = function(cb) {
+
+AutoInstance.prototype.preinstall = function preinstall(cb) {
     if (this.LOG.debug) console.log('AutoInstance.prototype.preinstall');
     return cb();
 };
 
 // 오버라이딩
-AutoInstance.prototype.install = function(cb) {
+AutoInstance.prototype.install = function install(cb) {
     if (this.LOG.debug) console.log('AutoInstance.prototype.install');
     return cb();
 };
 
+AutoInstance.prototype.subLoad = function subLoad(cb) {
+    if (this.LOG.debug) console.log('AutoInstance.prototype.subLoad');
+
+    
+    // TODO: 하위 호출 방식 테스트
+    // var sub        = require('@mod-c/mn_menu');
+    var sub        = require('./node_modules/@mod-c/mn_menu/gulpfile');
+    
+    // gulp.registry(sub.obj);
+    // gulp.series('template')();
+
+    // sub.series('template')();
+    sub.runTask('template');
+
+    return cb();
+};
 
 
-AutoInstance.prototype._load_cfg = function(cb) {
+AutoInstance.prototype._load_cfg = function _load_cfg(cb) {
     if (this.LOG.debug) console.log('AutoInstance.prototype._load_cfg');
+
+    var _mod = [];
+    var _modName;
+
+    if (this.LOG.debug) console.log('___loading '+ this.FILE.PKG + '___');
+
+    // 설정객체가 없는 경우
+    // REVIEW: 없을 때만 로딩인시 시점 확인
+    
+    try {
+        // 설정 로딩
+        if (!this.CFG) {
+            this.CFG = JSON.parse(fs.readFileSync(this.PATH.base + this.FILE.CFG));
+        }
+        
+        // 패키지 로딩
+        if(!this.PKG) {
+            this.PKG = JSON.parse(fs.readFileSync(this.PATH.base + this.FILE.PKG));
+            if (!this.PKG) {
+                console.log('___error file 없음: '+ this.FILE.PKG + '___');
+                throw new Error("에러!");
+            }
+        }
+    } catch(err) {
+        gulpError('error 설정/패키지 읽기 실패 :' + err);
+    }    
+    
+    // 설치 모듈 로딩 : 경로
+    this.MOD = {};
+
+    for (var _prop in this.PKG.dependencies) {
+
+        var _path;
+        var _fullPath;
+        var _stat;
+        var _relativePath;
+
+        _path = require.resolve(_prop); // 모듈 설치 여부 검사
+        _path = path.dirname(_path); // 모듈 설치 여부 검사
+        _path = _path.replace(/\\/g,'/');
+
+        // 상대경로 변환
+        _relativePath = path.relative(process.cwd(), _path);
+        _relativePath = _relativePath.replace(/\\/g,'/'); 
+
+        try {
+            _fullPath = _path + '/' + this.FILE.CFG;
+            
+            _stat = fs.statSync(_fullPath);
+
+            if (_stat.isFile() && _path != '.') {
+                MODULES[_prop] = {
+                    path: _relativePath + '/' + this.FILE.CFG,
+                    dir: _relativePath,
+                    type: 'm'
+                };
+            }
+        } catch(err) {
+            // 무시함
+        }
+
+        if (!I_MODULE_IGNORE) {
+            try {
+                _fullPath = _path + '/' + this.FILE.CFG;
+                _stat = fs.statSync(_fullPath);
+                if (_stat.isFile() && _path != '.') {
+                    MODULES[_prop] = {
+                        path: _relativePath + '/' + this.FILE.CFG,
+                        dir: _relativePath,
+                        type: 'i'
+                    };
+                }
+            } catch(err) {
+                // 무시함
+            }
+        }
+    }
     return cb();
 };
 
 
-AutoInstance.prototype._update_check = function(cb) {
+AutoInstance.prototype._update_check = function _update_check(cb) {
     if (this.LOG.debug) console.log('AutoInstance.prototype._update_check');
+
     return cb();
 };
 
 
-AutoInstance.prototype._update_build = function(cb) {
+AutoInstance.prototype._update_build = function _update_build(cb) {
     if (this.LOG.debug) console.log('AutoInstance.prototype._update_build');
     return cb();
 };
 
 
-AutoInstance.prototype._preinstall_submodule = function(cb) {
+AutoInstance.prototype._preinstall_submodule = function _preinstall_submodule(cb) {
     if (this.LOG.debug) console.log('AutoInstance.prototype._preinstall_submodule');
     return cb();
 };
 
 
-AutoInstance.prototype._preinstall_submodule_m = function(cb) {
+AutoInstance.prototype._preinstall_submodule_m = function _preinstall_submodule_m(cb) {
     if (this.LOG.debug) console.log('AutoInstance.prototype._preinstall_submodule_m');
     return cb();
 };
 
 
-AutoInstance.prototype._preinstall_submodule_i = function(cb) {
+AutoInstance.prototype._preinstall_submodule_i = function _preinstall_submodule_i(cb) {
     if (this.LOG.debug) console.log('AutoInstance.prototype._preinstall_submodule_i');
     return cb();
 };
 
 
-AutoInstance.prototype._install_imodule = function(cb) {
+AutoInstance.prototype._install_imodule = function _install_imodule(cb) {
     if (this.LOG.debug) console.log('AutoInstance.prototype._install_imodule');
     return cb();
 };
 
 
-AutoInstance.prototype._install_submodule = function(cb) {
+AutoInstance.prototype._install_submodule = function _install_submodule(cb) {
     if (this.LOG.debug) console.log('AutoInstance.prototype._install_submodule');
     return cb();
 };
@@ -262,7 +338,7 @@ function AutoModule() {
 
     // 오버라이딩
     this.PATH['dist'] = 'dist/';
-    this.PATH['templage'] = {
+    this.PATH['template'] = {
         ext: ".sql",                    // 기본 변환 확장자    // TODO: 확장자는 제거 형태로.. abc.asp.hbs => abc.asp
         dist: "publish/",               // 템플릿 배포 폴더 template_overlap = true 기본폴더로 지정(덮어씀)
         src: "src/**/*.hbs",            // TODO: 기본 구조 변경에 따른 tempate  폴더 삽입
@@ -270,6 +346,7 @@ function AutoModule() {
         helpers: "template/*.js",       // helper(메소드)명 : export 객체명
         data: "template/*.json"         // data명 : 파일명.객체명  TODO: data/ 폴더 명 사용 불필요 할듯 이미 구분됨
     };
+    this.DEBUG_HBS = true;
 }
 util.inherits(AutoModule, AutoBase);
 
@@ -278,41 +355,44 @@ AutoModule.prototype.init = function(gulpInst) {
     AutoBase.prototype.init.call(this, gulpInst);
     if (this.LOG.debug) console.log('AutoModule.prototype.init');
 
-    gulpInst.task('template', gulpInst.series(this._load_cfg, this._template_hbs));
-    gulpInst.task('default', gulpInst.series(this.preinstall, this.install, this.template));
+    gulpInst.task('template', gulpInst.series(this._load_cfg.bind(this), this._template_hbs.bind(this)));
 };
 
 
-AutoModule.prototype.template = function(cb) {
+AutoModule.prototype.template = function template(cb) {
     if (this.LOG.debug) console.log('AutoModule.prototype.template');
     return cb();
 };
 
 
-AutoModule.prototype._load_cfg = function(cb) {
+AutoModule.prototype._load_cfg = function _load_cfg(cb) {
     if (this.LOG.debug) console.log('AutoModule.prototype._load_cfg');
 
     var setup;
 
     // 설정객체가 없는 경우
-    if (!CONFIG) {
-        setup = fs.readFileSync(this.PATH.base + CONFIG_FILE);
-        CONFIG = JSON.parse(setup);
-    }
-
+    try {
+        if (!this.CFG) {
+            setup = fs.readFileSync(this.PATH.base + this.FILE.CFG);
+            this.CFG = JSON.parse(setup);
+        }
+    } catch(err) {
+        gulpError('error 설정/패키리 읽기 실패 :' + this.FILE.CFG, 'load-config');
+    }   
     return cb();
 };
 
 
-AutoModule.prototype._template_hbs = function(cb) {
+AutoModule.prototype._template_hbs = function _template_hbs(cb) {
     if (this.LOG.debug) console.log('AutoModule.prototype._template_hbs');
 
     var _dist = this.PATH.template.dist;
 
-    if (this.CFG.options.template_overlap) _dist = this.PATH.dist;
+    // REVEW: 템플릿 구성 방식 바껴서 제거함
+    // if (this.CFG.options.template_overlap) _dist = this.PATH.dist;
 
     return gulp.src(this.PATH.base + this.PATH.template.src)
-        .pipe(hb({debug: DEBUG_HBS})
+        .pipe(hb({debug: this.DEBUG_HBS})
             .partials(this.PATH.base + this.PATH.template.partials)
             .helpers(this.PATH.base + this.PATH.template.helpers)
             .data(this.PATH.base + this.PATH.template.data)
@@ -323,9 +403,38 @@ AutoModule.prototype._template_hbs = function(cb) {
 };
 
 
-AutoModule.prototype.pipe_cfg_replace = function(cb) {
-    if (this.LOG.debug) console.log('AutoModule.prototype.pipe_cfg_replace');
-    return cb();
+AutoModule.prototype.pipe_cfg_replace = function(p_this) {
+    
+    var _this = p_this;
+
+    return through.obj(function(file, enc, cb) {
+        var result;
+        var filePath = String(file.relative);
+        
+        if (file.isNull()) {
+            // return empty file
+            return cb(null, file);
+        }else if(file.isBuffer()) {
+            result = String(file.contents);
+            _this.CFG.replace.forEach(function(value, index, arr) {
+                
+                // REVIEW:  !! JSON 파일은 정규식 지원 안함
+                if ((value.src instanceof RegExp && filePath.search(value.src) > -1) ||
+                    value.src === filePath || value.src.length === 0) {
+                    result = result.replace(value.string, value.replacement);
+                }
+            });
+        }
+        // if (file.isStream()) {
+        //   file.contents = file.contents.pipe(prefixStream(prefixText));
+        // }
+        
+        // 파이프 파일에 저장
+        file.contents = new Buffer(result);
+
+        cb(null, file);
+    });
+    // return through.obj();
 };
 
 
@@ -444,23 +553,33 @@ AutoModModel.prototype.init = function(gulpInst) {
     AutoModule.prototype.init.call(this, gulpInst);
     if (this.LOG.debug) console.log('AutoModModel.prototype.init');
 
-    gulpInst.task('preinstall', gulpInst.series(this._load_cfg, this.__preinstall_cfg_build, this._save_cfg));
-    gulpInst.task('install', gulpInst.series(this._load_cfg, this._install_group, this._install_unit, this._template_hbs));
+    gulpInst.task('preinstall', gulpInst.series(this._load_cfg.bind(this), this.__preinstall_cfg_build.bind(this), this._save_cfg.bind(this)));
+    
+    gulpInst.task('install', gulpInst.series(this._load_cfg.bind(this), this._install_group.bind(this), this._install_unit.bind(this), this._template_hbs.bind(this)));
+    
+    gulpInst.task('default', gulpInst.series('preinstall', 'install', 'template'));
 };
 
 
-AutoModModel.prototype.preinstall = function(cb) {
+AutoModModel.prototype.preinstall = function preinstall(cb) {
     if (this.LOG.debug) console.log('AutoModModel.prototype.preinstall');
     
     return cb();
 };
 
 
-AutoModModel.prototype.install = function(cb) {
+AutoModModel.prototype.install = function install(cb) {
     if (this.LOG.debug) console.log('AutoModModel.prototype.install');
     
     return cb();
 };
+
+AutoModModel.prototype.default = function (cb) {
+    if (this.LOG.debug) console.log('AutoModModel.prototype.default');
+    
+    return cb();
+};
+
 
 // 내부 클래스
 /** 
@@ -468,11 +587,13 @@ AutoModModel.prototype.install = function(cb) {
  * install 공통
  * ! 파이프 파일을 통합하기 전에 이용
  */
-AutoModModel.prototype.pipe_install_common = function() {
-    return lazypipe()
+AutoModModel.prototype.pipe_install_common = function pipe_install_common(cb) {
+    
+    var _this = this;
+    var laz = lazypipe()
         // DDL 명령 (create, alter)
         .pipe(replace, this.REG_EXP.DDL_COMMAND, function(match, p1, offset, string) {
-            if (this.CFG.options.ddl_create) {
+            if (_this.CFG.options.ddl_create) {
                 match = match.replace(p1, 'CREATE');
             }
             return match;
@@ -481,10 +602,10 @@ AutoModModel.prototype.pipe_install_common = function() {
         .pipe(replace, this.REG_EXP.DDL_ALL, function(match, p1, p2, p3, p4, offset, string) {
             var _match;
 
-            _match = this.prefixNameBuild(match, p1, p2, p3, this.CFG.obj_name, this.CFG.options.obj_type);
+            _match = _this.prefixNameBuild(match, p1, p2, p3, _this.CFG.obj_name, _this.CFG.options.obj_type);
             
-            if (this.CFG.prefix_name.length > 0 ||  this.CFG.suffix_name.length > 0) {
-                _match = _match.replace(p4, this.CFG.prefix_name + p4 + this.CFG.suffix_name);
+            if (_this.CFG.prefix_name.length > 0 ||  _this.CFG.suffix_name.length > 0) {
+                _match = _match.replace(p4, _this.CFG.prefix_name + p4 + _this.CFG.suffix_name);
             }
             return _match;
         })
@@ -495,16 +616,16 @@ AutoModModel.prototype.pipe_install_common = function() {
             var _match = '';
 
             // _replace에서 타겟명 변경 안된것 처리
-            if (this.CFG.prefix_name.length > 0 ||  this.CFG.suffix_name.length > 0) {
-                _targetName = this.CFG.prefix_name + p4 + this.CFG.suffix_name;
+            if (_this.CFG.prefix_name.length > 0 ||  _this.CFG.suffix_name.length > 0) {
+                _targetName = _this.CFG.prefix_name + p4 + _this.CFG.suffix_name;
                 _match = match.replace(p4, _targetName);
             } else {
                 _match = match;
             }
 
-            if (this.CFG.options.obj_fnc_type === 0) return _match;     // 유지 이후 처리 안함
+            if (_this.CFG.options.obj_fnc_type === 0) return _match;     // 유지 이후 처리 안함
 
-            this.CFG._replace.some(function(value, index, arr){
+            _this.CFG._replace.some(function(value, index, arr){
                 if (value.string === match) {
                     _index = index;
                     return true;
@@ -512,7 +633,7 @@ AutoModModel.prototype.pipe_install_common = function() {
             });
 
             if (_index != null) {
-                return this.CFG._replace[_index].replacement;
+                return _this.CFG._replace[_index].replacement;
             } else {
                 return _match;
             }
@@ -522,19 +643,19 @@ AutoModModel.prototype.pipe_install_common = function() {
             var _match;
             var _index = null;
 
-            if (this.CFG.options.obj_fnc_type === 0) return match;     // 유지 이후 처리 안함
+            if (_this.CFG.options.obj_fnc_type === 0) return match;     // 유지 이후 처리 안함
 
             if (p1.toUpperCase().trim() === 'TABLE' || p1.toUpperCase().trim() === 'FUNCTION' ||
                 p1.toUpperCase().trim() === 'REFERENCES') {
                 return  match;
             } else {
-                this.CFG._replace.some(function(value, index, arr){
+                _this.CFG._replace.some(function(value, index, arr){
                     if (value.string === match) {
                         _index = index;
                         return true;
                     }
                 });
-                if (_index != null) _match = this.CFG._replace[_index].replacement;    
+                if (_index != null) _match = _this.CFG._replace[_index].replacement;    
             }
             return _match;
         })
@@ -542,16 +663,16 @@ AutoModModel.prototype.pipe_install_common = function() {
         .pipe(replace, this.REG_EXP.USE_OBJ_NAME, function(match, p1, p2, offset, string) {
             var _match;
 
-            if (this.CFG.clear.use) return '';
+            if (_this.CFG.clear.use) return '';
 
             // 객체명 있는 경우 교체함
-            _match = this.prefixNameBuild(match, null, p1, p2, this.CFG.obj_name, 3); 
+            _match = _this.prefixNameBuild(match, null, p1, p2, _this.CFG.obj_name, 3); 
             return _match;
         })
         // 주석 /** **/ 
         .pipe(replace, this.REG_EXP.COMMENT, function(match, p1, offset, string) {
             
-            if (this.CFG.clear.comment) return '';
+            if (_this.CFG.clear.comment) return '';
             return match;
         })
         // 첫 빈줄 제거
@@ -560,45 +681,20 @@ AutoModModel.prototype.pipe_install_common = function() {
         .pipe(replace, this.REG_EXP.LAST_SPACE, '')
         // 정규표현 : 마지막 GO
         .pipe(replace, this.REG_EXP.LAST_GO, function(match, p1, offset, string) {
-            if (this.CFG.options.last_go && match.trim() != 'GO') return match + '\n\nGO--Auto\n\n';
+            if (_this.CFG.options.last_go && match.trim() != 'GO') return match + '\n\nGO--Auto\n\n';
             else return match + '--End\n\n';
         })
-        .pipe(function() {
-            // console.log('___func__');
-            return through.obj(function(file, enc, cb) {
-                var result;
-                var filePath = String(file.relative);
-                
-                if (file.isNull()) {
-                    // return empty file
-                    return cb(null, file);
-                }else if(file.isBuffer()) {
-                    result = String(file.contents);
-                    this.CFG.replace.forEach(function(value, index, arr) {
-                        
-                        // REVIEW:  !! JSON 파일은 정규식 지원 안함
-                        if ((value.src instanceof RegExp && filePath.search(value.src) > -1) ||
-                            value.src === filePath || value.src.length === 0) {
-                            result = result.replace(value.string, value.replacement);
-                        }
-                    });
-                }
-                // if (file.isStream()) {
-                //   file.contents = file.contents.pipe(prefixStream(prefixText));
-                // }
-                
-                // 파이프 파일에 저장
-                file.contents = new Buffer(result);
+        .pipe(this.pipe_cfg_replace, this);
 
-                cb(null, file);
-            });
-            // return through.obj();
-        });
+        // return cb();
+    return laz();
 }
 
-AutoModModel.prototype.__preinstall_cfg_build = function(cb) {
+AutoModModel.prototype.__preinstall_cfg_build = function __preinstall_cfg_build(cb) {
     if (this.LOG.debug) console.log('AutoModModel.prototype.__preinstall_cfg_build');
-
+    
+    var _this = this;
+    
     this.CFG._replace = [];
     this.CFG.distPath = this.PATH.dist;
 
@@ -606,16 +702,16 @@ AutoModModel.prototype.__preinstall_cfg_build = function(cb) {
         .pipe(replace(this.REG_EXP.DML_SP, function(match, p1, p2, p3, p4, offset, string) {
                 var objData = {};
                 var _match;
-                
+
                 // 제외 조건 : 유지 + 객체 없음
-                if (this.CFG.options.obj_fnc_type === 1 && typeof p3 === 'undefined') return match;
+                if (_this.CFG.options.obj_fnc_type === 1 && typeof p3 === 'undefined') return match;
                 // 제외 조건 : 있을때만 교체 + 객체 없음
-                if (this.CFG.options.obj_fnc_type === 3 && typeof p3 === 'undefined') return match;
+                if (_this.CFG.options.obj_fnc_type === 3 && typeof p3 === 'undefined') return match;
 
-                _match = this.prefixNameBuild(match, p1, p2, p3, this.CFG.obj_name, this.CFG.options.obj_fnc_type);
+                _match = _this.prefixNameBuild(match, p1, p2, p3, _this.CFG.obj_name, _this.CFG.options.obj_fnc_type);
 
-                if (this.CFG.prefix_name.length > 0 ||  this.CFG.suffix_name.length > 0) {
-                    _match = _match.replace(p4, this.CFG.prefix_name + p4 + this.CFG.suffix_name);
+                if (_this.CFG.prefix_name.length > 0 ||  _this.CFG.suffix_name.length > 0) {
+                    _match = _match.replace(p4, _this.CFG.prefix_name + p4 + _this.CFG.suffix_name);
                 }
         
                 objData = {
@@ -623,7 +719,7 @@ AutoModModel.prototype.__preinstall_cfg_build = function(cb) {
                     string: match,
                     replacement: _match
                 };
-                this.CFG._replace.push(objData);
+                _this.CFG._replace.push(objData);
                 return match;
             })
         )
@@ -637,10 +733,10 @@ AutoModModel.prototype.__preinstall_cfg_build = function(cb) {
                 }
 
                 //  this.CFG.options.obj_fnc_type (* fn은 있을 경우만 교체)
-                _match = this.prefixNameBuild(match, p2, p3, p4, this.CFG.obj_name, this.CFG.options.obj_fnc_type);
+                _match = _this.prefixNameBuild(match, p2, p3, p4, _this.CFG.obj_name, _this.CFG.options.obj_fnc_type);
                 
-                if (this.CFG.prefix_name.length > 0 ||  this.CFG.suffix_name.length > 0) {
-                    _match = _match.replace(p5, this.CFG.prefix_name + p5 + this.CFG.suffix_name);
+                if (_this.CFG.prefix_name.length > 0 ||  _this.CFG.suffix_name.length > 0) {
+                    _match = _match.replace(p5, this.CFG.prefix_name + p5 + _this.CFG.suffix_name);
                 }
 
                 objData = {
@@ -648,7 +744,7 @@ AutoModModel.prototype.__preinstall_cfg_build = function(cb) {
                     string: match,
                     replacement: _match
                 };
-                this.CFG._replace.push(objData);
+                _this.CFG._replace.push(objData);
 
                 return match;
             })
@@ -656,28 +752,55 @@ AutoModModel.prototype.__preinstall_cfg_build = function(cb) {
 };
 
 
-AutoModModel.prototype._install_group = function(cb) {
+AutoModModel.prototype._install_group = function _install_group(cb) {
     if (this.LOG.debug) console.log('AutoModModel.prototype._install_group');
+
+    var _this = this;
 
     if (!this.CFG.options.intall_group)  return cb();
 
     return gulp.src(this.PATH.base + this.PATH.src)
-        .pipe(_install_common())
-        .pipe(groupConcat(FILE_GROUP))          // REVEIW: 이전에 gulp.dest 하면 없어짐
-        .pipe(gulp.dest(this.PATH.base + this.PATH.dist));
+        .pipe(_this.pipe_install_common())
+        .pipe(groupConcat(_this.FILE_GROUP))          // REVEIW: 이전에 gulp.dest 하면 없어짐
+        .pipe(gulp.dest(_this.PATH.base + _this.PATH.dist));
 };
 
 
-AutoModModel.prototype._install_unit = function(cb) {
+AutoModModel.prototype._install_unit = function _install_unit(cb) {
     if (this.LOG.debug) console.log('AutoModModel.prototype._install_unit');
+
+    var _this = this;
 
     if (!this.CFG.options.intall_unit) return cb();
 
     return gulp.src(this.PATH.base + this.PATH.src)
-        .pipe(_install_common())
-        .pipe(gulp.dest(this.PATH.base + this.PATH.dist));    
+        // .pipe(_this.pipe_install_common())
+        .pipe(gulp.dest(_this.PATH.base + _this.PATH.dist));    
 };
 
+
+/**
+ * gulp 오류 출력
+ * TODO: 위치 조정
+ * @param {*} errName 오류 구분 명칭
+ * @param {*} message 오류 메세지
+ */
+function gulpError(message, errName) {
+    // 제사한 오류 출력
+    // if (this.ERR_LEVEL === 1) {
+    //     throw new gutil.PluginError({
+    //         plugin: errName,
+    //         message: message
+    //     });                
+    // } else {
+        throw new Error(message);
+    // }
+}
+
+module.exports.AutoBase = AutoBase;
+module.exports.AutoInstance = AutoInstance;
+module.exports.AutoModule = AutoModule;
+module.exports.AutoModModel = AutoModModel;
 
 //#####################################
 // 테스트
@@ -686,11 +809,6 @@ var b = new AutoInstance();
 var c = new AutoModule();
 var d = new AutoModModel();
 
-
-module.exports.AutoBase = AutoBase;
-module.exports.AutoInstance = AutoInstance;
-module.exports.AutoModule = AutoModule;
-module.exports.AutoModModel = AutoModModel;
 
 // 등록
 // gulp.registry(a);
@@ -705,7 +823,10 @@ module.exports.AutoModModel = AutoModModel;
 // 테스크 실행
 // gulp.series('default')();
 // gulp.series('install')();
-// gulp.series('template')();
+// gulp.series('tempate')();
+// gulp.series('reset')();
+// gulp.series('preinstall')();
+
 
 // gulp.series(b._reset_dist)();
 // b.init.call(this);

@@ -5,4 +5,7 @@ var gulp        = require('gulp');
 var Auto        = require('.');
 
 
-gulp.registry(new Auto.AutoModModel());
+var i = new Auto.AutoInstance();
+i.FILE.CFG = 'auto_i_module.json';
+
+gulp.registry(i);

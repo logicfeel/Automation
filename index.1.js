@@ -5,8 +5,10 @@ var util            = require('util');
 var gulp            = require('gulp');
 var rename          = require('gulp-rename');
 var clean           = require('gulp-clean');
-
 var DefaultRegistry = require('undertaker-registry');
+
+// 테스트 모듈
+var Undertaker      = require('undertaker');
 
 function AutoBase() {
     DefaultRegistry.call(this);
@@ -27,6 +29,42 @@ function AutoBase() {
     });
 }
 util.inherits(AutoBase, DefaultRegistry);
+
+
+Object.equals = function(x, y) { 
+    if (x === y) return true; 
+    // if both x and y are null or undefined and exactly the same 
+    
+    if (!(x instanceof Object) || !(y instanceof Object)) return false; 
+    // if they are not strictly equal, they both need to be Objects 
+    
+    if (x.constructor !== y.constructor) return false; 
+    // they must have the exact same prototype chain, the closest we can do is 
+    // test there constructor. 
+    for (var p in x) {
+         if (!x.hasOwnProperty(p)) continue; 
+         // other properties were tested using x.constructor === y.constructor 
+         
+         if (!y.hasOwnProperty(p)) return false; 
+         // allows to compare x[ p ] and y[ p ] when set to undefined 
+         
+         if (x[p] === y[p]) continue; 
+         // if they have the same strict value or identity then they are equal 
+         
+         if (typeof(x[p]) !== "object") return false; 
+         // Numbers, Strings, Functions, Booleans must be strictly equal 
+         
+         if (!Object.equals(x[p], y[p])) return false; 
+         // Objects and Arrays must be tested recursively 
+    } 
+    
+    for (p in y) { 
+        if (y.hasOwnProperty(p) && !x.hasOwnProperty(p)) return false; 
+        // allows x[ p ] to be set to undefined 
+    } 
+    return true; 
+}
+
 
 
 // 전역 속성
@@ -51,16 +89,18 @@ AutoBase.prototype.init = function(gulpInst) {
     //     console.log('clean..');
     //     done();
     // });
-    // gulpInst.task('clean2', this._clean_dist);
-    gulpInst.task('clean2', gulpInst.series(this._clean_dist));
+    gulpInst.task('clean1', this._clean_dist);
+    gulpInst.task('clean2', gulpInst.series(this._clean_dist.bind(this)));  // 특수한 경우 !! series 을 사용하여 사용
     // gulpInst.task('clean2', gulpInst.series.call(this, this._clean_dist));
     
-    gulpInst.task('clean3', this._clean_dist);
+    gulpInst.task('clean3', gulpInst.series(this._clean_dist));
 
 }
 AutoBase.prototype.set  = function set(name, fn) {
     fn.TT = "T";
-    var task = this._tasks[name] = fn.bind(this);
+    var task;
+    if (name === 'clean1') task = this._tasks[name] = fn.bind(this);
+    else task = this._tasks[name] = fn;
     // var task = this._tasks[name] = fn;
     
     return task;
@@ -156,18 +196,34 @@ var b = new AutoInstance({a:b});
 var c = new AutoModModel();
 var d = new AutoModule();
 
-// gulp.registry(a);
-gulp.registry(b);
+gulp.registry(a);
+// gulp.registry(b);
+
+
 
 // b._clean_dist();
 // b._clean_dist();
 // a._clean_dist();
 
 
-gulp.series('clean2')();
+// gulp.series('clean1')();
+// gulp.series('clean2')();
+gulp.series('clean3')();
 
 // gulp.series('clean2').call(d);
 
+
+// var taker = new Undertaker();
+// taker.registry(a);
+
+// // taker.series()
+// // taker.series('clean2')();
+
+// taker.task('default', taker.series('clean', 'build', 'serve', function(cb) {
+//     console.log('Server bind to ' + this.bindTo);
+//     console.log('Serving' + this.build);
+//     cb();
+//   }));
 
 // 이벤트 성공 ^^
 // gulp.emit('update', 1);
