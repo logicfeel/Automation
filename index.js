@@ -14,14 +14,11 @@ var concat          = require('gulp-concat');
 var through         = require('through2');
 var groupConcat     = require('gulp-group-concat');
 var hb              = require('gulp-hb');
-
+var path            = require('path');
 
 function AutoBase() {
     DefaultRegistry.call(this);
 
-    this.ERR_LEVEL = 1;
-    this.CFG = null;
-    this.PKG = null;
     this.PATH = {
         base: '',
         nodes: 'node_modules/',
@@ -29,8 +26,19 @@ function AutoBase() {
         i_module: '../**/@instance/'
     };
     this.PREFIX_NM = '';
+    this.FILE = {
+        CFG: 'auto_module.json',
+        PKG: 'package.json',
+        MAP: 'installemap.json',
+        GULP: 'gulpfile.js'
+    };
+    this.ERR_LEVEL = 1;
+    this.CFG = null;
+    this.PKG = this.load_PKG(this.PATH.base + this.FILE.PKG);
+    this.MOD = null;  // 하위(종속) 자동모듈
 }
 util.inherits(AutoBase, DefaultRegistry);
+
 
 // 전역 속성
 AutoBase.prototype.ERR_LEVEL = 0;
@@ -42,12 +50,6 @@ AutoBase.prototype.LOG = {
     sub: false          // 서브 모듈 여부
 };
 
-AutoBase.prototype.FILE = {
-    CFG: 'auto_module.json',
-    PKG: 'package.json',
-    MAP: 'installemap.json',
-    GULP: 'gulpfile.js'
-};
 
 /**
  * undertaker-registry 태스크 등록
@@ -56,11 +58,7 @@ AutoBase.prototype.FILE = {
 AutoBase.prototype.init = function(gulpInst) {
     if (this.LOG.debug) console.log('AutoBase.prototype.init');
 
-    gulpInst.task('reset', gulpInst.series(this.reset.bind(this), this._reset_dist.bind(this)));
-};
-
-AutoBase.prototype.setTaskPrefix  = function(name) {
-    this.PREFIX_NM = name;
+    gulpInst.task(this.PREFIX_NM + 'reset', gulpInst.series(this.reset.bind(this), this._reset_dist.bind(this)));
 };
 
 
@@ -114,6 +112,27 @@ AutoBase.prototype._save_cfg = function _save_cfg(cb) {
         .pipe(gulp.dest(this.PATH.base + './'));
 };
 
+AutoBase.prototype.load_PKG = function(path) {
+    
+    var pkg;
+
+    try {
+        pkg = JSON.parse(fs.readFileSync(path));
+        if (!pkg) {
+            console.log('___error file 없음: '+ path + '___');
+            throw new Error("에러!");
+        }
+    } catch(err) {
+        gulpError('error 설정/패키지 읽기 실패 :' + err);
+    }
+
+    return pkg;    
+};
+
+AutoBase.prototype.setTaskPrefix  = function(name) {
+    if (name.length > 0 ) this.PREFIX_NM = name + ':';
+};
+
 
 //#####################################
 // AutoInstance
@@ -123,8 +142,6 @@ function AutoInstance() {
     // 오버라이딩
     this.PATH['dist'] = 'install/';
     this.PATH['map'] = 'map/';
-
-    this.MOD = null;
 }
 util.inherits(AutoInstance, AutoBase);
 
@@ -133,20 +150,21 @@ AutoInstance.prototype.init = function(gulpInst) {
     AutoBase.prototype.init.call(this, gulpInst);
     if (this.LOG.debug) console.log('AutoInstance.prototype.init');
 
-    gulpInst.task('update', gulpInst.series(this.subLoad.bind(this)));
+    // 테스트 용
+    // gulpInst.task(this.PREFIX_NM + 'update', gulpInst.series(this.subLoad.bind(this)));
 
     // 로딩테스트 후 주석 해제
-    // gulpInst.task('update', gulpInst.series(this._load_cfg.bind(this), this._update_check.bind(this), this._update_build.bind(this), this._save_cfg.bind(this)));
+    gulpInst.task(this.PREFIX_NM + 'update', gulpInst.series(this._load_cfg.bind(this), this._update_check.bind(this), this._update_build.bind(this), this._save_cfg.bind(this)));
 
-    gulpInst.task('reset_all', gulpInst.series(this.reset.bind(this), this._reset_dist.bind(this)));
+    gulpInst.task(this.PREFIX_NM + 'reset_all', gulpInst.series(this.reset.bind(this), this._reset_dist.bind(this)));
 
-    gulpInst.task('reset_sub', gulpInst.series(this.reset.bind(this), this._reset_dist.bind(this)));
+    gulpInst.task(this.PREFIX_NM + 'reset_sub', gulpInst.series(this.reset.bind(this), this._reset_dist.bind(this)));
 
-    gulpInst.task('preinstall', gulpInst.series(this.preinstall.bind(this)));
+    gulpInst.task(this.PREFIX_NM + 'preinstall', gulpInst.series(this.preinstall.bind(this)));
     
-    gulpInst.task('install', gulpInst.series(this.install.bind(this)));
+    gulpInst.task(this.PREFIX_NM + 'install', gulpInst.series(this.install.bind(this)));
     
-    gulpInst.task('default', gulpInst.series(this.update.bind(this), this.preinstall.bind(this), this.install.bind(this)));
+    gulpInst.task(this.PREFIX_NM + 'default', gulpInst.series(this.update.bind(this), this.preinstall.bind(this), this.install.bind(this)));
 };
 
 
@@ -187,19 +205,25 @@ AutoInstance.prototype.install = function install(cb) {
     return cb();
 };
 
+// 테스트 완료 작동함
 AutoInstance.prototype.subLoad = function subLoad(cb) {
     if (this.LOG.debug) console.log('AutoInstance.prototype.subLoad');
 
-    
     // TODO: 하위 호출 방식 테스트
     // var sub        = require('@mod-c/mn_menu');
-    var sub        = require('./node_modules/@mod-c/mn_menu/gulpfile');
-    
+    // var sub        = require('./node_modules/@mod-c/mn_menu/');
+    var sub        = require('@mod-c/mn_menu');    
+
     // gulp.registry(sub.obj);
     // gulp.series('template')();
-
+    sub.obj.setTaskPrefix('mn_menu');
+    sub.obj.PATH.base = './node_modules/@mod-c/mn_menu/';
     // sub.series('template')();
-    sub.runTask('template');
+
+    gulp.registry(sub.obj);
+
+    // sub.runTask('mn_menu:template');
+    gulp.series('mn_menu:template')();
 
     return cb();
 };
@@ -222,20 +246,36 @@ AutoInstance.prototype._load_cfg = function _load_cfg(cb) {
             this.CFG = JSON.parse(fs.readFileSync(this.PATH.base + this.FILE.CFG));
         }
         
-        // 패키지 로딩
-        if(!this.PKG) {
-            this.PKG = JSON.parse(fs.readFileSync(this.PATH.base + this.FILE.PKG));
-            if (!this.PKG) {
-                console.log('___error file 없음: '+ this.FILE.PKG + '___');
-                throw new Error("에러!");
-            }
-        }
+        // // 패키지 로딩
+        // if(!this.PKG) {
+        //     this.PKG = JSON.parse(fs.readFileSync(this.PATH.base + this.FILE.PKG));
+        //     if (!this.PKG) {
+        //         console.log('___error file 없음: '+ this.FILE.PKG + '___');
+        //         throw new Error("에러!");
+        //     }
+        // }
     } catch(err) {
         gulpError('error 설정/패키지 읽기 실패 :' + err);
     }    
     
     // 설치 모듈 로딩 : 경로
     this.MOD = {};
+
+    for (var _prop in this.PKG.dependencies) {
+        
+        var _path;
+        var sub;
+        
+        sub = require(_prop);
+
+        if (sub.obj instanceof AutoBase) {
+            
+        }
+        
+        _path = require.resolve(_prop); // 모듈 설치 여부 검사
+
+
+    }
 
     for (var _prop in this.PKG.dependencies) {
 
@@ -258,7 +298,7 @@ AutoInstance.prototype._load_cfg = function _load_cfg(cb) {
             _stat = fs.statSync(_fullPath);
 
             if (_stat.isFile() && _path != '.') {
-                MODULES[_prop] = {
+                this.MOD[_prop] = {
                     path: _relativePath + '/' + this.FILE.CFG,
                     dir: _relativePath,
                     type: 'm'
@@ -273,7 +313,7 @@ AutoInstance.prototype._load_cfg = function _load_cfg(cb) {
                 _fullPath = _path + '/' + this.FILE.CFG;
                 _stat = fs.statSync(_fullPath);
                 if (_stat.isFile() && _path != '.') {
-                    MODULES[_prop] = {
+                    this.MOD[_prop] = {
                         path: _relativePath + '/' + this.FILE.CFG,
                         dir: _relativePath,
                         type: 'i'
@@ -355,7 +395,7 @@ AutoModule.prototype.init = function(gulpInst) {
     AutoBase.prototype.init.call(this, gulpInst);
     if (this.LOG.debug) console.log('AutoModule.prototype.init');
 
-    gulpInst.task('template', gulpInst.series(this._load_cfg.bind(this), this._template_hbs.bind(this)));
+    gulpInst.task(this.PREFIX_NM + 'template', gulpInst.series(this._load_cfg.bind(this), this._template_hbs.bind(this)));
 };
 
 
@@ -553,11 +593,11 @@ AutoModModel.prototype.init = function(gulpInst) {
     AutoModule.prototype.init.call(this, gulpInst);
     if (this.LOG.debug) console.log('AutoModModel.prototype.init');
 
-    gulpInst.task('preinstall', gulpInst.series(this._load_cfg.bind(this), this.__preinstall_cfg_build.bind(this), this._save_cfg.bind(this)));
+    gulpInst.task(this.PREFIX_NM + 'preinstall', gulpInst.series(this._load_cfg.bind(this), this.__preinstall_cfg_build.bind(this), this._save_cfg.bind(this)));
     
-    gulpInst.task('install', gulpInst.series(this._load_cfg.bind(this), this._install_group.bind(this), this._install_unit.bind(this), this._template_hbs.bind(this)));
+    gulpInst.task(this.PREFIX_NM + 'install', gulpInst.series(this._load_cfg.bind(this), this._install_group.bind(this), this._install_unit.bind(this), this._template_hbs.bind(this)));
     
-    gulpInst.task('default', gulpInst.series('preinstall', 'install', 'template'));
+    gulpInst.task(this.PREFIX_NM + 'default', gulpInst.series(this.PREFIX_NM + 'preinstall', this.PREFIX_NM + 'install', this.PREFIX_NM + 'template'));
 };
 
 
@@ -804,10 +844,10 @@ module.exports.AutoModModel = AutoModModel;
 
 //#####################################
 // 테스트
-var a = new AutoBase();
-var b = new AutoInstance();
-var c = new AutoModule();
-var d = new AutoModModel();
+// var a = new AutoBase();
+// var b = new AutoInstance();
+// var c = new AutoModule();
+// var d = new AutoModModel();
 
 
 // 등록
@@ -830,6 +870,6 @@ var d = new AutoModModel();
 
 // gulp.series(b._reset_dist)();
 // b.init.call(this);
-//  gulp.task('default', function(cb){cb();});
-//  gulp.task('default', b.init);
+//  gulp.task(this.PREFIX_NM + 'default', function(cb){cb();});
+//  gulp.task(this.PREFIX_NM + 'default', b.init);
 // console.log('End');
