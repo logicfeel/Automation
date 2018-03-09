@@ -15,12 +15,16 @@ var through         = require('through2');
 var groupConcat     = require('gulp-group-concat');
 var hb              = require('gulp-hb');
 var path            = require('path');
+var deepmerge       = require('deepmerge');
+var writeJsonFile   = require('write-json-file');
+var glob            = require('glob'); 
 
-function AutoBase() {
+
+function AutoBase(basePath, autoType) {
     DefaultRegistry.call(this);
 
     this.PATH = {
-        base: '',
+        base: basePath ? basePath.replace(/\\/g,'/') + '/' : '',
         nodes: 'node_modules/',
         module: '../**/@mod*/',
         i_module: '../**/@instance/'
@@ -32,9 +36,13 @@ function AutoBase() {
         MAP: 'installemap.json',
         GULP: 'gulpfile.js'
     };
+
     this.ERR_LEVEL = 1;
-    this.CFG = null;
-    this.PKG = this.load_PKG(this.PATH.base + this.FILE.PKG);
+    this.set_cfg(this.PATH.base + this.FILE.CFG);
+    this.set_pkg(this.PATH.base + this.FILE.PKG);
+    // this.PKG = AutoBase.prototype.load_pkg(this.PATH.base + this.FILE.PKG);
+    
+    this.AUTO_TYPE = autoType;
     this.MOD = null;  // 하위(종속) 자동모듈
 }
 util.inherits(AutoBase, DefaultRegistry);
@@ -42,6 +50,7 @@ util.inherits(AutoBase, DefaultRegistry);
 
 // 전역 속성
 AutoBase.prototype.ERR_LEVEL = 0;
+AutoBase.prototype.I_MOD_IGNORE = 0;
 
 AutoBase.prototype.LOG = {
     silent: true,      // gulp 로그 비활성화
@@ -93,6 +102,24 @@ AutoBase.prototype.reset = function reset(cb) {
 };
 
 
+// AutoBase.prototype.load_cfg = function load_cfg() {
+//     if (this.LOG.debug) console.log('AutoModule.prototype._load_cfg');
+
+//     var setup;
+
+//     // 설정객체가 없는 경우
+//     try {
+//         if (!this.CFG) {
+//             setup = fs.readFileSync(this.PATH.base + this.FILE.CFG);
+//             this.CFG = JSON.parse(setup);
+//         }
+//     } catch(err) {
+//         gulpError('error 설정/패키리 읽기 실패 :' + this.FILE.CFG, 'load-config');
+//     }   
+//     return cb();
+// };
+
+
 AutoBase.prototype._reset_dist = function _reset_dist(cb) {
     if (this.LOG.debug) console.log('AutoBase.prototype._reset_dist');
 
@@ -104,21 +131,35 @@ AutoBase.prototype._reset_dist = function _reset_dist(cb) {
 AutoBase.prototype._save_cfg = function _save_cfg(cb) {
     if (this.LOG.debug) console.log('AutoBase.prototype._save_cfg');
 
+    writeJsonFile.sync(this.PATH.base + this.FILE.CFG, this.CFG);
+
+    return cb();
     // TODO: gulp 사용 안하는 방식으로 변경
-    fs.writeFileSync(this.FILE.CFG, JSON.stringify(this.CFG));
+    // fs.writeFileSync(this.FILE.CFG, JSON.stringify(this.CFG));
         
-    return gulp.src(this.PATH.base + this.FILE.CFG)
-        .pipe(sortJSON({ space: 2 }))
-        .pipe(gulp.dest(this.PATH.base + './'));
+    // return gulp.src(this.PATH.base + this.FILE.CFG)
+    //     .pipe(sortJSON({ space: 2 }))
+    //     .pipe(gulp.dest(this.PATH.base + './'));
 };
 
-AutoBase.prototype.load_PKG = function(path) {
+
+AutoBase.prototype.set_pkg = function(path) {
+    this.PKG = this.load(path);
+};
+
+
+AutoBase.prototype.set_cfg = function(path) {
+    this.CFG = this.load(path);
+};
+
+
+AutoBase.prototype.load = function(path) {
     
-    var pkg;
+    var obj;
 
     try {
-        pkg = JSON.parse(fs.readFileSync(path));
-        if (!pkg) {
+        obj = JSON.parse(fs.readFileSync(path));
+        if (!obj) {
             console.log('___error file 없음: '+ path + '___');
             throw new Error("에러!");
         }
@@ -126,9 +167,11 @@ AutoBase.prototype.load_PKG = function(path) {
         gulpError('error 설정/패키지 읽기 실패 :' + err);
     }
 
-    return pkg;    
+    return obj;    
 };
 
+
+// TODO: 이부분 제거 가능 상위에 삽입
 AutoBase.prototype.setTaskPrefix  = function(name) {
     if (name.length > 0 ) this.PREFIX_NM = name + ':';
 };
@@ -136,8 +179,8 @@ AutoBase.prototype.setTaskPrefix  = function(name) {
 
 //#####################################
 // AutoInstance
-function AutoInstance() {
-    AutoBase.call(this);    
+function AutoInstance(basePath) {
+    AutoBase.call(this, basePath, 'I');    
     
     // 오버라이딩
     this.PATH['dist'] = 'install/';
@@ -150,17 +193,16 @@ AutoInstance.prototype.init = function(gulpInst) {
     AutoBase.prototype.init.call(this, gulpInst);
     if (this.LOG.debug) console.log('AutoInstance.prototype.init');
 
-    // 테스트 용
-    // gulpInst.task(this.PREFIX_NM + 'update', gulpInst.series(this.subLoad.bind(this)));
-
     // 로딩테스트 후 주석 해제
-    gulpInst.task(this.PREFIX_NM + 'update', gulpInst.series(this._load_cfg.bind(this), this._update_check.bind(this), this._update_build.bind(this), this._save_cfg.bind(this)));
+    // gulpInst.task(this.PREFIX_NM + 'update', gulpInst.series(this.subLoad.bind(this)));
+    // gulpInst.task(this.PREFIX_NM + 'update', gulpInst.series(this._load_cfg.bind(this), this._load_mod.bind(this), this._update_check.bind(this), this._update_build.bind(this), this._save_cfg.bind(this)));
+    gulpInst.task(this.PREFIX_NM + 'update', gulpInst.series(this._load_mod.bind(this), this._update_check.bind(this), this._update_build.bind(this), this._save_cfg.bind(this)));
 
     gulpInst.task(this.PREFIX_NM + 'reset_all', gulpInst.series(this.reset.bind(this), this._reset_dist.bind(this)));
 
     gulpInst.task(this.PREFIX_NM + 'reset_sub', gulpInst.series(this.reset.bind(this), this._reset_dist.bind(this)));
 
-    gulpInst.task(this.PREFIX_NM + 'preinstall', gulpInst.series(this.preinstall.bind(this)));
+    gulpInst.task(this.PREFIX_NM + 'preinstall', gulpInst.series(this._load_mod.bind(this), this._preinstall_submodule_m.bind(this), this._preinstall_submodule_i.bind(this), this._preinstall_build.bind(this), this._save_cfg.bind(this)));
     
     gulpInst.task(this.PREFIX_NM + 'install', gulpInst.series(this.install.bind(this)));
     
@@ -210,118 +252,109 @@ AutoInstance.prototype.subLoad = function subLoad(cb) {
     if (this.LOG.debug) console.log('AutoInstance.prototype.subLoad');
 
     // TODO: 하위 호출 방식 테스트
-    // var sub        = require('@mod-c/mn_menu');
+    var modName = '@mod-c/mn_menu';
+    var sub        = require(modName);
     // var sub        = require('./node_modules/@mod-c/mn_menu/');
-    var sub        = require('@mod-c/mn_menu');    
+    // var sub        = require('@mod-c/mn_menu');    
+    var relativePath = path.relative(process.cwd(), path.dirname(require.resolve(modName)));
+    var i = new sub.AutoClass(relativePath);
+
+    // i.PATH.base = './node_modules/@mod-c/mn_menu/';
+    
+
+    i.setTaskPrefix(modName);
+    gulp.registry(i);
 
     // gulp.registry(sub.obj);
     // gulp.series('template')();
-    sub.obj.setTaskPrefix('mn_menu');
-    sub.obj.PATH.base = './node_modules/@mod-c/mn_menu/';
+    
+    // i.PATH.base = './node_modules/@mod-c/mn_menu/';
     // sub.series('template')();
-
-    gulp.registry(sub.obj);
+    // sub.obj.setTaskPrefix('mn_menu');
+    // gulp.registry(sub.obj);
+    
+    // gulp.registry(i);
+    
 
     // sub.runTask('mn_menu:template');
-    gulp.series('mn_menu:template')();
+    gulp.series(modName + ':template')(); 
 
+    // var modName = '@mod-c/mn_menu';
+    // // delete require.cache(modName)
+    // var mod = require(modName);
+    // var mod = require('node_modules/' + modName);
+    
+    // var relativePath = path.relative(process.cwd(), path.dirname(require.resolve(modName)));
+
+    // var auto = new mod.AutoClass(/* base 넘김 */);
+    // gulp.registry(auto);
+
+    // // sub.runTask('mn_menu:template');
+    // gulp.series('mn_menu:template')();
+
+
+    
     return cb();
 };
 
 
-AutoInstance.prototype._load_cfg = function _load_cfg(cb) {
-    if (this.LOG.debug) console.log('AutoInstance.prototype._load_cfg');
+AutoInstance.prototype._load_mod = function _load_mod(cb) {
+    if (this.LOG.debug) console.log('AutoInstance.prototype._load_mod');
 
     var _mod = [];
     var _modName;
 
-    if (this.LOG.debug) console.log('___loading '+ this.FILE.PKG + '___');
+    // if (this.LOG.debug) console.log('___loading '+ this.FILE.PKG + '___');
 
     // 설정객체가 없는 경우
     // REVIEW: 없을 때만 로딩인시 시점 확인
     
-    try {
-        // 설정 로딩
-        if (!this.CFG) {
-            this.CFG = JSON.parse(fs.readFileSync(this.PATH.base + this.FILE.CFG));
-        }
+    // try {
+    //     // 설정 로딩
+    //     if (!this.CFG) {
+    //         this.CFG = JSON.parse(fs.readFileSync(this.PATH.base + this.FILE.CFG));
+    //     }
         
-        // // 패키지 로딩
-        // if(!this.PKG) {
-        //     this.PKG = JSON.parse(fs.readFileSync(this.PATH.base + this.FILE.PKG));
-        //     if (!this.PKG) {
-        //         console.log('___error file 없음: '+ this.FILE.PKG + '___');
-        //         throw new Error("에러!");
-        //     }
-        // }
-    } catch(err) {
-        gulpError('error 설정/패키지 읽기 실패 :' + err);
-    }    
+    //     // // 패키지 로딩
+    //     // if(!this.PKG) {
+    //     //     this.PKG = JSON.parse(fs.readFileSync(this.PATH.base + this.FILE.PKG));
+    //     //     if (!this.PKG) {
+    //     //         console.log('___error file 없음: '+ this.FILE.PKG + '___');
+    //     //         throw new Error("에러!");
+    //     //     }
+    //     // }
+    // } catch(err) {
+    //     gulpError('error 설정/패키지 읽기 실패 :' + err);
+    // }    
     
     // 설치 모듈 로딩 : 경로
     this.MOD = {};
 
-    for (var _prop in this.PKG.dependencies) {
-        
-        var _path;
-        var sub;
-        
-        sub = require(_prop);
-
-        if (sub.obj instanceof AutoBase) {
-            
-        }
-        
-        _path = require.resolve(_prop); // 모듈 설치 여부 검사
-
-
-    }
+    var _relativePath;
+    var _sub;
+    var _instance;
 
     for (var _prop in this.PKG.dependencies) {
 
-        var _path;
-        var _fullPath;
-        var _stat;
-        var _relativePath;
-
-        _path = require.resolve(_prop); // 모듈 설치 여부 검사
-        _path = path.dirname(_path); // 모듈 설치 여부 검사
-        _path = _path.replace(/\\/g,'/');
-
-        // 상대경로 변환
-        _relativePath = path.relative(process.cwd(), _path);
-        _relativePath = _relativePath.replace(/\\/g,'/'); 
-
-        try {
-            _fullPath = _path + '/' + this.FILE.CFG;
+        _sub            = require(_prop);
+        // 검사 후 로딩 
+        /**
+         * 검사를 어떻게 할것인가?
+         * 1. 인스턴스 조회 
+         *      - 생성해야 하므로 부하가 추가됨
+         *    
+         * 2. 클래스 명칭 정의 조회  <== 이것으로 처리
+         */
+        if (_sub.AutoClass) {
+            _relativePath   = path.relative(process.cwd(), path.dirname(require.resolve(_prop)));
+            _instance = new _sub.AutoClass(_relativePath);
             
-            _stat = fs.statSync(_fullPath);
-
-            if (_stat.isFile() && _path != '.') {
-                this.MOD[_prop] = {
-                    path: _relativePath + '/' + this.FILE.CFG,
-                    dir: _relativePath,
-                    type: 'm'
-                };
-            }
-        } catch(err) {
-            // 무시함
-        }
-
-        if (!I_MODULE_IGNORE) {
-            try {
-                _fullPath = _path + '/' + this.FILE.CFG;
-                _stat = fs.statSync(_fullPath);
-                if (_stat.isFile() && _path != '.') {
-                    this.MOD[_prop] = {
-                        path: _relativePath + '/' + this.FILE.CFG,
-                        dir: _relativePath,
-                        type: 'i'
-                    };
-                }
-            } catch(err) {
-                // 무시함
-            }
+            // 하위 인스턴스 무시
+            if (this.I_MOD_IGNORE && _instance instanceof AutoInstance) break;
+            
+            _instance.setTaskPrefix(_prop);
+            this.MOD[_prop] = _instance;
+            gulp.registry(_instance);
         }
     }
     return cb();
@@ -330,13 +363,87 @@ AutoInstance.prototype._load_cfg = function _load_cfg(cb) {
 
 AutoInstance.prototype._update_check = function _update_check(cb) {
     if (this.LOG.debug) console.log('AutoInstance.prototype._update_check');
+    
+    var _prop;
 
+    // 패키지 기준 모듈 검사
+    for (_prop in this.PKG.dependencies) {
+
+        try {
+            require.resolve(_prop); // 모듈 설치 여부 검사
+            // _stat = fs.statSync(_path);
+        } catch(err) {
+            gulpError('error 모듈이 설치되지 않았음 (package 기준) :' + _prop, 'update-check');
+        }
+    }
+    
+    // 설정 기준 모듈 검사
+    for (_prop in this.CFG.modules) {
+
+        try {
+            require.resolve(_prop); // 모듈 설치 여부 검사
+        } catch(err) {
+            gulpError('error 모듈이 설치되지 않았음 (config 기준) :' + _prop, 'update-check');
+        }
+    }
+    
     return cb();
 };
 
 
 AutoInstance.prototype._update_build = function _update_build(cb) {
     if (this.LOG.debug) console.log('AutoInstance.prototype._update_build');
+
+    var _prop;
+    // var _config = {};
+    var b_pkg;
+    var b_conf;
+    var _modCfg;
+
+    // TODO: 반복 부분 공통화 처리 필요
+    for (var _prop in this.MOD) {
+
+        if(this.PKG.dependencies[_prop]) b_pkg = true;
+        else b_pkg = false;
+        
+        if(this.CFG.modules[_prop]) b_conf = true;
+        else b_conf = false;
+
+
+        // 설정에 추가 (병합)
+        if (b_pkg && !b_conf) {
+            try {
+                _modCfg = this.MOD[_prop].CFG;
+
+                if ( this.MOD[_prop].AUTO_TYPE === 'M') {
+                    _modCfg = deepmerge(_modCfg, this.CFG.public, { arrayMerge: overwriteMerge });
+                }
+                
+                this.CFG.modules[_prop] = _modCfg;
+                
+                // 하위 모듈 설정에 등록
+                this.MOD[_prop].CFG = _modCfg;      
+                // gulp.series(this.MOD[_prop]._save_cfg.bind(this.MOD[_prop]));
+                // gulp.series(this._save_cfg.bind(this.MOD[_prop]));
+                this.MOD[_prop]._save_cfg(cb);
+                
+
+            } catch(err) {
+                gulpError('error 읽기/쓰기 실패 :' + _prop, 'update-build');
+            }            
+        }
+        
+        // 설정에서 제거
+        if (!b_pkg && b_conf) {
+            delete this.CFG.modules[_prop];
+        }
+    }
+
+    // 콜백 함수
+    function overwriteMerge(destinationArray, sourceArray, options) {
+        return sourceArray
+    }
+
     return cb();
 };
 
@@ -349,15 +456,81 @@ AutoInstance.prototype._preinstall_submodule = function _preinstall_submodule(cb
 
 AutoInstance.prototype._preinstall_submodule_m = function _preinstall_submodule_m(cb) {
     if (this.LOG.debug) console.log('AutoInstance.prototype._preinstall_submodule_m');
-    return cb();
+    
+    var _prop;
+    var _this = this;
+    var _mod;
+    
+    for (_prop in this.CFG.modules) {
+        _mod = this.MOD[_prop];
+        if (this.MOD[_prop].AUTO_TYPE === 'M') {
+
+            gulp.series(_prop + ':default')(); 
+
+            // gulp.series(_prop + ':default', function(cb) {
+            //     console.log('a' + _prop);
+            //     _this.CFG[_prop] = _mod.CFG;
+            // })();
+
+            // 처리후 설정을 저장하는 로직
+            _this.CFG[_prop] = _mod.CFG;
+        }
+    }
+    return function(cb) {
+            console.log('a' + _prop);
+            // _this.CFG[_prop] = _mod.CFG;
+            return cb();
+        }
+    // return cb();
 };
 
 
 AutoInstance.prototype._preinstall_submodule_i = function _preinstall_submodule_i(cb) {
     if (this.LOG.debug) console.log('AutoInstance.prototype._preinstall_submodule_i');
+
+    var _prop;
+    
+    for (_prop in this.CFG.modules) {
+        if (this.MOD[_prop].AUTO_TYPE === 'I') {
+            gulp.series(_prop + ':preinstall')(); 
+        }
+    }
+
     return cb();
 };
 
+AutoInstance.prototype._preinstall_build = function _preinstall_build(cb) {
+    if (this.LOG.debug) console.log('AutoInstance.prototype._preinstall_build');
+
+    var _prop;
+    var _mod;
+    var _install;
+    var _distPath;
+    var _arrDist;
+    var _dir;
+
+    for (var _prop in this.MOD) {
+
+
+        // 일반모듈 일 경우
+        if (this.MOD[_prop].AUTO_TYPE === 'M') {
+            
+            _mod = this.MOD[_prop];
+            // glob 의 형식 : 전체 파일
+            _dir = _mod.PATH.base;
+            _distPath = _dir + '/' + _mod.PATH.dist + '/**/*.*';
+            _arrDist = glob.sync(_distPath);
+
+            // _install = new InstallPath(_arrDist, 'dist', 'install', 'node_modules/module_m');
+            _install = new InstallPath(_arrDist, _mod.PATH.dist, this.PATH.dist, _dir);
+            _mod.CFG['_install'] = _install.getObject();
+        }
+
+        this.CFG.modules[_prop] = _mod.CFG;
+    }
+
+    return cb();
+};
 
 AutoInstance.prototype._install_imodule = function _install_imodule(cb) {
     if (this.LOG.debug) console.log('AutoInstance.prototype._install_imodule');
@@ -373,8 +546,8 @@ AutoInstance.prototype._install_submodule = function _install_submodule(cb) {
 
 //#####################################
 // AutoModule
-function AutoModule() {
-    AutoBase.call(this);
+function AutoModule(basePath) {
+    AutoBase.call(this, basePath, 'M');
 
     // 오버라이딩
     this.PATH['dist'] = 'dist/';
@@ -395,30 +568,14 @@ AutoModule.prototype.init = function(gulpInst) {
     AutoBase.prototype.init.call(this, gulpInst);
     if (this.LOG.debug) console.log('AutoModule.prototype.init');
 
-    gulpInst.task(this.PREFIX_NM + 'template', gulpInst.series(this._load_cfg.bind(this), this._template_hbs.bind(this)));
+    // gulpInst.task(this.PREFIX_NM + 'template', gulpInst.series(this._load_cfg.bind(this), this._template_hbs.bind(this)));
+    gulpInst.task(this.PREFIX_NM + 'template', gulpInst.series(this._template_hbs.bind(this)));
+    
 };
 
 
 AutoModule.prototype.template = function template(cb) {
     if (this.LOG.debug) console.log('AutoModule.prototype.template');
-    return cb();
-};
-
-
-AutoModule.prototype._load_cfg = function _load_cfg(cb) {
-    if (this.LOG.debug) console.log('AutoModule.prototype._load_cfg');
-
-    var setup;
-
-    // 설정객체가 없는 경우
-    try {
-        if (!this.CFG) {
-            setup = fs.readFileSync(this.PATH.base + this.FILE.CFG);
-            this.CFG = JSON.parse(setup);
-        }
-    } catch(err) {
-        gulpError('error 설정/패키리 읽기 실패 :' + this.FILE.CFG, 'load-config');
-    }   
     return cb();
 };
 
@@ -516,8 +673,8 @@ AutoModule.prototype.prefixNameBuild = function(fullName, prefix, suffix, obj, r
 
 //#####################################
 // AutoModModel
-function AutoModModel() {
-    AutoModule.call(this);
+function AutoModModel(basePath) {
+    AutoModule.call(this, basePath);
     
     this.PATH['src'] = 'src/**/*.sql';
 
@@ -593,11 +750,13 @@ AutoModModel.prototype.init = function(gulpInst) {
     AutoModule.prototype.init.call(this, gulpInst);
     if (this.LOG.debug) console.log('AutoModModel.prototype.init');
 
-    gulpInst.task(this.PREFIX_NM + 'preinstall', gulpInst.series(this._load_cfg.bind(this), this.__preinstall_cfg_build.bind(this), this._save_cfg.bind(this)));
+    // gulpInst.task(this.PREFIX_NM + 'preinstall', gulpInst.series(this._load_cfg.bind(this), this.__preinstall_cfg_build.bind(this), this._save_cfg.bind(this)));
+    gulpInst.task(this.PREFIX_NM + 'preinstall', gulpInst.series(this.__preinstall_cfg_build.bind(this), this._save_cfg.bind(this)));
+
+    // gulpInst.task(this.PREFIX_NM + 'install', gulpInst.series(this._load_cfg.bind(this), this._install_group.bind(this), this._install_unit.bind(this), this._template_hbs.bind(this)));
+    gulpInst.task(this.PREFIX_NM + 'install', gulpInst.series(this._install_group.bind(this), this._install_unit.bind(this), this._template_hbs.bind(this)));
     
-    gulpInst.task(this.PREFIX_NM + 'install', gulpInst.series(this._load_cfg.bind(this), this._install_group.bind(this), this._install_unit.bind(this), this._template_hbs.bind(this)));
-    
-    gulpInst.task(this.PREFIX_NM + 'default', gulpInst.series(this.PREFIX_NM + 'preinstall', this.PREFIX_NM + 'install', this.PREFIX_NM + 'template'));
+    gulpInst.task(this.PREFIX_NM + 'default', gulpInst.series(this.PREFIX_NM + 'preinstall', this.PREFIX_NM + 'install'));
 };
 
 
@@ -735,8 +894,8 @@ AutoModModel.prototype.__preinstall_cfg_build = function __preinstall_cfg_build(
     
     var _this = this;
     
-    this.CFG._replace = [];
-    this.CFG.distPath = this.PATH.dist;
+    _this.CFG["_replace"] = [];
+    _this.CFG.distPath = this.PATH.dist;
 
     return gulp.src(this.PATH.base + this.PATH.src)
         .pipe(replace(this.REG_EXP.DML_SP, function(match, p1, p2, p3, p4, offset, string) {
@@ -759,7 +918,7 @@ AutoModModel.prototype.__preinstall_cfg_build = function __preinstall_cfg_build(
                     string: match,
                     replacement: _match
                 };
-                _this.CFG._replace.push(objData);
+                _this.CFG["_replace"].push(objData);
                 return match;
             })
         )
@@ -784,7 +943,7 @@ AutoModModel.prototype.__preinstall_cfg_build = function __preinstall_cfg_build(
                     string: match,
                     replacement: _match
                 };
-                _this.CFG._replace.push(objData);
+                _this.CFG["_replace"].push(objData);
 
                 return match;
             })
@@ -836,6 +995,308 @@ function gulpError(message, errName) {
         throw new Error(message);
     // }
 }
+
+
+/**
+ * 인스톨 정보(경로) 구성 클래스
+ * 
+ * InstallPath('node_modules/module_m/dist/ALL.sql', 'dist', 'install', ''node_modules/module_m')
+ * InstallPath('[...]', 'dist', 'install', ''node_modules/module_m')
+ * @param {*} original  대상 경로 + 파일명 (타입 : Array, String)
+ * @param {*} source    경로명
+ * @param {*} target    (*선택) 타겟(설치) 경로명
+ * @param {*} basePath  (*선택) original 경로에서 제거되는 경로
+ */
+function InstallPath(original, source, target, basePath, parentInstallPath) {
+    
+    this.source = source ? this._trimPath(source) : '';
+    this.target = target ? this._trimPath(target) : '';
+    this.file = {};
+    this.path = [];
+    this._parent = parentInstallPath;
+    this.basePath = basePath ? basePath : '';
+    
+    if (this.basePath.length > 0) {
+        this.basePath = basePath.indexOf('\\') > -1 ? basePath.replace(/\\/g, '/') : basePath;
+    }
+
+    var _format;
+    
+    if (original) {
+        if (Array.isArray(original)) {
+            for (var i = 0; i < original.length; i++) {
+                _format = this.pathFormat(original[i]);
+                this.add(_format);
+            }
+        } else {
+            _format = this.pathFormat(original);
+            this.add(_format);
+        }
+    }
+}
+(function() {
+    
+    // TODO: trimPath 명으로 변경
+    InstallPath.prototype._trimPath = function(path) {
+        return path.replace('/', '');
+    };
+
+    // TODO: dir 깊이 0 이하일 경우 예외 처리?
+    InstallPath.prototype.add = function(format) {
+
+        var _sursor;
+        var _next;
+        var _nextFormat;
+        var _install;
+
+        // 1. 현재 위치의 파일일 경우
+        if (this.source === format.dirs[0] && format.depth === 1) {
+            this.file[format.filename] = '';
+        } else {
+
+            if (format.depth < 1) {
+                gulpError('하위 폴더가 없습니다.'); 
+            }
+
+            _sursor     = this.contains(format.dirs[1]);
+            _next       = this.nextSource(format.path);
+            _nextFormat = this.pathFormat(_next.string);
+
+            // 2. 자식중에 위치가 있는 경우 (하위 재귀적 호출)
+            if (_sursor > -1) {
+                // 찾아서 넣어야함
+                this.path[_sursor].add(_nextFormat);
+
+            // 3. 자식에 없는 경우 (신규 생성)
+            } else {
+                _install = new InstallPath(_next.string, _next.source, _next.source, '', this);
+                
+                // 4. 자식에 하위가 있는 경우 
+                if (_next.depth > 1) {
+                    _install.add(_nextFormat);
+                }
+                
+                this.path.push(_install);
+            }
+        }
+    };
+
+    // 자식에 유무 검사
+    InstallPath.prototype.contains = function(source) {
+
+        var sursor = -1;
+
+        for (var ii = 0; ii < this.path.length; ii++) {
+            if (this._trimPath(this.path[ii].source) === source) sursor = ii;
+        }
+
+        return sursor;
+    };
+
+    // 다음 폴더 조회 (리턴)
+    InstallPath.prototype.nextSource = function(pathStr) {
+
+        var arrPath = pathStr.split('/');
+        var nextString;
+        var nextPath;
+
+        if (arrPath.length > 0 && arrPath[0] === '') {
+            arrPath = arrPath.slice(1);   // 공백일 경우 첫 배열 삭제
+        }
+
+        nextString = arrPath.slice(1).join('/');
+        nextPath = arrPath.slice(1, 2).toString();
+        
+        return {
+            string: nextString,
+            source: nextPath
+        };
+    };
+
+    // path 포멧 리턴
+    InstallPath.prototype.pathFormat = function(pathStr) {
+
+        var _dir;
+        
+        if (pathStr.indexOf('\\') > -1) {
+            pathStr = pathStr.replace(/\\/g, '/');   
+        }
+
+        // 기본 경로 제거
+        pathStr = pathStr.replace(this.basePath, '');   
+        
+        
+        
+        _dir = pathStr.split('/');
+
+        // 공백일 경우 첫 배열 삭제
+        if (_dir.length > 0 && _dir[0] === '') {
+            _dir = _dir.slice(1);   
+        }
+
+        pathStr = _dir.join('/');
+
+        return {
+            path: pathStr,
+            dirname: path.dirname(pathStr),
+            filename: path.basename(pathStr),
+            depth: _dir.length - 1,
+            dirs: _dir
+        };
+    };
+
+    // path 포멧 리턴
+    InstallPath.prototype.getObject = function() {
+        
+        var obj     = {};
+
+        for (var prop in this) {
+            if (typeof this[prop] !== "function") {
+
+                // path 는 배열 InstallPath 객체 
+                if (prop === 'path') {
+                    obj[prop] = [];
+                    for (var ii = 0; ii < this.path.length; ii++) {
+                        obj[prop].push(this.path[ii].getObject());
+                    }                
+                
+                // source 속성
+                } else if (prop === 'source') {    
+                    // REVIEW : 소스는 동적으로 실제 경로를 가져옴                
+                    obj[prop] = this.getSource();   
+
+                // 내부 속성은 제외
+                } else if (prop.substr(0,1) != '_') {
+                    obj[prop] = this[prop];
+                }
+            }
+        }
+        return obj;
+
+    };
+
+    InstallPath.prototype.getSource = function() {
+        
+        var _source = this.source;
+
+        if (this._parent) {
+            _source = this._parent.getSource() + '/' + _source;
+        }
+        return _source;
+    };
+
+    InstallPath.prototype.getTarget = function() {
+        
+        var _target = this.target;
+
+        if (this._parent) {
+            _target = this.rPathTrim(this._parent.getTarget()) + '/' + _target;
+        }
+        return _target;
+    };
+
+    InstallPath.prototype.rPathTrim = function(p_path) {
+        
+        if (typeof p_path === 'string') {
+            if (p_path.charAt(p_path.length - 1) === '/') {
+                p_path = p_path.substr(0, p_path.length - 1);
+            }
+        }
+        return p_path;
+    };
+
+
+
+    InstallPath.prototype.getBasePath = function() {
+        
+        var _base;
+
+        if (this.basePath) {
+            _base = this.basePath;
+        } else if (this._parent) {
+            _base = this._parent.getBasePath();
+        }
+        return _base;
+    };
+
+    InstallPath.prototype.getInstall = function() {
+        
+        var arr = [];
+        var target;
+    
+        for (var prop in this) {
+            if (typeof this[prop] !== "function") {
+ 
+                // file
+                if (prop === 'file') {
+
+                    for (var prop2 in this[prop]) {
+                        var obj = {};
+                        
+                        // REVIEW this.rPathTrim 공통으로 뽑아야 하는지?
+                        obj.src = this.rPathTrim(this.getBasePath()) + '/' + this.source + '/' + prop2;
+                        target = this[prop][prop2] != '' ? this[prop][prop2] : prop2;
+                        obj.dest = this.rPathTrim(this.getTarget()) + '/' + target;
+                        arr.push(obj);
+                    }
+                
+                // path
+                } else if (prop === 'path') {
+
+                    for (var ii = 0; ii < this.path.length; ii++) {
+                        arr = arr.concat(this.path[ii].getInstall());
+                    }
+                }
+            }
+        }
+        return arr;
+    };
+
+
+    InstallPath.prototype.reset = function() {
+
+        this.source = '';
+        this.target = '';
+        this.file = {};
+        this.path = [];
+        this.basePath = '';
+        this._parent = null;
+    };
+
+    InstallPath.prototype.load = function(obj, parent) {
+        
+        var _obj;
+        var _install;
+
+        if (!(obj instanceof Object)) {
+            throw new Error('Object 객체가 아닙니다.');
+        }
+
+        if (parent && !(parent instanceof InstallPath)) {
+            throw new Error('InstallPath 객체가 아닙니다.');
+        }
+        // _obj = JSON.parse(JSON.stringify(obj));
+        // TODO: 참조 부분 끊게 만들어야 함
+
+        _obj = obj;
+
+        this.source     = _obj.source;
+        this.target     = _obj.target;
+        this.file       = _obj.file;
+        this.basePath  = _obj.basePath;
+        this._parent    = parent;
+
+        for (var i = 0; i < _obj.path.length; i++) {
+            _install = new InstallPath();
+            _install.load(_obj.path[i], this);
+            this.path.push(_install);
+        }
+
+        return this;
+    };
+
+}());
+
 
 module.exports.AutoBase = AutoBase;
 module.exports.AutoInstance = AutoInstance;

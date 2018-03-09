@@ -7,5 +7,6 @@ var Auto        = require('.');
 
 var i = new Auto.AutoInstance();
 i.FILE.CFG = 'auto_i_module.json';
+i.set_cfg('auto_i_module.json');
 
 gulp.registry(i);

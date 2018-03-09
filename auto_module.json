@@ -1,71 +1,33 @@
 {
-  "_replace": [
-    {
-      "replacement": "SELECT DB_OBJ.MnAuth_FN_AuthChk('1')",
-      "src": "FN\\MnMenu.FN.sql",
-      "string": "SELECT sstory40.MnAuth_FN_AuthChk('1')"
-    },
-    {
-      "replacement": "SELECT DB_OBJ.MnAuth_FN_AuthChk('777')",
-      "src": "FN\\MnMenu.FN.sql",
-      "string": "SELECT sstory40.MnAuth_FN_AuthChk('777')"
-    },
-    {
-      "replacement": "exec DB_OBJ.[MnAcct_Account_SP_C]",
-      "src": "SP\\MnMenu.SP.sql",
-      "string": "exec abc.[MnAcct_Account_SP_C]"
-    },
-    {
-      "replacement": "excute [DB_OBJ].[MnAcct_Account_SP_C]",
-      "src": "SP\\MnMenu.SP.sql",
-      "string": "excute [abc].[MnAcct_Account_SP_C]"
-    },
-    {
-      "replacement": "exec  @abc =  DB_OBJ.[MnAcct_Account_SP_C]",
-      "src": "SP\\MnMenu.SP.sql",
-      "string": "exec  @abc =  abc.[MnAcct_Account_SP_C]"
-    },
-    {
-      "replacement": "exec @abc=DB_OBJ.[MnAcct_Account_SP_C]",
-      "src": "SP\\MnMenu.SP.sql",
-      "string": "exec @abc=abc.[MnAcct_Account_SP_C]"
-    },
-    {
-      "replacement": "SELECT DB_OBJ.MnAuth_FN_AuthChk3('1')",
-      "src": "SP\\MnMenu.SP.sql",
-      "string": "SELECT sstory40.MnAuth_FN_AuthChk3('1')"
-    },
-    {
-      "replacement": "SELECT DB_OBJ.MnAuth_FN_AuthChk3('777')",
-      "src": "SP\\MnMenu.SP.sql",
-      "string": "SELECT sstory40.MnAuth_FN_AuthChk3('777')"
-    }
-  ],
+  "_replace": [],
+  "engines": {
+    "type": "auto-mod-c",
+    "version": "1.x.x"
+  },
+  "obj_name": "DB_OBJ",
+  "prefix_name": "",
+  "suffix_name": "",
+  "module": "",
+  "distPath": "dist/",
   "clear": {
     "comment": false,
     "use": true
   },
-  "distPath": "dist/",
-  "module": "",
-  "obj_name": "DB_OBJ",
   "options": {
+    "obj_type": 1,
+    "obj_fnc_type": 3,
     "ddl_create": true,
+    "log": true,
+    "last_go": true,
     "intall_group": true,
     "intall_unit": true,
-    "last_go": true,
-    "log": true,
-    "obj_fnc_type": 3,
-    "obj_type": 1,
     "template_overlap": true
   },
-  "prefix_name": "",
   "replace": [
     {
-      "replacement": "",
+      "string": "",
       "src": "",
-      "string": ""
+      "replacement": ""
     }
-  ],
-  "suffix_name": "",
-  "version": "1.0.0"
+  ]
 }
