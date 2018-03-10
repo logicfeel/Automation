@@ -3,6 +3,8 @@
 var util            = require('util');
 var gulp            = require('gulp');  // gulp 4.0 기준
 var DefaultRegistry = require('undertaker-registry');
+// var Undertaker      = require('undertaker');
+// var runSequence = require('run-sequence');
 var gutil           = require("gulp-util");
 var rename          = require('gulp-rename');
 var clean           = require('gulp-clean');
@@ -19,6 +21,8 @@ var deepmerge       = require('deepmerge');
 var writeJsonFile   = require('write-json-file');
 var glob            = require('glob'); 
 
+var mkdirp = require('mkdirp');
+// var mkdir = require('mkdirp-sync');
 
 function AutoBase(basePath, autoType) {
     DefaultRegistry.call(this);
@@ -202,11 +206,13 @@ AutoInstance.prototype.init = function(gulpInst) {
 
     gulpInst.task(this.PREFIX_NM + 'reset_sub', gulpInst.series(this.reset.bind(this), this._reset_dist.bind(this)));
 
-    gulpInst.task(this.PREFIX_NM + 'preinstall', gulpInst.series(this._load_mod.bind(this), this._preinstall_submodule_m.bind(this), this._preinstall_submodule_i.bind(this), this._preinstall_build.bind(this), this._save_cfg.bind(this)));
+    // gulpInst.task(this.PREFIX_NM + 'abstract_task', function(cb){return cb();});
+
+    gulpInst.task(this.PREFIX_NM + 'preinstall', gulpInst.series(this._load_mod.bind(this), this._preinstall_submodule_m.bind(this, gulpInst), this._preinstall_submodule_i.bind(this), this._preinstall_build.bind(this), this._save_cfg.bind(this)));
     
-    gulpInst.task(this.PREFIX_NM + 'install', gulpInst.series(this.install.bind(this)));
+    gulpInst.task(this.PREFIX_NM + 'install', gulpInst.series(this._load_mod.bind(this), this._install_imodule.bind(this), this._install_submodule.bind(this), this._save_cfg.bind(this)));
     
-    gulpInst.task(this.PREFIX_NM + 'default', gulpInst.series(this.update.bind(this), this.preinstall.bind(this), this.install.bind(this)));
+    gulpInst.task(this.PREFIX_NM + 'default', gulpInst.series(this.PREFIX_NM + 'update', this.PREFIX_NM + 'preinstall', this.PREFIX_NM + 'install'));
 };
 
 
@@ -422,7 +428,9 @@ AutoInstance.prototype._update_build = function _update_build(cb) {
                 this.CFG.modules[_prop] = _modCfg;
                 
                 // 하위 모듈 설정에 등록
-                this.MOD[_prop].CFG = _modCfg;      
+                // this.MOD[_prop].CFG = _modCfg;      
+                this.MOD[_prop].CFG = this.CFG.modules[_prop];
+
                 // gulp.series(this.MOD[_prop]._save_cfg.bind(this.MOD[_prop]));
                 // gulp.series(this._save_cfg.bind(this.MOD[_prop]));
                 this.MOD[_prop]._save_cfg(cb);
@@ -454,49 +462,49 @@ AutoInstance.prototype._preinstall_submodule = function _preinstall_submodule(cb
 };
 
 
-AutoInstance.prototype._preinstall_submodule_m = function _preinstall_submodule_m(cb) {
+AutoInstance.prototype._preinstall_submodule_m = function _preinstall_submodule_m(gulpInst, cb) {
     if (this.LOG.debug) console.log('AutoInstance.prototype._preinstall_submodule_m');
     
     var _prop;
-    var _this = this;
-    var _mod;
-    
+    var _arrTask = [];
+
     for (_prop in this.CFG.modules) {
-        _mod = this.MOD[_prop];
         if (this.MOD[_prop].AUTO_TYPE === 'M') {
-
-            gulp.series(_prop + ':default')(); 
-
-            // gulp.series(_prop + ':default', function(cb) {
-            //     console.log('a' + _prop);
-            //     _this.CFG[_prop] = _mod.CFG;
-            // })();
-
-            // 처리후 설정을 저장하는 로직
-            _this.CFG[_prop] = _mod.CFG;
+            _arrTask.push(_prop + ':default');
         }
     }
-    return function(cb) {
-            console.log('a' + _prop);
-            // _this.CFG[_prop] = _mod.CFG;
-            return cb();
-        }
-    // return cb();
+
+    // 이런식으로 처리해도 됨
+    // gulp.series(_this.abstract_task.bind(this), _prop + ':default', function end(_cb){
+    gulp.series(_arrTask, function end(_cb){
+        _cb();
+        cb();
+    })();
 };
+
+// 추상 태스크
+// AutoInstance.prototype.abstract_task = function abstract_task(cb) {
+//     if (this.LOG.debug) console.log('~~~~~~~~~~~~~~ AutoInstance.prototype.abstract_task');
+//     return cb();
+// };
 
 
 AutoInstance.prototype._preinstall_submodule_i = function _preinstall_submodule_i(cb) {
     if (this.LOG.debug) console.log('AutoInstance.prototype._preinstall_submodule_i');
 
     var _prop;
+    var _arrTask = [];
     
     for (_prop in this.CFG.modules) {
         if (this.MOD[_prop].AUTO_TYPE === 'I') {
-            gulp.series(_prop + ':preinstall')(); 
+            _arrTask.push(_prop + ':preinstall');
         }
     }
 
-    return cb();
+    gulp.series(_arrTask, function end(_cb){
+        _cb();
+        cb();
+    })();
 };
 
 AutoInstance.prototype._preinstall_build = function _preinstall_build(cb) {
@@ -510,7 +518,6 @@ AutoInstance.prototype._preinstall_build = function _preinstall_build(cb) {
     var _dir;
 
     for (var _prop in this.MOD) {
-
 
         // 일반모듈 일 경우
         if (this.MOD[_prop].AUTO_TYPE === 'M') {
@@ -534,14 +541,212 @@ AutoInstance.prototype._preinstall_build = function _preinstall_build(cb) {
 
 AutoInstance.prototype._install_imodule = function _install_imodule(cb) {
     if (this.LOG.debug) console.log('AutoInstance.prototype._install_imodule');
+
+    var _prop;
+    var _arrTask = [];
+    
+    if (!this.I_MOD_IGNORE) {
+        for (_prop in this.CFG.modules) {
+            if (this.MOD[_prop].AUTO_TYPE === 'I') {
+                _arrTask.push(_prop + ':default');
+            }
+        }
+    }
+
     return cb();
 };
 
 
 AutoInstance.prototype._install_submodule = function _install_submodule(cb) {
     if (this.LOG.debug) console.log('AutoInstance.prototype._install_submodule');
+
+    var _prop;
+    var install;
+    var arr = [];
+    var _path;
+    var SOURCEMAP = {};
+
+    // 중복 파일 초기화
+    this.CFG._overlap = {
+        module: [],
+        file: []
+    };
+
+    for ( _prop in this.CFG.modules) {
+        
+        var mod_map;
+
+        // 조건 모듈
+        if (this.MOD[_prop].AUTO_TYPE === 'M') {
+            
+            // _installObj = ;
+            install = new InstallPath();
+            install.load(this.CFG.modules[_prop]._install);
+            arr = install.getInstall();
+
+            SOURCEMAP[_prop] = arr;
+             
+            this.copyDest(arr, _prop);
+
+        } else if (this.MOD[_prop].AUTO_TYPE === 'I' && !this.I_MOD_IGNORE) {
+            var _sourcemapTemp;
+
+            // !인터페이스 경로임 
+            try {
+                _sourcemapTemp = JSON.parse(fs.readFileSync(this.PATH.base + this.MOD[_prop].PATH.base + '/' + this.PATH.map + this.FILE.MAP));
+            } catch(err) {
+                gulpError('error i모듈 설치맵 읽기 실패 :' + _prop, 'install-submodule');
+            }
+
+            // 상위 경로 추가함
+            for (var __prop in _sourcemapTemp) {
+                
+                _sourcemapTemp[__prop].forEach(function(v, i, a) {
+                    v.src = v.src.replace('../', this.PATH.nodes);
+                });
+                
+                SOURCEMAP[_prop + '/' + __prop] = _sourcemapTemp[__prop];
+                
+                this.copyDest(_sourcemapTemp[__prop], _prop + '/' + __prop);
+            }
+        }
+    }
+
+
+
+    /**
+     * 중복 모듈 찾기
+     */
+
+     // 경로 + 모둘명  => 모듈명만 추출
+     function getModName(modName) {
+        var _n = modName.split('/');
+        return _n[_n.length - 1];
+    }
+
+    for (_prop in SOURCEMAP) {
+        for (var _prop2 in SOURCEMAP) {
+            if (_prop === getModName(_prop2) && _prop != _prop2) {
+                
+                //if (this.CFG._overlap.module _prop2)
+                var _findModule;
+                _findModule = this.CFG._overlap.module.find(function(__value, __index, __array) {
+                    return __value[0] === _prop;
+                });
+                
+                if (_findModule) {
+                    _findModule.push(_prop2);
+                } else {
+                    this.CFG._overlap.module.push([_prop, _prop2]);
+                }
+            }
+        }
+    }
+
+    /**
+     * 중복 파일 찾기
+     * REVIEW: 로직을 좀 깔끔한게 정리 필요 .. 작동은 됨
+     */
+    var destTemp = [];
+    var findDest;
+
+    for (_prop in SOURCEMAP) {
+        SOURCEMAP[_prop].forEach(function(value, index, array) {
+            
+            findDest = destTemp.find(function(_v, _i, _a) {
+                return value.dest === _v.dest;
+            })
+            
+            // 중복된 경우
+            if (findDest) {
+
+                var _findFile;
+
+                _findFile = this.CFG._overlap.file.find(function(__value, __index, __array) {
+                    return value.dest === __value.string;
+                });
+
+                if (_findFile) {
+                    _findFile.modules.push(_prop);
+
+                } else {
+                    var _file = {
+                        string: value.dest,
+                        modules: [findDest.mod, _prop], // 기존모듈명, 중복모듈명
+                    };
+                    this.CFG._overlap.file.push(_file);
+                }
+
+            // 임시 스택에 저장 (비교시 이용)
+            } else {
+                destTemp.push({dest: value.dest, mod: _prop});
+            }
+        });
+    } 
+
+    // 소스맵 파일 저장
+    writeJsonFile.sync(this.PATH.map + this.FILE.MAP, SOURCEMAP);
+
+
     return cb();
 };
+
+
+AutoInstance.prototype.copyDest = function(arr, mod) {
+    // 설치 모듈 목록
+    if (this.LOG.debug || (!this.LOG.notresult && !this.LOG.sub)) {
+        console.log(gutil.colors.green('설치 모듈 : '+ mod));
+    }
+
+    var _this = this;
+
+    arr.forEach(function(value, index, array) {
+
+        fs.readFile(value.src, 'utf8', function(err, data){
+            if (err) gulpError('파일읽기 실패 :' + value.src);
+
+            mkdirp(path.dirname(value.dest), function (err) {
+                if (err) gulpError('디렉토리 생성 실패 (중복제외) :' + value.src + err);
+                
+                fs.writeFile(value.dest, data, function(err){
+                    if (err) gulpError('파일 복사 실패 :' + value.src + err);
+    
+                    var cursorPath = process.cwd().replace(/\\/g,'/');
+                
+                    if (_this.LOG.debug || (!_this.LOG.notresult && !_this.LOG.sub)) {
+                        console.log(gutil.colors.blue('설치 성공 : ') + value.src.replace(cursorPath, '') 
+                            + gutil.colors.blue(' >> ') + value.dest
+                        );
+                        // console.log(gutil.colors.blue('설치 성공 ^.^ => ') + value.src);
+                    }
+    
+                });
+            });
+
+        });
+
+        // try {
+        //     fs.mkdirSync(path.dirname(value.dest));
+        // } catch(err) {
+        //     if (err && err.code != 'EEXIST') {
+        //         gulpError('디렉토리 생성 실패 (중복제외) :' + value.src + err);
+        //     }
+        // }
+
+        
+        // try {
+        //     mkdir(path.dirname(value.dest));
+        // } catch(err) {
+        //     if (err && err.code != 'EEXIST') {
+        //         gulpError('디렉토리 생성 실패 (중복제외) :' + value.src + err);
+        //     }
+        // }
+
+
+
+        
+    });        
+}
 
 
 //#####################################
@@ -679,14 +884,14 @@ function AutoModModel(basePath) {
     this.PATH['src'] = 'src/**/*.sql';
 
     this.FILE_GROUP = {
-        'ALL.sql': "src/**/*.sql",
-        'U.sql': "src/*+(Table|U)/*.sql",
-        'VW.sql': "src/*VW/*.sql",
-        'FN.sql': "src/*FN/*.sql",
-        'TF.sql': "src/*TF/*.sql",
-        'TR.sql': "src/*TR/*.sql",
-        'SP.sql': "src/*SP/*.sql",
-        'ETC.sql': "src/*ETC/*.sql"
+        'ALL.sql': this.PATH.base + "src/**/*.sql",
+        'U.sql': this.PATH.base + "src/*+(Table|U)/*.sql",
+        'VW.sql': this.PATH.base + "src/*VW/*.sql",
+        'FN.sql': this.PATH.base + "src/*FN/*.sql",
+        'TF.sql': this.PATH.base + "src/*TF/*.sql",
+        'TR.sql': this.PATH.base + "src/*TR/*.sql",
+        'SP.sql': this.PATH.base + "src/*SP/*.sql",
+        'ETC.sql': this.PATH.base + "src/*ETC/*.sql"
     };
 
     this.REG_EXP = {
@@ -1165,6 +1370,11 @@ function InstallPath(original, source, target, basePath, parentInstallPath) {
                     // REVIEW : 소스는 동적으로 실제 경로를 가져옴                
                     obj[prop] = this.getSource();   
 
+                // file 속성
+                // } else if (prop === 'file') {    
+                // // REVIEW : 소스는 동적으로 실제 경로를 가져옴                
+                //     obj[prop] = this[prop];   
+                
                 // 내부 속성은 제외
                 } else if (prop.substr(0,1) != '_') {
                     obj[prop] = this[prop];

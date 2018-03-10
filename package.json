@@ -30,7 +30,10 @@
     "gulp-replace": "^0.6.1",
     "gulp-util": "^3.0.8",
     "lazypipe": "^1.0.1",
+    "mkdirp": "^0.5.1",
+    "mkdirp-sync": "0.0.3",
     "path": "^0.12.7",
+    "run-sequence": "^2.2.1",
     "through2": "^2.0.3",
     "write-json-file": "^2.3.0"
   },
