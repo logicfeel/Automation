@@ -38,6 +38,6 @@
     "write-json-file": "^2.3.0"
   },
   "dependencies": {
-    "@mod-c/mn_menu": "file:../mn_menu@mod-c"
+    "@mod-c/mn_menu": "mn_menu@mod-c"
   }
 }

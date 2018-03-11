@@ -55,6 +55,28 @@
         {
             "type": "node",
             "request": "launch",
+            "name": "i Gulp reset-all",
+            "program": "${workspaceFolder}/node_modules/gulp/bin/gulp.js",
+            "args": [
+                "reset-all",
+                "--gulpfile",
+                "i_gulpfile.js"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "i Gulp reset-sub",
+            "program": "${workspaceFolder}/node_modules/gulp/bin/gulp.js",
+            "args": [
+                "reset-sub",
+                "--gulpfile",
+                "i_gulpfile.js"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
             "name": "i Gulp update",
             "program": "${workspaceFolder}/node_modules/gulp/bin/gulp.js",
             "args": [
@@ -84,7 +106,18 @@
                 "--gulpfile",
                 "i_gulpfile.js"
             ]
-        },        
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "i Gulp default",
+            "program": "${workspaceFolder}/node_modules/gulp/bin/gulp.js",
+            "args": [
+                "default",
+                "--gulpfile",
+                "i_gulpfile.js"
+            ]
+        },       
         {
             "type": "node",
             "request": "launch",
