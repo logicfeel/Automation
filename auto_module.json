@@ -1,8 +1,49 @@
 {
-	"_replace": [],
+	"_replace": [
+		{
+			"src": "FN/MnMenu.FN.sql",
+			"string": "SELECT sstory40.MnAuth_FN_AuthChk('1')",
+			"replacement": "SELECT DB_OBJ.MnAuth_FN_AuthChk('1')"
+		},
+		{
+			"src": "FN/MnMenu.FN.sql",
+			"string": "SELECT sstory40.MnAuth_FN_AuthChk('777')",
+			"replacement": "SELECT DB_OBJ.MnAuth_FN_AuthChk('777')"
+		},
+		{
+			"src": "SP/MnMenu.SP.sql",
+			"string": "exec abc.[MnAcct_Account_SP_C]",
+			"replacement": "exec DB_OBJ.[MnAcct_Account_SP_C]"
+		},
+		{
+			"src": "SP/MnMenu.SP.sql",
+			"string": "excute [abc].[MnAcct_Account_SP_C]",
+			"replacement": "excute [DB_OBJ].[MnAcct_Account_SP_C]"
+		},
+		{
+			"src": "SP/MnMenu.SP.sql",
+			"string": "exec  @abc =  abc.[MnAcct_Account_SP_C]",
+			"replacement": "exec  @abc =  DB_OBJ.[MnAcct_Account_SP_C]"
+		},
+		{
+			"src": "SP/MnMenu.SP.sql",
+			"string": "exec @abc=abc.[MnAcct_Account_SP_C]",
+			"replacement": "exec @abc=DB_OBJ.[MnAcct_Account_SP_C]"
+		},
+		{
+			"src": "SP/MnMenu.SP.sql",
+			"string": "SELECT sstory40.MnAuth_FN_AuthChk3('1')",
+			"replacement": "SELECT DB_OBJ.MnAuth_FN_AuthChk3('1')"
+		},
+		{
+			"src": "SP/MnMenu.SP.sql",
+			"string": "SELECT sstory40.MnAuth_FN_AuthChk3('777')",
+			"replacement": "SELECT DB_OBJ.MnAuth_FN_AuthChk3('777')"
+		}
+	],
 	"engines": {
-	  "type": "auto-mod-c",
-	  "version": "1.x.x"
+		"type": "auto-mod-c",
+		"version": "1.x.x"
 	},
 	"obj_name": "DB_OBJ",
 	"prefix_name": "",
@@ -10,24 +51,24 @@
 	"module": "",
 	"distPath": "dist/",
 	"clear": {
-	  "comment": false,
-	  "use": true
+		"comment": false,
+		"use": true
 	},
 	"options": {
-	  "obj_type": 1,
-	  "obj_fnc_type": 3,
-	  "ddl_create": true,
-	  "log": true,
-	  "last_go": true,
-	  "intall_group": true,
-	  "intall_unit": true,
-	  "template_overlap": true
+		"obj_type": 1,
+		"obj_fnc_type": 3,
+		"ddl_create": true,
+		"log": true,
+		"last_go": true,
+		"intall_group": true,
+		"intall_unit": true,
+		"template_overlap": true
 	},
 	"replace": [
-	  {
-		"string": "",
-		"src": "",
-		"replacement": ""
-	  }
+		{
+			"string": "",
+			"src": "",
+			"replacement": ""
+		}
 	]
-  }
+}
