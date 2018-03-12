@@ -20,8 +20,7 @@
     "log": true,
     "last_go": true,
     "intall_group": true,
-    "intall_unit": true,
-    "template_overlap": true
+    "intall_unit": true
   },
   "replace": [
     {

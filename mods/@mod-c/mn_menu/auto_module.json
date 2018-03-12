@@ -1,42 +1,42 @@
 {
 	"_replace": [
 		{
-			"src": "FN/MnMenu.FN.sql",
+			"src": "FN\\MnMenu.FN.sql",
 			"string": "SELECT sstory40.MnAuth_FN_AuthChk('1')",
 			"replacement": "SELECT DB_OBJ.MnAuth_FN_AuthChk('1')"
 		},
 		{
-			"src": "FN/MnMenu.FN.sql",
+			"src": "FN\\MnMenu.FN.sql",
 			"string": "SELECT sstory40.MnAuth_FN_AuthChk('777')",
 			"replacement": "SELECT DB_OBJ.MnAuth_FN_AuthChk('777')"
 		},
 		{
-			"src": "SP/MnMenu.SP.sql",
+			"src": "SP\\MnMenu.SP.sql",
 			"string": "exec abc.[MnAcct_Account_SP_C]",
 			"replacement": "exec DB_OBJ.[MnAcct_Account_SP_C]"
 		},
 		{
-			"src": "SP/MnMenu.SP.sql",
+			"src": "SP\\MnMenu.SP.sql",
 			"string": "excute [abc].[MnAcct_Account_SP_C]",
 			"replacement": "excute [DB_OBJ].[MnAcct_Account_SP_C]"
 		},
 		{
-			"src": "SP/MnMenu.SP.sql",
+			"src": "SP\\MnMenu.SP.sql",
 			"string": "exec  @abc =  abc.[MnAcct_Account_SP_C]",
 			"replacement": "exec  @abc =  DB_OBJ.[MnAcct_Account_SP_C]"
 		},
 		{
-			"src": "SP/MnMenu.SP.sql",
+			"src": "SP\\MnMenu.SP.sql",
 			"string": "exec @abc=abc.[MnAcct_Account_SP_C]",
 			"replacement": "exec @abc=DB_OBJ.[MnAcct_Account_SP_C]"
 		},
 		{
-			"src": "SP/MnMenu.SP.sql",
+			"src": "SP\\MnMenu.SP.sql",
 			"string": "SELECT sstory40.MnAuth_FN_AuthChk3('1')",
 			"replacement": "SELECT DB_OBJ.MnAuth_FN_AuthChk3('1')"
 		},
 		{
-			"src": "SP/MnMenu.SP.sql",
+			"src": "SP\\MnMenu.SP.sql",
 			"string": "SELECT sstory40.MnAuth_FN_AuthChk3('777')",
 			"replacement": "SELECT DB_OBJ.MnAuth_FN_AuthChk3('777')"
 		}

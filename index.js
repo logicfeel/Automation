@@ -23,8 +23,16 @@ var mkdirp          = require('mkdirp');
 function AutoBase(basePath, autoType) {
     DefaultRegistry.call(this);
 
+    var _base = basePath ? basePath : this.getDirname();
+
+    // 상대경로 반환
+    _base = path.relative(process.cwd(), _base); 
+    
+    // 접근 '/' 경로 변경
+    _base = _base ? _base.replace(/\\/g,'/') + '/' : '';
+
     this.PATH = {
-        base: basePath ? basePath.replace(/\\/g,'/') + '/' : '',
+        base: _base,
         nodes: 'node_modules/',
         module: '../**/@mod*/',
         i_module: '../**/@instance/'
@@ -53,9 +61,9 @@ AutoBase.prototype.ERR_LEVEL = 0;
 AutoBase.prototype.I_MOD_IGNORE = 0;
 
 AutoBase.prototype.LOG = {
-    silent: true,      // gulp 로그 비활성화
+    silent: true,       // gulp 로그 비활성화
     notresult: false,   // 설치 모듈/파일 정보 (마지막)
-    debug: true,       // 디버깅시 상세 콘솔 로그 표시
+    debug: true,        // 디버깅시 상세 콘솔 로그 표시
     sub: false          // 서브 모듈 여부
 };
 
@@ -66,6 +74,8 @@ AutoBase.prototype.LOG = {
  */
 AutoBase.prototype.init = function(gulpInst) {
     if (this.LOG.debug) console.log('AutoBase.prototype.init');
+    
+    this.runTask.call(this);
 
     gulpInst.task(this.PREFIX_NM + 'reset', gulpInst.series(this.reset.bind(this), this._reset_dist.bind(this)));
 };
@@ -655,14 +665,13 @@ function AutoModule(basePath) {
     // 오버라이딩
     this.PATH['dist'] = 'dist/';
     this.PATH['template'] = {
-        ext: ".sql",                    // 기본 변환 확장자    // TODO: 확장자는 제거 형태로.. abc.asp.hbs => abc.asp
-        dist: "publish/",               // 템플릿 배포 폴더 template_overlap = true 기본폴더로 지정(덮어씀)
-        src: "src/**/*.hbs",            // TODO: 기본 구조 변경에 따른 tempate  폴더 삽입
-        partials: "template/part/*.hbs",  // partical명 : 파일명
-        helpers: "template/*.js",       // helper(메소드)명 : export 객체명
-        data: "template/*.json"         // data명 : 파일명.객체명  TODO: data/ 폴더 명 사용 불필요 할듯 이미 구분됨
+        dist: "publish/",                       // 템플릿 배포 폴더 
+        src: 'src/**/*.hbs',                    // 일반 배치 소스
+        srcPub: 'template/*.hbs',               // 템플릿 배포 소스
+        partials: "template/parts/**/*.hbs",    // partical명 : 파일명
+        helpers: "template/*.js",               // helper(메소드)명 : export 객체명
+        data: "template/*.json"                 // data명 : 파일명.객체명  TODO: data/ 폴더 명 사용 불필요 할듯 이미 구분됨
     };
-    this.DEBUG_HBS = true;
 }
 util.inherits(AutoModule, AutoBase);
 
@@ -672,7 +681,7 @@ AutoModule.prototype.init = function(gulpInst) {
     if (this.LOG.debug) console.log('AutoModule.prototype.init');
 
     gulpInst.task(this.PREFIX_NM + 'template', gulpInst.series(
-        this._template_hbs.bind(this)));
+        this._template_publish.bind(this)));
 };
 
 
@@ -682,23 +691,34 @@ AutoModule.prototype.template = function template(cb) {
 };
 
 
-AutoModule.prototype._template_hbs = function _template_hbs(cb) {
-    if (this.LOG.debug) console.log('AutoModule.prototype._template_hbs');
+AutoModule.prototype._template_publish = function _template_publish(cb) {
+    if (this.LOG.debug) console.log('AutoModule.prototype._template_publish');
 
-    var _dist = this.PATH.template.dist;
-
-    // REVEW: 템플릿 구성 방식 바껴서 제거함
-    // if (this.CFG.options.template_overlap) _dist = this.PATH.dist;
-
-    return gulp.src(this.PATH.base + this.PATH.template.src)
-        .pipe(hb({debug: this.DEBUG_HBS})
-            .partials(this.PATH.base + this.PATH.template.partials)
+    // TODO: 아래 부분이 중복됨
+    return gulp.src(this.PATH.base  + this.PATH.template.srcPub)
+        .pipe(hb({debug: this.LOG.debug})
+            .partials(this.PATH.base  + this.PATH.template.partials)
             .helpers(this.PATH.base + this.PATH.template.helpers)
             .data(this.PATH.base + this.PATH.template.data)
-            .data(this.PATH.base + 'package.json')               // 패키지 정보
+            .data(this.PATH.base + this.FILE.PKG)               // 패키지 정보
         )
-        .pipe(rename({extname: this.PATH.template.ext}))
-        .pipe(gulp.dest(this.PATH.base + _dist));
+        .pipe(rename({extname: ''}))                            // 파일명.확장자.hbs
+        .pipe(gulp.dest(this.PATH.base + this.PATH.template.dist));
+};
+
+
+AutoModule.prototype._template_dist = function _template_dist(cb) {
+    if (this.LOG.debug) console.log('AutoModule.prototype._template_dist');
+
+    return gulp.src(this.PATH.base  + this.PATH.template.src)
+        .pipe(hb({debug: this.LOG.debug})
+            .partials(this.PATH.base  + this.PATH.template.partials)
+            .helpers(this.PATH.base + this.PATH.template.helpers)
+            .data(this.PATH.base + this.PATH.template.data)
+            .data(this.PATH.base + this.FILE.PKG)               // 패키지 정보
+        )
+        .pipe(rename({extname: ''}))                            // 파일명.확장자.hbs
+        .pipe(gulp.dest(this.PATH.base + this.PATH.dist));
 };
 
 
@@ -860,7 +880,7 @@ AutoModModel.prototype.init = function(gulpInst) {
     gulpInst.task(this.PREFIX_NM + 'install', gulpInst.series(
         this._install_group.bind(this), 
         this._install_unit.bind(this), 
-        this._template_hbs.bind(this)));
+        this._template_dist.bind(this)));
     
     gulpInst.task(this.PREFIX_NM + 'default', gulpInst.series(
         this.PREFIX_NM + 'preinstall', 

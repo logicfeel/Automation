@@ -117,7 +117,18 @@
                 "--gulpfile",
                 "i_gulpfile.js"
             ]
-        },       
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "t Gulp template",
+            "program": "${workspaceFolder}/node_modules/gulp/bin/gulp.js",
+            "args": [
+                "template",
+                "--gulpfile",
+                "t_gulpfile.js"
+            ]
+        },
         {
             "type": "node",
             "request": "launch",
