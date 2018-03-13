@@ -52,6 +52,9 @@ function AutoBase(basePath, autoType) {
     
     this.AUTO_TYPE = autoType;
     this.MOD = null;  // 하위(종속) 자동모듈
+
+    this.runTask.call(this);
+
 }
 util.inherits(AutoBase, DefaultRegistry);
 
@@ -75,7 +78,7 @@ AutoBase.prototype.LOG = {
 AutoBase.prototype.init = function(gulpInst) {
     if (this.LOG.debug) console.log('AutoBase.prototype.init');
     
-    this.runTask.call(this);
+    // this.runTask.call(this);
 
     gulpInst.task(this.PREFIX_NM + 'reset', gulpInst.series(this.reset.bind(this), this._reset_dist.bind(this)));
 };
@@ -880,7 +883,9 @@ AutoModModel.prototype.init = function(gulpInst) {
     gulpInst.task(this.PREFIX_NM + 'install', gulpInst.series(
         this._install_group.bind(this), 
         this._install_unit.bind(this), 
-        this._template_dist.bind(this)));
+        this._template_dist.bind(this),
+        this._template_publish.bind(this)
+    ));
     
     gulpInst.task(this.PREFIX_NM + 'default', gulpInst.series(
         this.PREFIX_NM + 'preinstall', 
@@ -1432,6 +1437,48 @@ module.exports.AutoBase = AutoBase;
 module.exports.AutoInstance = AutoInstance;
 module.exports.AutoModule = AutoModule;
 module.exports.AutoModModel = AutoModModel;
+
+
+
+// *******************************
+
+var EventEmitter = require('events').EventEmitter;
+
+function AutoTempalte(tmp) {
+    EventEmitter.call(this);
+    
+    this.TMP = tmp ? tmp : {};
+}
+
+util.inherits(AutoTempalte, EventEmitter);
+
+// 사용자 정의 
+AutoTempalte.prototype.getCompilePart = function(filename, targetPath) {
+    
+    var _this = this;
+    
+    mkdirp(targetPath, function (err) {
+        if (err) gulpError('디렉토리 생성 실패 (중복제외) :' + value.src + err);
+        
+        _this._compilePart(filename, targetPath);
+    });
+};
+
+AutoTempalte.prototype._compilePart = function(filename, targetPath) {
+    
+    return gulp.src(this.dirname + 'parts/' + filename)
+        .pipe(hb({debug: true})
+            .partials(this.dirname + 'parts/**/*.hbs')
+            .helpers(this.dirname + '*.js')
+            .data(this.TMP)               // 패키지 정보
+            .data(this.dirname + '*.json')
+        )
+        .pipe(gulp.dest(targetPath));
+
+};
+
+
+module.exports.AutoTempalte = AutoTempalte;
 
 //#####################################
 // 테스트

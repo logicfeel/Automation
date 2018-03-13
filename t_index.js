@@ -46,6 +46,11 @@ AutoClass.prototype._Entity = function() {
 };
 
 
+function TemplateClass() {
+
+}
+
 module.exports = {
-    AutoClass: AutoClass
+    AutoClass: AutoClass,
+    Tempate: TemplateClass
 };
