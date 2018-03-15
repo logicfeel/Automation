@@ -38,7 +38,8 @@ gulp.task('handlebar', function () {
         .pipe(hb({debug: true})
             .partials('./src/partials/**/*.hbs')
             .partials({
-                far: '정의에서 부분 삽입'
+                far: '정의에서 부분 삽입',
+                // pa: './src/partials/includes/hero.1.hbs' // 파일명을 가져오지는 못함
             })            
             .helpers({
                 bold: function(person) {
