@@ -134,7 +134,7 @@
             "request": "launch",
             "name": "프로그램 시작",
             "program": "${workspaceFolder}/index.js"
-        }
+        },
 
         {
             "type": "node",
