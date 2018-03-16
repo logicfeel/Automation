@@ -31,49 +31,8 @@
 		"install": "install/"
 	},
 	"modules": {
-		"@mod-c/mn_menu": {
-			"_replace": [
-				{
-					"src": "FN\\MnMenu.FN.sql",
-					"string": "SELECT sstory40.MnAuth_FN_AuthChk('1')",
-					"replacement": "SELECT DB_OBJ.MnAuth_FN_AuthChk('1')"
-				},
-				{
-					"src": "FN\\MnMenu.FN.sql",
-					"string": "SELECT sstory40.MnAuth_FN_AuthChk('777')",
-					"replacement": "SELECT DB_OBJ.MnAuth_FN_AuthChk('777')"
-				},
-				{
-					"src": "SP\\MnMenu.SP.sql",
-					"string": "exec abc.[MnAcct_Account_SP_C]",
-					"replacement": "exec DB_OBJ.[MnAcct_Account_SP_C]"
-				},
-				{
-					"src": "SP\\MnMenu.SP.sql",
-					"string": "excute [abc].[MnAcct_Account_SP_C]",
-					"replacement": "excute [DB_OBJ].[MnAcct_Account_SP_C]"
-				},
-				{
-					"src": "SP\\MnMenu.SP.sql",
-					"string": "exec  @abc =  abc.[MnAcct_Account_SP_C]",
-					"replacement": "exec  @abc =  DB_OBJ.[MnAcct_Account_SP_C]"
-				},
-				{
-					"src": "SP\\MnMenu.SP.sql",
-					"string": "exec @abc=abc.[MnAcct_Account_SP_C]",
-					"replacement": "exec @abc=DB_OBJ.[MnAcct_Account_SP_C]"
-				},
-				{
-					"src": "SP\\MnMenu.SP.sql",
-					"string": "SELECT sstory40.MnAuth_FN_AuthChk3('1')",
-					"replacement": "SELECT DB_OBJ.MnAuth_FN_AuthChk3('1')"
-				},
-				{
-					"src": "SP\\MnMenu.SP.sql",
-					"string": "SELECT sstory40.MnAuth_FN_AuthChk3('777')",
-					"replacement": "SELECT DB_OBJ.MnAuth_FN_AuthChk3('777')"
-				}
-			],
+		"@mod-c/asp_common": {
+			"_replace": [],
 			"engines": {
 				"type": "auto-mod-c",
 				"version": "1.x.x"
@@ -109,41 +68,10 @@
 				"source": "dist",
 				"target": "install",
 				"file": {
-					"ALL.sql": "",
-					"FN.sql": "",
-					"SP.sql": "",
-					"U.sql": ""
+					"Common_Fnc.asp": ""
 				},
-				"path": [
-					{
-						"source": "dist/FN",
-						"target": "FN",
-						"file": {
-							"MnMenu.FN.sql": ""
-						},
-						"path": [],
-						"basePath": ""
-					},
-					{
-						"source": "dist/SP",
-						"target": "SP",
-						"file": {
-							"MnMenu.SP.sql": ""
-						},
-						"path": [],
-						"basePath": ""
-					},
-					{
-						"source": "dist/Table",
-						"target": "Table",
-						"file": {
-							"MnMenu.Table.sql": ""
-						},
-						"path": [],
-						"basePath": ""
-					}
-				],
-				"basePath": "node_modules/@mod-c/mn_menu/"
+				"path": [],
+				"basePath": "node_modules/@mod-c/asp_common/"
 			}
 		}
 	},

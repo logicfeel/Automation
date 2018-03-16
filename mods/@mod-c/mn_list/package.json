@@ -12,6 +12,5 @@
     "gulp": "^4.0.0"
   },
   "dependencies": {
-    "@mod-c/header": "file:../../mods/@mod-c/header"
   }    
 }

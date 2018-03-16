@@ -53,7 +53,7 @@ function AutoBase(basePath, autoType) {
     this.AUTO_TYPE = autoType;
     this.MOD = null;  // 하위(종속) 자동모듈
 
-    this.runTask.call(this);
+    // this.runTask.call(this);
 
 }
 util.inherits(AutoBase, DefaultRegistry);

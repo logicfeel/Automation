@@ -1,32 +1,8 @@
 {
-	"@mod-c/mn_menu": [
+	"@mod-c/asp_common": [
 		{
-			"src": "node_modules/@mod-c/mn_menu/dist/ALL.sql",
-			"dest": "install/ALL.sql"
-		},
-		{
-			"src": "node_modules/@mod-c/mn_menu/dist/FN.sql",
-			"dest": "install/FN.sql"
-		},
-		{
-			"src": "node_modules/@mod-c/mn_menu/dist/SP.sql",
-			"dest": "install/SP.sql"
-		},
-		{
-			"src": "node_modules/@mod-c/mn_menu/dist/U.sql",
-			"dest": "install/U.sql"
-		},
-		{
-			"src": "node_modules/@mod-c/mn_menu/dist/FN/MnMenu.FN.sql",
-			"dest": "install/FN/MnMenu.FN.sql"
-		},
-		{
-			"src": "node_modules/@mod-c/mn_menu/dist/SP/MnMenu.SP.sql",
-			"dest": "install/SP/MnMenu.SP.sql"
-		},
-		{
-			"src": "node_modules/@mod-c/mn_menu/dist/Table/MnMenu.Table.sql",
-			"dest": "install/Table/MnMenu.Table.sql"
+			"src": "node_modules/@mod-c/asp_common/dist/Common_Fnc.asp",
+			"dest": "install/Common_Fnc.asp"
 		}
 	]
 }
