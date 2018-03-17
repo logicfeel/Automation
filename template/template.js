@@ -1,8 +1,7 @@
 'use strict';
 
 var util            = require('util');
-// var Auto            = require('../autoModule');
-var Auto            = require('../../../../autoModule');
+var Auto            = require('../autoModule');
 
 function TemplateClass() {
     Auto.AutoTempalte.call(this);

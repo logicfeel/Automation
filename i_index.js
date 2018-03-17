@@ -4,8 +4,9 @@
 // gulp 4.0
 var Auto            = require('./autoModule');
 var util            = require('util');
+var template        = require('./template/template');
 
-var r = require('@mod-c/asp_common');
+// var r = require('@mod-c/asp_common');
 // var r = require('./node_modules/@mod-c/asp_common');
 
 
@@ -21,11 +22,8 @@ AutoClass.prototype.getDirname = function() {
 }
 
 
-function TemplateClass() {
-
-}
 
 module.exports = {
     AutoClass: AutoClass,
-    Tempate: TemplateClass
+    TemplateClass: template.TemplateClass
 };

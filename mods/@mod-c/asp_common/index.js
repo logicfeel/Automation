@@ -1,8 +1,10 @@
 'use strict';
 
 // gulp 4.0
-var Auto            = require('../../../');
+// var Auto            = require('../../');
+var Auto            = require('../../../autoModule');
 var util            = require('util');
+var template        = require('./template/template');
 
 var writeJsonFile   = require('write-json-file');
 
@@ -37,5 +39,6 @@ AutoClass.prototype.setEntity = function(name) {
 
 
 module.exports = {
-    AutoClass: AutoClass
+    AutoClass: AutoClass,
+    TemplateClass: template.TemplateClass
 };
