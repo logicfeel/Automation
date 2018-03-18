@@ -135,12 +135,18 @@
             "name": "프로그램 시작",
             "program": "${workspaceFolder}/index.js"
         },
-
         {
             "type": "node",
             "request": "launch",
             "name": "index.1",
             "program": "${workspaceFolder}/index.1.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "AutoTemplate",
+            "program": "${workspaceFolder}/AutoTemplate.js"
         }
+        
     ]
 }

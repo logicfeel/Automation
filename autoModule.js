@@ -175,7 +175,7 @@ AutoBase.prototype._load_mod = function _load_mod(cb) {
             if (this.I_MOD_IGNORE && _instance instanceof AutoInstance) break;
 
             if (typeof _sub.TemplateClass === 'function') {
-                this.TMP = new _sub.TemplateClass();
+                this.TMP = new _sub.TemplateClass(this);
             }
            
             _instance.setTaskPrefix(_prop);
@@ -304,7 +304,7 @@ AutoInstance.prototype.init = function(gulpInst) {
         this._save_cfg.bind(this)));
 
     gulpInst.task(this.PREFIX_NM + 'template-all', gulpInst.series(
-        this._load_mod.bind(this), 
+        // this._load_mod.bind(this), 
         this.PREFIX_NM + 'template',
         this._template_submodule_i.bind(this), 
         this._template_submodule_m.bind(this), 
@@ -1522,13 +1522,15 @@ module.exports.AutoModModel = AutoModModel;
 
 
 // *******************************
+// 개발후 클래스 파일로 분리
 
 var EventEmitter = require('events').EventEmitter;
 
 function AutoTempalte(tmp) {
     EventEmitter.call(this);
     
-    this.TMP = tmp ? tmp : {};
+    // this.TMP = tmp ? tmp : {};
+    this.src
 }
 
 util.inherits(AutoTempalte, EventEmitter);
@@ -1537,6 +1539,26 @@ util.inherits(AutoTempalte, EventEmitter);
 AutoTempalte.prototype.init = function() {
 
 };
+
+// AutoTempalte.prototype._setPropertie = function(pIdx) {
+        
+//     var obj = {
+//         get: function() { return this._items[pIdx]; },
+//         set: function(newValue) { this._items[pIdx] = newValue; },
+//         enumerable: true,
+//         configurable: true
+//     };
+//     return obj;        
+// };
+
+AutoTempalte.prototype.import = function(modName) {
+    
+    // TODO: try 예외 추가
+    var mod = require(modName);
+    
+    //  return 
+};
+
 
 // 사용자 정의 
 AutoTempalte.prototype.getCompilePart = function(filename, targetPath) {
@@ -1556,7 +1578,7 @@ AutoTempalte.prototype._compilePart = function(filename, targetPath) {
         .pipe(hb({debug: true})
             .partials(this.dirname + 'parts/**/*.hbs')
             .helpers(this.dirname + '*.js')
-            .data(this.TMP)               // 패키지 정보
+            // .data(this.TMP)               // 패키지 정보
             .data(this.dirname + '*.json')
         )
         .pipe(gulp.dest(targetPath));
