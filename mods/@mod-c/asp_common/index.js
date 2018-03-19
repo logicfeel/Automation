@@ -20,10 +20,10 @@ AutoClass.prototype.getDirname = function() {
     return __dirname;
 }
 
-// 오버라이딩
-AutoClass.prototype.runTask = function() {
+// // 오버라이딩
+// AutoClass.prototype.runTask = function() {
 
-}
+// }
 
 
 
