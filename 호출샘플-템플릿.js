@@ -32,11 +32,28 @@ t.partials('~');
 a.src["aaa"].compile = t;
 
 // 2-3
+//단축형도 가능하고 
 var t = a.part['p1.asp'];
 t.data('~');
 t.partials('~');
 a.src["aaa"] = t;
 a.src["aaa"].compile();
+
+a.part['p1.asp'].data('~');
+a.part['p1.asp'].partials('~');
+a.src["aaa"] = a.part['p1.asp'];
+a.src["aaa"].compile();
+
+var at = this.import('모듈명');
+at.part['p1.asp'].data('~');
+at.part['p1.asp'].partials('~');
+this.src["aaa"] = at.part['p1.asp'];
+this.src["aaa"].compile();
+
+var at = this.import('모듈명');
+this.data.push('신규데이터');
+this.data["신규데이터"] = at.data['p1.json'];
+
 
 
 /**

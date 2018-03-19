@@ -2,7 +2,7 @@
 'use strict';
 
 // gulp 4.0
-var Auto            = require('./autoModule');
+var Auto            = require('./AutoModule');
 var util            = require('util');
 var template        = require('./template/template');
 
@@ -11,7 +11,7 @@ var template        = require('./template/template');
 
 
 function AutoClass() {
-    Auto.AutoInstance.call(this, __dirname);
+    Auto.AutoInstance.call(this, __dirname, template.TemplateClass);
     
 }
 util.inherits(AutoClass, Auto.AutoInstance);
@@ -25,5 +25,6 @@ AutoClass.prototype.getDirname = function() {
 
 module.exports = {
     AutoClass: AutoClass,
-    TemplateClass: template.TemplateClass
+    TemplateClass: template.TemplateClass,
+    // auto: new AutoClass()       // 인스턴스
 };
