@@ -115,7 +115,8 @@
             "args": [
                 "default",
                 "--gulpfile",
-                "i_gulpfile.js"
+                "i_gulpfile.js",
+                "-S",
             ]
         },
         {

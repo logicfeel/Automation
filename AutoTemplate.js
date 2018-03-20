@@ -6,6 +6,11 @@ var path            = require('path');
 var gulp            = require('gulp');  // gulp 4.0 기준
 var hb              = require('gulp-hb');
 var rename          = require('gulp-rename');
+var copyFileSync    = require('fs-copy-file-sync');
+
+var copy            = require('copy');
+var fs              = require('fs');
+var mkdirp          = require('mkdirp');
 
 // TODO: 공통파일 분리 해야함
 var LArray          = require('./LArray');
@@ -39,12 +44,12 @@ function AutoTempalte(pAutoBase) {
         decorator:  [/(?:.*template\/decorators\/)([\w\/.]*)(?:[.]{1}[\w]*)\b/gi, '$1']
     };
     
-    this._pushTmpSrc(this.src, this._AutoBase.PATH.template.src, REG.src, 'src');
-    this._pushTmpSrc(this.template, this._AutoBase.PATH.template.srcPub, REG.template, 'template');
-    this._pushTmpSrc(this.part, this._AutoBase.PATH.template.partials, REG.part, 'part');
-    this._pushMod(this.data, this._AutoBase.PATH.template.data, REG.data);
-    this._pushMod(this.helper, this._AutoBase.PATH.template.helpers, REG.helper);
-    this._pushMod(this.decorator, this._AutoBase.PATH.template.decorators, REG.decorator);
+    this._pushTmpSrc(this.src, this._AutoBase.PATT_TEMP.src, REG.src, 'src');
+    this._pushTmpSrc(this.template, this._AutoBase.PATT_TEMP.srcPub, REG.template, 'template');
+    this._pushTmpSrc(this.part, this._AutoBase.PATT_TEMP.partials, REG.part, 'part');
+    this._pushMod(this.data, this._AutoBase.PATT_TEMP.data, REG.data);
+    this._pushMod(this.helper, this._AutoBase.PATT_TEMP.helpers, REG.helper);
+    this._pushMod(this.decorator, this._AutoBase.PATT_TEMP.decorators, REG.decorator);
 
     
     // TEST:
@@ -56,7 +61,7 @@ function AutoTempalte(pAutoBase) {
     //     200
     // );
     
-    console.log('생성');
+    // console.log('생성');
 };
 util.inherits(AutoTempalte, EventEmitter);
 
@@ -70,13 +75,17 @@ AutoTempalte.prototype._pushTmpSrc = function(pTarget, pPattern, pReg, pCode) {
     var pathBase = AutoBase.PATH.base;
     var savePath = '';
     var _this = this;
-    
+    var _prefix = '';
+
     if (pCode == 'src') {
-        savePath = 'src/';
+        savePath = AutoBase.PATH.src;
+        _prefix = '_';      //(__) 규칙
     } else if  (pCode == 'part') {
-        savePath = 'template/parts/';
+        savePath = AutoBase.PATH.template_part;
+        _prefix = '__';      //(__) 규칙
     } else if  (pCode == 'template') {
-        savePath = 'template/';
+        savePath = AutoBase.PATH.template;
+        _prefix = '_';      //(__) 규칙
     }
 
     _arr = glob.sync(pPattern);
@@ -91,11 +100,14 @@ AutoTempalte.prototype._pushTmpSrc = function(pTarget, pPattern, pReg, pCode) {
             function(pIdx, newValue) { 
                 this._items[pIdx] = newValue; 
 
+                var destPath = savePath + '@' + path.basename(newValue.path);
                 // (.)접두사 + 파일명 복사 
-                console.log('::: > 임시 파일 복사..');
-                return gulp.src(newValue.path)
-                    .pipe(rename({prefix: '__'}))                            
-                    .pipe(gulp.dest(pathBase + savePath));
+
+                // 저장 폴더가 없는 경우 생성
+                mkdirp.sync(path.dirname(destPath));
+                copyFileSync(newValue.path, destPath);
+
+                // console.log('::: > 임시 파일 복사..');
             }
         );
     });
@@ -118,7 +130,15 @@ AutoTempalte.prototype._pushMod = function(pTarget, pPattern, pReg) {
 
 // 추상 메소드
 AutoTempalte.prototype.init = function() {
+};
 
+// 추상 메소드
+AutoTempalte.prototype.before_template = function() {
+    /**
+     * 템플릿 처리전에 실행 
+     * i : update >> preinstall >> (실행) >> template-all >> install
+     * m : preinstall >> install >> (실행) >> template
+     */
 };
 
 
@@ -156,8 +176,6 @@ function TemplateSource(pAutoTemplate, pPath, pCode) {
     this._AutoTemplate = pAutoTemplate;
     this.path = pPath;          // 조각 경로 (호출기준)
     
-    // 컨텐츠 읽기 TODO
-    // this.content = pContent;    // 조각내용 string
     this.code = pCode;
     this.content = null;    // 조각내용 string
     
@@ -166,7 +184,11 @@ function TemplateSource(pAutoTemplate, pPath, pCode) {
     this._helper = [];
     this._decorator = [];
 
-
+    try {
+        this.content = fs.readFileSync(pPath);
+    } catch(err) {
+        gulpError('error 템플릿 소스 읽기 실패 :' + pPath, 'TemplateSource');
+    }
 
     // return {
     //     partials: function() {},
@@ -228,10 +250,10 @@ TemplateSource.prototype.compile = function(data) {
             // 패키지 정보
             .data(pathBase + AutoBase.FILE.PKG)
             // 기본 정보 로딩 (glob경로)
-            .partials(pathBase  + AutoBase.PATH.template.partials)
-            .decorators(pathBase + AutoBase.PATH.template.decorators)
-            .helpers(pathBase + AutoBase.PATH.template.helpers)
-            .data(pathBase + AutoBase.PATH.template.data)
+            .partials(pathBase  + AutoBase.PATT_TEMP.partials)
+            .decorators(pathBase + AutoBase.PATT_TEMP.decorators)
+            .helpers(pathBase + AutoBase.PATT_TEMP.helpers)
+            .data(pathBase + AutoBase.PATT_TEMP.data)
             // 조각 추가 정보 로딩 (배열 glob 경로)
             .partials(_this._part)
             .decorators(_this._decorator)
@@ -264,6 +286,27 @@ TemplateSource.prototype.decorators = function(pattern) {
 };
 
 // REVEIW: 제거 하는 메소드도 넣어야 할듯
+
+
+
+/**
+ * gulp 오류 출력
+ * TODO: 위치 조정
+ * @param {*} errName 오류 구분 명칭
+ * @param {*} message 오류 메세지
+ */
+function gulpError(message, errName) {
+    // 제사한 오류 출력
+    // if (this.ERR_LEVEL === 1) {
+    //     throw new gutil.PluginError({
+    //         plugin: errName,
+    //         message: message
+    //     });                
+    // } else {
+        throw new Error(message);
+    // }
+}
+
 
 
 module.exports.AutoTempalte = AutoTempalte;

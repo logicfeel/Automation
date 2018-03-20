@@ -12,7 +12,7 @@ util.inherits(TemplateClass, temp.AutoTempalte);
 
 // 추상메소드 >> 오버라이딩 
 TemplateClass.prototype.init = function() {
-    console.log('TemplateClass.prototype.init');
+    // console.log('TemplateClass.prototype.init');
     /**
      * 템플릿 초기화
      */
@@ -30,10 +30,16 @@ TemplateClass.prototype.init = function() {
 
     // 복사 진행
     this.src['testTemplate.sql'] = this.template['mainTem.asp'];
-    // this.src['testTemplate.sql'] = 'aa';
 
-    console.log(':::::::::::::');
+    // console.log(':::::::::::::');
 };
+
+// 추상메소드 >> 오버라이딩 
+TemplateClass.prototype.before_template = function() {
+    // console.log('TemplateClass.prototype.before_template');
+    // console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
+};
+
 
 /**
  * su/sub 조각 설정
@@ -41,7 +47,7 @@ TemplateClass.prototype.init = function() {
  * @param {*} anthor 작성자
  */
 TemplateClass.prototype.setPart_su_sub = function(titile, anthor) {
-    console.log('su/sub 조각 설정');
+    // console.log('su/sub 조각 설정');
 };
 
 module.exports = {
