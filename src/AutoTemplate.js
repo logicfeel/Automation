@@ -1,5 +1,6 @@
 'use strict';
 
+var EventEmitter    = require('events').EventEmitter;
 var util            = require('util');
 var glob            = require('glob'); 
 var path            = require('path');
@@ -10,13 +11,12 @@ var copyFileSync    = require('fs-copy-file-sync');
 var fs              = require('fs');
 var mkdirp          = require('mkdirp');
 
-// TODO: 공통파일 분리 해야함
-var LArray          = require('./LArray');
+var LArray          = require('larray');    // LCommon # LArray
 
 // *******************************
 // 개발후 클래스 파일로 분리
 
-var EventEmitter = require('events').EventEmitter;
+
 
 function AutoTempalte(pAutoBase) {
     EventEmitter.call(this);
@@ -263,7 +263,7 @@ function gulpError(message, errName) {
 
 
 
-module.exports.AutoTempalte = AutoTempalte;
+module.exports = AutoTempalte;
 
 
 // ##########################################

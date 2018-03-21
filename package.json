@@ -17,28 +17,18 @@
   },
   "homepage": "https://github.com/logicfeel/Automation#readme",
   "devDependencies": {
-    "deepmerge": "^2.1.0",
     "fs": "0.0.1-security",
     "fs-copy-file-sync": "^1.0.1",
     "glob": "^7.1.2",
     "gulp": "^4.0.0",
-    "gulp-clean": "^0.4.0",
-    "gulp-concat": "^2.6.1",
-    "gulp-group-concat": "^1.1.6",
     "gulp-hb": "^7.0.1",
-    "gulp-json-sort": "^1.0.0",
     "gulp-rename": "^1.2.2",
-    "gulp-replace": "^0.6.1",
     "gulp-rm": "^1.0.5",
     "gulp-util": "^3.0.8",
-    "larray": "git+https://github.com/logicfeel/LCommon.git#larray",
-    "lazypipe": "^1.0.1",
     "mkdirp": "^0.5.1",
     "path": "^0.12.7",
     "through2": "^2.0.3",
-    "write-json-file": "^2.3.0"
-  },
-  "dependencies": {
-    "@mod-c/asp_common": "file:mods/@mod-c/asp_common"
+    "write-json-file": "^2.3.0",
+    "larray": "git+https://github.com/logicfeel/LCommon.git#larray"
   }
 }

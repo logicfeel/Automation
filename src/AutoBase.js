@@ -1,5 +1,17 @@
 'use strict';
 
+var util            = require('util');
+var gulp            = require('gulp');  // gulp 4.0 기준
+var DefaultRegistry = require('undertaker-registry');
+var rename          = require('gulp-rename');
+var fs              = require('fs');
+var hb              = require('gulp-hb');
+var path            = require('path');
+var writeJsonFile   = require('write-json-file');
+var rm              = require('gulp-rm');
+
+var AutoTempalte    = require('./AutoTemplate').AutoTempalte;
+
 function AutoBase(basePath, TemplateClass) {
     DefaultRegistry.call(this);
 
@@ -60,8 +72,10 @@ function AutoBase(basePath, TemplateClass) {
     
     this.TMP = TemplateClass ? new TemplateClass(this) : null;
     
-    if (this instanceof AutoInstance)   this.AUTO_TYPE = 'I';
-    if (this instanceof AutoModule)     this.AUTO_TYPE  = 'M';
+    // TODO: 
+    this.AUTO_TYPE = '';
+    // if (this instanceof AutoInstance)   this.AUTO_TYPE = 'I';
+    // if (this instanceof AutoModule)     this.AUTO_TYPE  = 'M';
     
     this.ERR_LEVEL = 1;
 }
@@ -79,6 +93,11 @@ AutoBase.prototype.LOG = {
     sub: false          // 서브 모듈 여부
 };
 
+
+
+AutoBase.prototype.getDirname = function() {
+    return __dirname;
+}
 
 /**
  * undertaker-registry 태스크 등록
@@ -367,3 +386,25 @@ AutoBase.prototype.load = function(path) {
 AutoBase.prototype.setTaskPrefix  = function(name) {
     if (name.length > 0 ) this.PREFIX_NM = name + ':';
 };
+
+
+/**
+ * gulp 오류 출력
+ * TODO: 위치 조정
+ * @param {*} errName 오류 구분 명칭
+ * @param {*} message 오류 메세지
+ */
+function gulpError(message, errName) {
+    // 제사한 오류 출력
+    // if (this.ERR_LEVEL === 1) {
+    //     throw new gutil.PluginError({
+    //         plugin: errName,
+    //         message: message
+    //     });                
+    // } else {
+        throw new Error(message);
+    // }
+}
+
+
+module.exports  = AutoBase;
