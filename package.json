@@ -17,7 +17,6 @@
   },
   "homepage": "https://github.com/logicfeel/Automation#readme",
   "devDependencies": {
-    "copy": "^0.3.1",
     "deepmerge": "^2.1.0",
     "fs": "0.0.1-security",
     "fs-copy-file-sync": "^1.0.1",
@@ -32,11 +31,10 @@
     "gulp-replace": "^0.6.1",
     "gulp-rm": "^1.0.5",
     "gulp-util": "^3.0.8",
+    "larray": "git+https://github.com/logicfeel/LCommon.git#larray",
     "lazypipe": "^1.0.1",
     "mkdirp": "^0.5.1",
-    "mkdirp-sync": "0.0.3",
     "path": "^0.12.7",
-    "run-sequence": "^2.2.1",
     "through2": "^2.0.3",
     "write-json-file": "^2.3.0"
   },

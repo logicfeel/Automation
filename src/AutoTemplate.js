@@ -7,8 +7,6 @@ var gulp            = require('gulp');  // gulp 4.0 기준
 var hb              = require('gulp-hb');
 var rename          = require('gulp-rename');
 var copyFileSync    = require('fs-copy-file-sync');
-
-var copy            = require('copy');
 var fs              = require('fs');
 var mkdirp          = require('mkdirp');
 
@@ -51,15 +49,6 @@ function AutoTempalte(pAutoBase) {
     this._pushMod(this.helper, this._AutoBase.PATT_TEMP.helpers, REG.helper);
     this._pushMod(this.decorator, this._AutoBase.PATT_TEMP.decorators, REG.decorator);
 
-    
-    // TEST:
-    // this.testSetter = new LArray();
-    // this.testSetter.setPropCallback(
-    //     "count", 
-    //     function() {return this._items.length},
-    //     function(nm){},
-    //     200
-    // );
     
     // console.log('생성');
 };
@@ -132,26 +121,23 @@ AutoTempalte.prototype._pushMod = function(pTarget, pPattern, pReg) {
 AutoTempalte.prototype.init = function() {
 };
 
-// 추상 메소드
+/**
+ * 템플릿 처리전에 실행 
+ * i : update >> preinstall >> (실행) >> template-all >> install
+ * m : preinstall >> install >> (실행) >> template
+ */
 AutoTempalte.prototype.before_template = function() {
-    /**
-     * 템플릿 처리전에 실행 
-     * i : update >> preinstall >> (실행) >> template-all >> install
-     * m : preinstall >> install >> (실행) >> template
-     */
 };
 
 
 AutoTempalte.prototype._import = function(modName) {
     
     var _mod;
-    // var _auto;
     var AutoTempalte;
     var AutoClass;
 
     try {
         _mod            = require(modName);
-        // _auto           = _mod.auto;
         AutoTempalte    = _mod.AutoTempalte;
         AutoClass       = _mod.AutoClass;
     } catch(err) {
@@ -189,39 +175,7 @@ function TemplateSource(pAutoTemplate, pPath, pCode) {
     } catch(err) {
         gulpError('error 템플릿 소스 읽기 실패 :' + pPath, 'TemplateSource');
     }
-
-    // return {
-    //     partials: function() {},
-    //     data: function() {},
-    //     helpers: function() {},
-    //     decorators: function() {}
-    // }
-}
-
-// // 사용자 정의 
-// AutoTempalte.prototype.getCompilePart = function(filename, targetPath) {
-    
-//     var _this = this;
-    
-//     mkdirp(targetPath, function (err) {
-//         if (err) gulpError('디렉토리 생성 실패 (중복제외) :' + value.src + err);
-        
-//         _this._compilePart(filename, targetPath);
-//     });
-// };
-
-// AutoTempalte.prototype._compilePart = function(filename, targetPath) {
-    
-//     return gulp.src(this.dirname + 'parts/' + filename)
-//         .pipe(hb({debug: true})
-//             .partials(this.dirname + 'parts/**/*.hbs')
-//             .helpers(this.dirname + '*.js')
-//             // .data(this.TMP)               // 패키지 정보
-//             .data(this.dirname + '*.json')
-//         )
-//         .pipe(gulp.dest(targetPath));
-
-// };
+};
 
 TemplateSource.prototype.compile = function(data) {
 
