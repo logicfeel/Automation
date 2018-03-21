@@ -19,7 +19,7 @@ var deepmerge       = require('deepmerge');
 var writeJsonFile   = require('write-json-file');
 var glob            = require('glob'); 
 var mkdirp          = require('mkdirp');
-var rm              = require( 'gulp-rm' )
+var rm              = require('gulp-rm')
 
 var AutoTempalte    = require('./AutoTemplate').AutoTempalte;
 var InstallPath     = require('./InstallPath').InstallPath;
@@ -51,7 +51,7 @@ function AutoBase(basePath, TemplateClass) {
     this.PATT = {
         src:    '',                                     // 하위에서 정의
         buffer: '**/__*.*',                             // 내부 컴파일에 포함된 파일(파일은 참조용도)
-        copy:   '**/@*.*'                               // 외부에서 복사된 파일
+        copy:   '**/@*.*'                               // 외부에서 복사된 파일명
     }
 
     // 템플릿 패턴
@@ -177,6 +177,8 @@ AutoBase.prototype._reset_dir = function _reset_dir(cb) {
             {read: false, allowEmpty :  true})
         .pipe(clean());
 };
+
+
 AutoBase.prototype._reset_del = function _reset_dir(cb) {
     if (this.LOG.debug) console.log('AutoBase.prototype._reset_dir');
 
@@ -444,7 +446,8 @@ AutoInstance.prototype.init = function(gulpInst) {
         this._save_cfg.bind(this)));
     
     gulpInst.task(this.PREFIX_NM + 'default', gulpInst.series(
-        this.default.bind(this), 
+        this._load_mod.bind(this), 
+        this.default.bind(this),
         this.PREFIX_NM + 'update', 
         this.PREFIX_NM + 'preinstall', 
         this.PREFIX_NM + 'template-all', 
@@ -1357,72 +1360,6 @@ module.exports.AutoBase = AutoBase;
 module.exports.AutoInstance = AutoInstance;
 module.exports.AutoModule = AutoModule;
 module.exports.AutoModModel = AutoModModel;
-
-
-
-// *******************************
-// 개발후 클래스 파일로 분리
-
-// var EventEmitter = require('events').EventEmitter;
-
-// function AutoTempalte(tmp) {
-//     EventEmitter.call(this);
-    
-//     // this.TMP = tmp ? tmp : {};
-//     this.src
-// }
-
-// util.inherits(AutoTempalte, EventEmitter);
-
-// // 추상 메소드
-// AutoTempalte.prototype.init = function() {
-
-// };
-
-// // AutoTempalte.prototype._setPropertie = function(pIdx) {
-        
-// //     var obj = {
-// //         get: function() { return this._items[pIdx]; },
-// //         set: function(newValue) { this._items[pIdx] = newValue; },
-// //         enumerable: true,
-// //         configurable: true
-// //     };
-// //     return obj;        
-// // };
-
-// AutoTempalte.prototype.import = function(modName) {
-    
-//     // TODO: try 예외 추가
-//     var mod = require(modName);
-    
-//     //  return 
-// };
-
-
-// // 사용자 정의 
-// AutoTempalte.prototype.getCompilePart = function(filename, targetPath) {
-    
-//     var _this = this;
-    
-//     mkdirp(targetPath, function (err) {
-//         if (err) gulpError('디렉토리 생성 실패 (중복제외) :' + value.src + err);
-        
-//         _this._compilePart(filename, targetPath);
-//     });
-// };
-
-// AutoTempalte.prototype._compilePart = function(filename, targetPath) {
-    
-//     return gulp.src(this.dirname + 'parts/' + filename)
-//         .pipe(hb({debug: true})
-//             .partials(this.dirname + 'parts/**/*.hbs')
-//             .helpers(this.dirname + '*.js')
-//             // .data(this.TMP)               // 패키지 정보
-//             .data(this.dirname + '*.json')
-//         )
-//         .pipe(gulp.dest(targetPath));
-
-// };
 
 
 // module.exports.AutoTempalte = AutoTempalte;
