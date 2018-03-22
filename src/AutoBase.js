@@ -295,11 +295,16 @@ AutoBase.prototype.getTemplateObj = function getTemplateObj() {
     var _decorator = {};
     var _data = {};
     var _propName = '';
+    var _dirname = '';
+    var _basename = ''
 
     // gulp-hp 전달 객체 조립 
     for(i = 0 ; this.TMP && i < this.TMP.part.length; i++) {
-        _propName = path.basename(this.TMP.part[i].path, this.PATT_TEMP.ext);
-        _parts[_propName] = this.TMP.part[i].content.toString();
+        _dirname = path.dirname(path.relative(this.PATH.template_part, this.TMP.part[i].path));
+        _dirname = _dirname =! '' ? _dirname + '/' : _dirname;
+        _basename =  path.basename(this.TMP.part[i].path, this.PATT_TEMP.ext);  // 확장자 제거(.hbs)
+        
+        _parts[_dirname + _basename] = this.TMP.part[i].content.toString();
     }
 
     // REVEIW: 아래 문법이 무난? 검토 _helpers = this.TMP ? Object.assign({}, this.TMP.helper.slice(0, this.TMP.helper.length - 1)) : {};
