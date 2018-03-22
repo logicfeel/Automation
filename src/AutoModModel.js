@@ -150,14 +150,14 @@ AutoModModel.prototype.pipe_install_common = function pipe_install_common(cb) {
     var _this = this;
     var commonPipe = lazypipe()
         // DDL 명령 (create, alter)
-        .pipe(replace, this.REG_EXP.DDL_COMMAND, function(match, p1, offset, string) {
+        .pipe(replace, this.REG_EXP['DDL_COMMAND'], function(match, p1, offset, string) {
             if (_this.CFG.options.ddl_create) {
                 match = match.replace(p1, 'CREATE');
             }
             return match;
         })
         // DDL 구문 (객체명)
-        .pipe(replace, this.REG_EXP.DDL_ALL, function(match, p1, p2, p3, p4, offset, string) {
+        .pipe(replace, this.REG_EXP['DDL_ALL'], function(match, p1, p2, p3, p4, offset, string) {
 
             var _match;
 
@@ -169,7 +169,7 @@ AutoModModel.prototype.pipe_install_common = function pipe_install_common(cb) {
             return _match;
         })
         // DML 구문 (프로시저)
-        .pipe(replace, this.REG_EXP.DML_SP, function(match, p1, p2, p3, p4, offset, string) {
+        .pipe(replace, this.REG_EXP['DML_SP'], function(match, p1, p2, p3, p4, offset, string) {
 
             var _index = null;
             var _targetName = '';
@@ -199,7 +199,7 @@ AutoModModel.prototype.pipe_install_common = function pipe_install_common(cb) {
             }
         })
         // DML 구문 (스칼라, 테이블)
-        .pipe(replace, this.REG_EXP.DML_FN, function(match, p1, p2, p3, p4, p5, offset, string) {
+        .pipe(replace, this.REG_EXP['DML_FN'], function(match, p1, p2, p3, p4, p5, offset, string) {
 
             var _match;
             var _index = null;
@@ -221,7 +221,7 @@ AutoModModel.prototype.pipe_install_common = function pipe_install_common(cb) {
             return _match;
         })
         // USE [객체명]
-        .pipe(replace, this.REG_EXP.USE_OBJ_NAME, function(match, p1, p2, offset, string) {
+        .pipe(replace, this.REG_EXP['USE_OBJ_NAME'], function(match, p1, p2, offset, string) {
 
             var _match;
 
@@ -232,17 +232,17 @@ AutoModModel.prototype.pipe_install_common = function pipe_install_common(cb) {
             return _match;
         })
         // 주석 /** **/ 
-        .pipe(replace, this.REG_EXP.COMMENT, function(match, p1, offset, string) {
+        .pipe(replace, this.REG_EXP['COMMENT'], function(match, p1, offset, string) {
             
             if (_this.CFG.clear.comment) return '';
             return match;
         })
         // 첫 빈줄 제거
-        .pipe(replace, this.REG_EXP.FIST_SPACE, '')    
+        .pipe(replace, this.REG_EXP['FIST_SPACE'], '')    
         // 마지막 빈줄 제거
-        .pipe(replace, this.REG_EXP.LAST_SPACE, '')
+        .pipe(replace, this.REG_EXP['LAST_SPACE'], '')
         // 정규표현 : 마지막 GO
-        .pipe(replace, this.REG_EXP.LAST_GO, function(match, p1, offset, string) {
+        .pipe(replace, this.REG_EXP['LAST_GO'], function(match, p1, offset, string) {
             if (_this.CFG.options.last_go && match.trim() != 'GO') return match + '\n\nGO--Auto\n\n';
             else return match + '--End\n\n';
         })
@@ -261,7 +261,7 @@ AutoModModel.prototype.__preinstall_cfg_build = function __preinstall_cfg_build(
     _this.CFG.distPath = this.PATH.dist;
 
     return gulp.src(this.PATH.base + this.PATT['src'])
-        .pipe(replace(this.REG_EXP.DML_SP, function(match, p1, p2, p3, p4, offset, string) {
+        .pipe(replace(this.REG_EXP['DML_SP'], function(match, p1, p2, p3, p4, offset, string) {
                 var objData = {};
                 var _match;
 
@@ -286,7 +286,7 @@ AutoModModel.prototype.__preinstall_cfg_build = function __preinstall_cfg_build(
                 return match;
             })
         )
-        .pipe(replace(this.REG_EXP.DML_FN, function(match, p1, p2, p3, p4, p5, offset, string) {
+        .pipe(replace(this.REG_EXP['DML_FN'], function(match, p1, p2, p3, p4, p5, offset, string) {
                 var objData = {};
                 var _match;
 
