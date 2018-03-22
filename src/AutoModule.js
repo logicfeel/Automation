@@ -97,5 +97,5 @@ AutoModule.prototype.prefixNameBuild = function(fullName, prefix, suffix, obj, r
 };
 
 
-module.exports = AutoBase;
+module.exports = AutoModule;
 
