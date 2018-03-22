@@ -21,6 +21,7 @@
     "gulp-group-concat": "^1.1.6",
     "gulp-replace": "^0.6.1",
     "gulp-util": "^3.0.8",
+    "lazypipe": "^1.0.1",
     "r.x.x-auto": "git+https://github.com/logicfeel/Automation.git#r.x.x-auto"
   },
   "devDependencies": {}

@@ -8,7 +8,7 @@ var DefaultRegistry = require('undertaker-registry');
 var gutil           = require("gulp-util");
 var replace         = require("gulp-replace");
 var groupConcat     = require('gulp-group-concat');
-
+var lazypipe        = require('lazypipe');
 
 var AutoModule      = require('r.x.x-auto').AutoModule;
 
