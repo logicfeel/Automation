@@ -33,7 +33,7 @@ function AutoTempalte(pAutoBase) {
     this.decorator  = new LArray();
 
     // [0] 정규식, [1] 캡쳐번호
-    var REG = {
+    this.REG_EXP = {
         src:        [/(?:.*src\/)([\w\/\-.]*)(?:[.]{1}[\w\-]*)\b/gi, '$1'], 
         template:   [/(?:.*template\/page\/)([\w\/\-.]*)(?:[.]{1}[\w]*)\b/gi, '$1'], 
         part:       [/(?:.*template\/parts\/)([\w\/\-.]*)(?:[.]{1}[\w]*)\b/gi, '$1'], 
@@ -42,12 +42,12 @@ function AutoTempalte(pAutoBase) {
         decorator:  [/(?:.*template\/decorators\/)([\w\/\-.]*)(?:[.]{1}[\w]*)\b/gi, '$1']
     };
     
-    this._pushTmpSrc(this.src, this._AutoBase.PATT_TEMP['src'], REG.src, 'src');
-    this._pushTmpSrc(this.template, this._AutoBase.PATT_TEMP['page'], REG.template, 'template');
-    this._pushTmpSrc(this.part, this._AutoBase.PATT_TEMP['partials'], REG.part, 'part');
-    this._pushMod(this.data, this._AutoBase.PATT_TEMP['data'], REG.data);
-    this._pushMod(this.helper, this._AutoBase.PATT_TEMP['helpers'], REG.helper);
-    this._pushMod(this.decorator, this._AutoBase.PATT_TEMP['decorators'], REG.decorator);
+    this._pushTmpSrc(this.src, this._AutoBase.PATT_TEMP['src'], this.REG_EXP['src'], 'src');
+    this._pushTmpSrc(this.template, this._AutoBase.PATT_TEMP['page'], this.REG_EXP['template'], 'template');
+    this._pushTmpSrc(this.part, this._AutoBase.PATT_TEMP['partials'], this.REG_EXP['part'], 'part');
+    this._pushMod(this.data, this._AutoBase.PATT_TEMP['data'], this.REG_EXP['data']);
+    this._pushMod(this.helper, this._AutoBase.PATT_TEMP['helpers'], this.REG_EXP['helper']);
+    this._pushMod(this.decorator, this._AutoBase.PATT_TEMP['decorators'], this.REG_EXP['decorator']);
 
     
     // console.log('생성');
@@ -67,13 +67,13 @@ AutoTempalte.prototype._pushTmpSrc = function(pTarget, pPattern, pReg, pCode) {
     var _prefix = '';
 
     if (pCode == 'src') {
-        savePath = AutoBase.PATH.src;
+        savePath = pathBase + AutoBase.PATH.src;
         _prefix = '_';      //(__) 규칙
     } else if  (pCode == 'part') {
-        savePath = AutoBase.PATH.template_part;
+        savePath = pathBase + AutoBase.PATH.template_part;
         _prefix = '__';      //(__) 규칙
     } else if  (pCode == 'template') {
-        savePath = AutoBase.PATH.template_page;
+        savePath = pathBase + AutoBase.PATH.template_page;
         _prefix = '__';      //(__) 규칙
     }
 
@@ -180,21 +180,29 @@ function TemplateSource(pAutoTemplate, pPath, pCode) {
 TemplateSource.prototype.compile = function(data) {
 
     // var args = Array.prototype.slice.call(arguments);
-    var compilePath = '@compile';
+    // var compilePath = '@compile';
     var AutoBase = this._AutoTemplate._AutoBase;
     var pathBase = AutoBase.PATH.base;
     var savePath = '';
     var _this = this;
+    var _dirname;
 
     // TODO: pCode 추소 검토 그리고 코드 값 this.AutoBase 참조 방식으로 변경
     if (this.code == 'src') {
-        savePath = 'src/';
+        // savePath = 'src/';
+        savePath = AutoBase.PATH['src'];
     } else if  (this.code == 'part') {
-        savePath = 'template/parts/';
+        // savePath = 'template/parts/';
+        savePath = AutoBase.PATH['template_part'];
     } else if  (this.code == 'template') {
-        savePath = 'template/';
+        // savePath = 'template/';
+        savePath = AutoBase.PATH['template_page'];
     }
-    savePath = savePath + compilePath ;
+    
+    // REVIEW: path 도 상대주소로 가져와야 할지?
+    _dirname = path.relative(savePath, path.dirname(this.path));
+    _dirname = _dirname ? _dirname + '/' : '';
+    savePath = savePath + AutoBase.PATH['compile'] + _dirname;
 
     // REVIEW: 파라메터 값을로 읽어와야 함 
     return gulp.src(this.path)
