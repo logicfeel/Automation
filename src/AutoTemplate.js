@@ -42,12 +42,12 @@ function AutoTempalte(pAutoBase) {
         decorator:  [/(?:.*template\/decorators\/)([\w\/.]*)(?:[.]{1}[\w]*)\b/gi, '$1']
     };
     
-    this._pushTmpSrc(this.src, this._AutoBase.PATT_TEMP.src, REG.src, 'src');
-    this._pushTmpSrc(this.template, this._AutoBase.PATT_TEMP.srcPub, REG.template, 'template');
-    this._pushTmpSrc(this.part, this._AutoBase.PATT_TEMP.partials, REG.part, 'part');
-    this._pushMod(this.data, this._AutoBase.PATT_TEMP.data, REG.data);
-    this._pushMod(this.helper, this._AutoBase.PATT_TEMP.helpers, REG.helper);
-    this._pushMod(this.decorator, this._AutoBase.PATT_TEMP.decorators, REG.decorator);
+    this._pushTmpSrc(this.src, this._AutoBase.PATT_TEMP['src'], REG.src, 'src');
+    this._pushTmpSrc(this.template, this._AutoBase.PATT_TEMP['page'], REG.template, 'template');
+    this._pushTmpSrc(this.part, this._AutoBase.PATT_TEMP['partials'], REG.part, 'part');
+    this._pushMod(this.data, this._AutoBase.PATT_TEMP['data'], REG.data);
+    this._pushMod(this.helper, this._AutoBase.PATT_TEMP['helpers'], REG.helper);
+    this._pushMod(this.decorator, this._AutoBase.PATT_TEMP['decorators'], REG.decorator);
 
     
     // console.log('생성');
@@ -73,7 +73,7 @@ AutoTempalte.prototype._pushTmpSrc = function(pTarget, pPattern, pReg, pCode) {
         savePath = AutoBase.PATH.template_part;
         _prefix = '__';      //(__) 규칙
     } else if  (pCode == 'template') {
-        savePath = AutoBase.PATH.template;
+        savePath = AutoBase.PATH.template_page;
         _prefix = '_';      //(__) 규칙
     }
 
@@ -198,16 +198,16 @@ TemplateSource.prototype.compile = function(data) {
 
     // REVIEW: 파라메터 값을로 읽어와야 함 
     return gulp.src(this.path)
-        .pipe(hb({ debug: AutoBase.LOG.debug })
+        .pipe(hb({ debug: AutoBase.LOG['debug'] })
             // 아규먼트
             .data(data)
             // 패키지 정보
-            .data(pathBase + AutoBase.FILE.PKG)
+            .data(pathBase + AutoBase.FILE['PKG'])
             // 기본 정보 로딩 (glob경로)
-            .partials(pathBase  + AutoBase.PATT_TEMP.partials)
-            .decorators(pathBase + AutoBase.PATT_TEMP.decorators)
-            .helpers(pathBase + AutoBase.PATT_TEMP.helpers)
-            .data(pathBase + AutoBase.PATT_TEMP.data)
+            .partials(pathBase  + AutoBase.PATT_TEMP['partials'])
+            .decorators(pathBase + AutoBase.PATT_TEMP['decorators'])
+            .helpers(pathBase + AutoBase.PATT_TEMP['helpers'])
+            .data(pathBase + AutoBase.PATT_TEMP['data'])
             // 조각 추가 정보 로딩 (배열 glob 경로)
             .partials(_this._part)
             .decorators(_this._decorator)

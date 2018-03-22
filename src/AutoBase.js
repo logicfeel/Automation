@@ -33,6 +33,7 @@ function AutoBase(basePath, TemplateClass) {
         compile: '@compile/',
         template: 'template/',
         template_part: 'template/parts/',
+        template_page: 'template/page/'
     };
 
     // gulp.src(pattern) 에서 사용 패턴 그룹
@@ -47,7 +48,7 @@ function AutoBase(basePath, TemplateClass) {
         ext: '.hbs',                                    // 템플릿 파일 확장자
         dist: 'publish/',                               // 템플릿 배포 폴더 
         src: 'src/**/!(__*)*.hbs',                      // 일반 배치 소스 (__시작하는 파일은 제외)
-        srcPub: 'template/!(__*)*.hbs',                 // 템플릿 배포 소스
+        page: 'template/page/**/!(__*)*.hbs',         // 템플릿 배포 소스
         partials: 'template/parts/**/!(__*)*.hbs',      // partical명 : 파일명
         helpers: 'template/helpers/!(__*)*.js',         // helper(메소드)명 : export 객체명
         decorators: 'template/decorators/!(__*)*.js',   // decorators(메소드)명 : export 객체명            
@@ -66,8 +67,8 @@ function AutoBase(basePath, TemplateClass) {
     };
 
     // 로딩 객체
-    this.CFG = this.load(this.PATH.base + this.FILE.CFG);
-    this.PKG = this.load(this.PATH.base + this.FILE.PKG);
+    this.CFG = this.load(this.PATH['base'] + this.FILE['CFG']);
+    this.PKG = this.load(this.PATH['base'] + this.FILE['PKG']);
     this.MOD = null;  // 하위(종속) 자동모듈
     
     this.TMP = TemplateClass ? new TemplateClass(this) : null;
@@ -104,7 +105,7 @@ AutoBase.prototype.getDirname = function() {
  * @param {*} gulpInst gulp 공유
  */
 AutoBase.prototype.init = function(gulpInst) {
-    if (this.LOG.debug) console.log('AutoBase.prototype.init');
+    if (this.LOG['debug']) console.log('AutoBase.prototype.init');
     
     // this.runTask.call(this);
     gulpInst.task(this.PREFIX_NM + 'reset', gulpInst.series(
@@ -147,27 +148,27 @@ AutoBase.prototype.get  =function get(name) {
 
 // 파일 초기화
 AutoBase.prototype.reset = function reset(cb) {
-  if (this.LOG.debug) console.log('AutoBase.prototype.reset');
+  if (this.LOG['debug']) console.log('AutoBase.prototype.reset');
   
   // REVIEW: 기능확인
   reset.description = '초기화 (폴더, 객체)';
 
-  return gulp.src(this.PATH.base + '.' + this.FILE.CFG)
-    .pipe(rename(this.FILE.CFG))
-    .pipe(gulp.dest(this.PATH.base + './'));
+  return gulp.src(this.PATH['base'] + '.' + this.FILE['CFG'])
+    .pipe(rename(this.FILE['CFG']))
+    .pipe(gulp.dest(this.PATH['base'] + './'));
 };
 
 // 폴더 초기화
 AutoBase.prototype._reset_dir = function _reset_dir(cb) {
-    if (this.LOG.debug) console.log('AutoBase.prototype._reset_dir');
+    if (this.LOG['debug']) console.log('AutoBase.prototype._reset_dir');
 
     return gulp.src(
             [
-                this.PATH.base + this.PATH.dist, 
-                this.PATH.base + this.PATH.map,
-                this.PATH.base + this.PATH.src + this.PATH.compile,
-                this.PATH.base + this.PATH.template + this.PATH.compile,
-                this.PATH.base + this.PATH.template_part + this.PATH.compile
+                this.PATH['base'] + this.PATH['dist'], 
+                this.PATH['base'] + this.PATH['map'],
+                this.PATH['base'] + this.PATH['src'] + this.PATH['compile'],
+                this.PATH['base'] + this.PATH['template_page'] + this.PATH['compile'],
+                this.PATH['base'] + this.PATH['template_part'] + this.PATH['compile']
             ], 
             {read: false, allowEmpty :  true})
         .pipe(clean());
@@ -175,14 +176,14 @@ AutoBase.prototype._reset_dir = function _reset_dir(cb) {
 
 
 AutoBase.prototype._reset_del = function _reset_dir(cb) {
-    if (this.LOG.debug) console.log('AutoBase.prototype._reset_dir');
+    if (this.LOG['debug']) console.log('AutoBase.prototype._reset_dir');
 
     return gulp.src(
             [
-                this.PATH.base + this.PATH.src + this.PATT['buffer'],
-                this.PATH.base + this.PATH.src + this.PATT['copy'],
-                this.PATH.base + this.PATH.template + this.PATT['buffer'],
-                this.PATH.base + this.PATH.template + this.PATT['copy']
+                this.PATH['base'] + tthis.PATH['src'] + this.PATT['buffer'],
+                this.PATH['base'] + tthis.PATH['src'] + this.PATT['copy'],
+                this.PATH['base'] + this.PATH['template_page'] + this.PATT['buffer'],
+                this.PATH['base'] + this.PATH['template_page'] + this.PATT['copy']
             ],
             {read: false})
         .pipe(rm());
@@ -190,16 +191,16 @@ AutoBase.prototype._reset_del = function _reset_dir(cb) {
 
 
 AutoBase.prototype._save_cfg = function _save_cfg(cb) {
-    if (this.LOG.debug) console.log('AutoBase.prototype._save_cfg');
+    if (this.LOG['debug']) console.log('AutoBase.prototype._save_cfg');
 
-    writeJsonFile.sync(this.PATH.base + this.FILE.CFG, this.CFG);
+    writeJsonFile.sync(this.PATH['base'] + this.FILE['CFG'], this.CFG);
 
     return cb();
 };
 
 
 AutoBase.prototype._load_mod = function _load_mod(cb) {
-    if (this.LOG.debug) console.log('AutoBase.prototype._load_mod');
+    if (this.LOG['debug']) console.log('AutoBase.prototype._load_mod');
 
     var _relativePath;
     var _sub;
@@ -235,7 +236,7 @@ AutoBase.prototype._load_mod = function _load_mod(cb) {
 
 
 AutoBase.prototype.template = function template(cb) {
-    if (this.LOG.debug) console.log('AutoBase.prototype.template');
+    if (this.LOG['debug']) console.log('AutoBase.prototype.template');
     
     // 템플릿이 지정 되어 있는 경우
     if (this.TMP instanceof AutoTempalte) {
@@ -246,43 +247,43 @@ AutoBase.prototype.template = function template(cb) {
 };
 
 AutoBase.prototype._template_publish = function _template_publish(cb) {
-    if (this.LOG.debug) console.log('AutoBase.prototype._template_publish');
+    if (this.LOG['debug']) console.log('AutoBase.prototype._template_publish');
 
     var hbObj = this.getTemplateObj();
 
     // TODO: 아래 부분이 중복됨
-    return gulp.src(this.PATH.base  + this.PATT_TEMP.srcPub)
-        .pipe(hb({debug: this.LOG.debug})
+    return gulp.src(this.PATH['base']  + this.PATT_TEMP['page'])
+        .pipe(hb({debug: this.LOG['debug']})
             .partials(hbObj.parts)
             .helpers(hbObj.helpers)
             .decorators(hbObj.decorator)
             .data(hbObj.data)
-            .data(this.PATH.base + this.FILE.PKG)               // 패키지 정보
-            .data(this.PATH.base + this.FILE.CFG)               // 설정 정보 (auto_module.json)
+            .data(this.PATH['base'] + this.FILE['PKG'])               // 패키지 정보
+            .data(this.PATH['base'] + this.FILE['CFG'])               // 설정 정보 (auto_module.json)
         )
         .pipe(rename({extname: ''}))                            // 파일명.확장자.hbs
-        .pipe(gulp.dest(this.PATH.base + this.PATT_TEMP.dist)
+        .pipe(gulp.dest(this.PATH['base'] + this.PATT_TEMP['dist'])
     );
 };
 
 
 
 AutoBase.prototype._template_dist = function _template_dist(cb) {
-    if (this.LOG.debug) console.log('AutoBase.prototype._template_dist');
+    if (this.LOG['debug']) console.log('AutoBase.prototype._template_dist');
 
     var hbObj = this.getTemplateObj();
 
-    return gulp.src(this.PATH.base  + this.PATT_TEMP.src)
-        .pipe(hb({debug: this.LOG.debug})
+    return gulp.src(this.PATH['base']  + this.PATT_TEMP['src'])
+        .pipe(hb({debug: this.LOG['debug']})
             .partials(hbObj.parts)
             .helpers(hbObj.helpers)
             .decorators(hbObj.decorator)
             .data(hbObj.data)
-            .data(this.PATH.base + this.FILE.PKG)               // 패키지 정보
-            .data(this.PATH.base + this.FILE.CFG)               // 설정 정보 (auto_module.json)            
+            .data(this.PATH['base'] + this.FILE['PKG'])               // 패키지 정보
+            .data(this.PATH['base'] + this.FILE['CFG'])               // 설정 정보 (auto_module.json)            
         )
         .pipe(rename({extname: ''}))                            // 파일명.확장자.hbs
-        .pipe(gulp.dest(this.PATH.base + this.PATH.dist)
+        .pipe(gulp.dest(this.PATH['base'] + this.PATH['dist'])
     );
 };
 
@@ -300,9 +301,9 @@ AutoBase.prototype.getTemplateObj = function getTemplateObj() {
 
     // gulp-hp 전달 객체 조립 
     for(i = 0 ; this.TMP && i < this.TMP.part.length; i++) {
-        _dirname = path.dirname(path.relative(this.PATH.template_part, this.TMP.part[i].path));
+        _dirname = path.dirname(path.relative(this.PATH['template_part'], this.TMP.part[i].path));
         _dirname = _dirname =! '' ? _dirname + '/' : _dirname;
-        _basename =  path.basename(this.TMP.part[i].path, this.PATT_TEMP.ext);  // 확장자 제거(.hbs)
+        _basename =  path.basename(this.TMP.part[i].path, this.PATT_TEMP['ext']);  // 확장자 제거(.hbs)
         
         _parts[_dirname + _basename] = this.TMP.part[i].content.toString();
     }
@@ -328,33 +329,33 @@ AutoBase.prototype.getTemplateObj = function getTemplateObj() {
 };
 
 // AutoBase.prototype._template_publish = function _template_publish(cb) {
-//     if (this.LOG.debug) console.log('AutoBase.prototype._template_publish');
+//     if (this.LOG['debug']) console.log('AutoBase.prototype._template_publish');
 // 
 //     // TODO: 아래 부분이 중복됨
-//     return gulp.src(this.PATH.base  + this.PATT_TEMP.srcPub)
-//         .pipe(hb({debug: this.LOG.debug})
-//             .partials(this.PATH.base  + this.PATT_TEMP.partials)
-//             .helpers(this.PATH.base + this.PATT_TEMP.helpers)
-//             .data(this.PATH.base + this.PATT_TEMP.data)
-//             .data(this.PATH.base + this.FILE.PKG)               // 패키지 정보
+//     return gulp.src(this.PATH['base']  + this.PATT_TEMP.page)
+//         .pipe(hb({debug: this.LOG['debug']})
+//             .partials(this.PATH['base']  + this.PATT_TEMP.partials)
+//             .helpers(this.PATH['base'] + this.PATT_TEMP.helpers)
+//             .data(this.PATH['base'] + this.PATT_TEMP.data)
+//             .data(this.PATH['base'] + this.FILE.PKG)               // 패키지 정보
 //         )
 //         .pipe(rename({extname: ''}))                            // 파일명.확장자.hbs
-//         .pipe(gulp.dest(this.PATH.base + this.PATT_TEMP.dist)
+//         .pipe(gulp.dest(this.PATH['base'] + this.PATT_TEMP.dist)
 //     );
 // };
 
 // AutoBase.prototype._template_dist = function _template_dist(cb) {
-//     if (this.LOG.debug) console.log('AutoBase.prototype._template_dist');
+//     if (this.LOG['debug']) console.log('AutoBase.prototype._template_dist');
 // 
-//     return gulp.src(this.PATH.base  + this.PATT_TEMP.src)
-//         .pipe(hb({debug: this.LOG.debug})
-//             .partials(this.PATH.base  + this.PATT_TEMP.partials)
-//             .helpers(this.PATH.base + this.PATT_TEMP.helpers)
-//             .data(this.PATH.base + this.PATT_TEMP.data)
-//             .data(this.PATH.base + this.FILE.PKG)               // 패키지 정보
+//     return gulp.src(this.PATH['base']  + this.PATT_TEMP.src)
+//         .pipe(hb({debug: this.LOG['debug']})
+//             .partials(this.PATH['base']  + this.PATT_TEMP.partials)
+//             .helpers(this.PATH['base'] + this.PATT_TEMP.helpers)
+//             .data(this.PATH['base'] + this.PATT_TEMP.data)
+//             .data(this.PATH['base'] + this.FILE.PKG)               // 패키지 정보
 //         )
 //         .pipe(rename({extname: ''}))                            // 파일명.확장자.hbs
-//         .pipe(gulp.dest(this.PATH.base + this.PATH.dist)
+//         .pipe(gulp.dest(this.PATH['base'] + this.PATH.dist)
 //     );
 // };
 
