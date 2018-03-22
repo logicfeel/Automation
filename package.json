@@ -1,6 +1,6 @@
 {
-  "name": "t1.x.x-auto",
-  "version": "1.0.0",
+  "name": "r.x.x-auto",
+  "version": "0.0.1",
   "description": "- gulp 를 활용",
   "main": "index.js",
   "scripts": {
