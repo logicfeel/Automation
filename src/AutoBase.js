@@ -10,7 +10,7 @@ var path            = require('path');
 var writeJsonFile   = require('write-json-file');
 var rm              = require('gulp-rm');
 
-var AutoTempalte    = require('./AutoTemplate').AutoTempalte;
+var AutoTempalte    = require('./AutoTemplate');
 
 function AutoBase(basePath, TemplateClass) {
     DefaultRegistry.call(this);
