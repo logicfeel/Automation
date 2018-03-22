@@ -11,7 +11,7 @@ var groupConcat     = require('gulp-group-concat');
 var lazypipe        = require('lazypipe');
 
 var AutoModule      = require('r.x.x-auto').AutoModule;
-
+var AutoTempalte    = require('r.x.x-auto').AutoTempalte;
 
 //#####################################
 // AutoModModel
