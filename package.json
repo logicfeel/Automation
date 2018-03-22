@@ -1,6 +1,6 @@
 {
-  "name": "1.x.x-auto",
-  "version": "1.0.0",
+  "name": "r.0.2-auto-mod-control",
+  "version": "0.0.1",
   "description": "- gulp 를 활용",
   "main": "index.js",
   "scripts": {

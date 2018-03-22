@@ -19,7 +19,7 @@ var deepmerge       = require('deepmerge');
 var writeJsonFile   = require('write-json-file');
 var glob            = require('glob'); 
 var mkdirp          = require('mkdirp');
-var rm              = require('gulp-rm')
+var rm              = require('gulp-rm');
 
 var AutoTempalte    = require('./AutoTemplate').AutoTempalte;
 var InstallPath     = require('./InstallPath').InstallPath;
