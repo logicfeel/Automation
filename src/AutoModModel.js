@@ -1,3 +1,16 @@
+'use strict';
+
+
+
+var util            = require('util');
+var gulp            = require('gulp');  // gulp 4.0 기준
+var DefaultRegistry = require('undertaker-registry');
+var gutil           = require("gulp-util");
+var replace         = require("gulp-replace");
+var groupConcat     = require('gulp-group-concat');
+
+
+var AutoModule      = require('r.x.x-auto').AutoModule;
 
 
 //#####################################
@@ -339,3 +352,6 @@ function gulpError(message, errName) {
         throw new Error(message);
     // }
 }
+
+
+module.exports = AutoModModel;
