@@ -16,7 +16,8 @@
     "url": "https://github.com/logicfeel/Automation/issues"
   },
   "homepage": "https://github.com/logicfeel/Automation#readme",
-  "devDependencies": {
+  "devDependencies": {},
+  "dependencies": {
     "fs": "0.0.1-security",
     "fs-copy-file-sync": "^1.0.1",
     "glob": "^7.1.2",
