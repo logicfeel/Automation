@@ -34,12 +34,12 @@ function AutoTempalte(pAutoBase) {
 
     // [0] 정규식, [1] 캡쳐번호
     var REG = {
-        src:        [/(?:.*src\/)([\w\/.]*)(?:[.]{1}[\w]*)\b/gi, '$1'], 
-        template:   [/(?:.*template\/)([\w\/.]*)(?:[.]{1}[\w]*)\b/gi, '$1'], 
-        part:       [/(?:.*template\/parts\/)([\w\/.]*)(?:[.]{1}[\w]*)\b/gi, '$1'], 
-        data:       [/(?:.*template\/data\/)([\w\/.]*)(?:[.]{1}[\w]*)\b/gi, '$1'], 
-        helper:     [/(?:.*template\/helpers\/)([\w\/.]*)(?:[.]{1}[\w]*)\b/gi, '$1'], 
-        decorator:  [/(?:.*template\/decorators\/)([\w\/.]*)(?:[.]{1}[\w]*)\b/gi, '$1']
+        src:        [/(?:.*src\/)([\w\/\-.]*)(?:[.]{1}[\w\-]*)\b/gi, '$1'], 
+        template:   [/(?:.*template\/page\/)([\w\/\-.]*)(?:[.]{1}[\w]*)\b/gi, '$1'], 
+        part:       [/(?:.*template\/parts\/)([\w\/\-.]*)(?:[.]{1}[\w]*)\b/gi, '$1'], 
+        data:       [/(?:.*template\/data\/)([\w\/\-.]*)(?:[.]{1}[\w]*)\b/gi, '$1'], 
+        helper:     [/(?:.*template\/helpers\/)([\w\/\-.]*)(?:[.]{1}[\w]*)\b/gi, '$1'], 
+        decorator:  [/(?:.*template\/decorators\/)([\w\/\-.]*)(?:[.]{1}[\w]*)\b/gi, '$1']
     };
     
     this._pushTmpSrc(this.src, this._AutoBase.PATT_TEMP['src'], REG.src, 'src');
@@ -74,7 +74,7 @@ AutoTempalte.prototype._pushTmpSrc = function(pTarget, pPattern, pReg, pCode) {
         _prefix = '__';      //(__) 규칙
     } else if  (pCode == 'template') {
         savePath = AutoBase.PATH.template_page;
-        _prefix = '_';      //(__) 규칙
+        _prefix = '__';      //(__) 규칙
     }
 
     _arr = glob.sync(pPattern);
@@ -165,10 +165,10 @@ function TemplateSource(pAutoTemplate, pPath, pCode) {
     this.code = pCode;
     this.content = null;    // 조각내용 string
     
-    this._part = [];
-    this._data = [];
-    this._helper = [];
-    this._decorator = [];
+    this._part = null;
+    this._data = null;
+    this._helper = null;
+    this._decorator = null;
 
     try {
         this.content = fs.readFileSync(pPath);
@@ -221,21 +221,25 @@ TemplateSource.prototype.compile = function(data) {
 
 
 TemplateSource.prototype.partials = function(pattern) {
+    this._part = this._part ? this._part : [];
     this._part.push(pattern);
 };
 
 
 TemplateSource.prototype.data = function(pattern) {
+    this._data = this._data ? this._data : [];
     this._data.push(pattern);
 };
 
 
 TemplateSource.prototype.helpers = function(pattern) {
+    this._helper = this._helper ? this._helper : [];
     this._helper.push(pattern);
 };
 
 
 TemplateSource.prototype.decorators = function(pattern) {
+    this._decorator = this._decorator ? this._decorator : [];
     this._decorator.push(pattern);
 };
 
