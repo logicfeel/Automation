@@ -105,6 +105,8 @@ AutoModModel.prototype.init = function(gulpInst) {
     ));
     
     gulpInst.task(this.PREFIX_NM + 'default', gulpInst.series(
+        this._load_mod.bind(this), 
+        this.default.bind(this),
         this.PREFIX_NM + 'preinstall', 
         this.PREFIX_NM + 'install',
         this.PREFIX_NM + 'template'
@@ -127,7 +129,12 @@ AutoModModel.prototype.install = function install(cb) {
 
 AutoModModel.prototype.default = function (cb) {
     if (this.LOG.debug) console.log('AutoModModel.prototype.default');
-    
+
+    // 템플릿이 지정 되어 있는 경우
+    if (this.TMP instanceof AutoTempalte) {
+        this.TMP.init();
+    }
+
     return cb();
 };
 
