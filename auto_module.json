@@ -1,0 +1,38 @@
+{
+	"engines": {
+		"type": "auto-instance",
+		"version": "1.x.x"
+	},
+	"public": {
+		"obj_name": "DB_OBJ",
+		"prefix_name": "",
+		"suffix_name": "",
+		"module": "",
+		"clear": {
+			"comment": false,
+			"use": true
+		},
+		"options": {
+			"obj_type": 1,
+			"obj_fnc_type": 3,
+			"ddl_create": true,
+			"log": true,
+			"last_go": true,
+			"intall_group": true,
+			"intall_unit": true
+		},
+		"replace": [
+			{
+				"string": "",
+				"src": "",
+				"replacement": ""
+			}
+		],
+		"install": "install/"
+	},
+	"modules": {},
+	"_overlap": {
+		"module": [],
+		"file": []
+	}
+}
