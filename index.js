@@ -1,30 +1,13 @@
 
 'use strict';
 
-// gulp 4.0
-var Auto            = require('./AutoModule');
-var util            = require('util');
-var template        = require('./template/template');
-
-// var r = require('@mod-c/asp_common');
-// var r = require('./node_modules/@mod-c/asp_common');
-
-
-function AutoClass() {
-    Auto.AutoInstance.call(this, __dirname, template.TemplateClass);
-    
-}
-util.inherits(AutoClass, Auto.AutoInstance);
-
-// 이 메소드는 모듈의 위치에 지정
-AutoClass.prototype.getDirname = function() {
-    return __dirname;
-}
-
+var AutoInstance        = require('./src/AutoInstance');
+var InstallPath         = require('./src/InstallPath');
+var AutoTempalte        = require('r.x.x-auto').AutoTempalte;
 
 
 module.exports = {
-    AutoClass: AutoClass,
-    TemplateClass: template.TemplateClass,
-    // auto: new AutoClass()       // 인스턴스
+    AutoInstance: AutoInstance,
+    InstallPath: InstallPath,
+    AutoTempalte: AutoTempalte
 };

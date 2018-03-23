@@ -2,7 +2,6 @@
 
 var path            = require('path');
 
-
 /**
  * gulp 오류 출력
  * TODO: 위치 조정

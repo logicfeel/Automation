@@ -5,22 +5,17 @@ var util            = require('util');
 var gulp            = require('gulp');  // gulp 4.0 기준
 var DefaultRegistry = require('undertaker-registry');
 var gutil           = require("gulp-util");
-var rename          = require('gulp-rename');
-var clean           = require('gulp-clean');
-var fs              = require('fs');
-var sortJSON        = require('gulp-json-sort').default;
-var lazypipe        = require('lazypipe');
-var replace         = require("gulp-replace");
-var concat          = require('gulp-concat'); 
-var through         = require('through2');
-var groupConcat     = require('gulp-group-concat');
-var hb              = require('gulp-hb');
 var path            = require('path');
 var deepmerge       = require('deepmerge');
 var writeJsonFile   = require('write-json-file');
 var glob            = require('glob'); 
 var mkdirp          = require('mkdirp');
-var rm              = require('gulp-rm');
+var fs              = require('fs');
+
+
+var AutoBase        = require('r.x.x-auto').AutoBase;
+var AutoTempalte    = require('r.x.x-auto').AutoTempalte;
+var InstallPath     = require('./InstallPath');
 
 //#####################################
 // AutoInstance
@@ -40,19 +35,19 @@ AutoInstance.prototype.init = function(gulpInst) {
     if (this.LOG.debug) console.log('AutoInstance.prototype.init');
 
     gulpInst.task(this.PREFIX_NM + 'update', gulpInst.series(
-        this._load_mod.bind(this), 
-        this._update_check.bind(this), 
+        this._load_mod.bind(this),
+        this._update_check.bind(this),
         this._update_build.bind(this),
         this._save_cfg.bind(this)));
 
     gulpInst.task(this.PREFIX_NM + 'reset-all', gulpInst.series(
-        this._load_mod.bind(this), 
-        this.reset_all.bind(this), 
+        this._load_mod.bind(this),
+        this.reset_all.bind(this),
         this.PREFIX_NM + 'reset'));
 
     gulpInst.task(this.PREFIX_NM + 'reset-sub', gulpInst.series(
-        this._load_mod.bind(this), 
-        this.reset_sub.bind(this), 
+        this._load_mod.bind(this),
+        this.reset_sub.bind(this),
         this.PREFIX_NM + 'reset'));
 
     gulpInst.task(this.PREFIX_NM + 'preinstall', gulpInst.series(
@@ -553,3 +548,6 @@ AutoInstance.prototype.copyDest = function(arr, mod) {
         });
     });        
 };
+
+
+module.exports = AutoInstance;

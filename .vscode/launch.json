@@ -4,132 +4,6 @@
     // 자세한 내용을 보려면 https://go.microsoft.com/fwlink/?linkid=830387을(를) 방문하세요.
     "version": "0.2.0",
     "configurations": [
-
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Gulp default",
-            "program": "${workspaceFolder}/node_modules/gulp/bin/gulp.js",
-            "args": [
-                "default"
-            ]
-        },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Gulp template",
-            "program": "${workspaceFolder}/node_modules/gulp/bin/gulp.js",
-            "args": [
-                "template"
-            ]
-        },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Gulp preinstall",
-            "program": "${workspaceFolder}/node_modules/gulp/bin/gulp.js",
-            "args": [
-                "preinstall"
-            ]
-        },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Gulp install",
-            "program": "${workspaceFolder}/node_modules/gulp/bin/gulp.js",
-            "args": [
-                "install"
-            ]
-        },        
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "i Gulp reset",
-            "program": "${workspaceFolder}/node_modules/gulp/bin/gulp.js",
-            "args": [
-                "reset",
-                "--gulpfile",
-                "i_gulpfile.js"
-            ]
-        },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "i Gulp reset-all",
-            "program": "${workspaceFolder}/node_modules/gulp/bin/gulp.js",
-            "args": [
-                "reset-all",
-                "--gulpfile",
-                "i_gulpfile.js"
-            ]
-        },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "i Gulp reset-sub",
-            "program": "${workspaceFolder}/node_modules/gulp/bin/gulp.js",
-            "args": [
-                "reset-sub",
-                "--gulpfile",
-                "i_gulpfile.js"
-            ]
-        },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "i Gulp update",
-            "program": "${workspaceFolder}/node_modules/gulp/bin/gulp.js",
-            "args": [
-                "update",
-                "--gulpfile",
-                "i_gulpfile.js"
-            ]
-        },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "i Gulp preinstall",
-            "program": "${workspaceFolder}/node_modules/gulp/bin/gulp.js",
-            "args": [
-                "preinstall",
-                "--gulpfile",
-                "i_gulpfile.js"
-            ]
-        },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "i Gulp install",
-            "program": "${workspaceFolder}/node_modules/gulp/bin/gulp.js",
-            "args": [
-                "install",
-                "--gulpfile",
-                "i_gulpfile.js"
-            ]
-        },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "i Gulp default",
-            "program": "${workspaceFolder}/node_modules/gulp/bin/gulp.js",
-            "args": [
-                "default",
-                "--gulpfile",
-                "i_gulpfile.js",
-                "-S",
-            ]
-        },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "t Gulp template",
-            "program": "${workspaceFolder}/node_modules/gulp/bin/gulp.js",
-            "args": [
-                "template",
-                "--gulpfile",
-                "t_gulpfile.js"
-            ]
-        },
         {
             "type": "node",
             "request": "launch",
@@ -139,15 +13,8 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "index.1",
-            "program": "${workspaceFolder}/index.1.js"
-        },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "AutoTemplate",
-            "program": "${workspaceFolder}/AutoTemplate.js"
+            "name": "test load",
+            "program": "${workspaceFolder}/test/load.js"
         }
-        
     ]
 }
