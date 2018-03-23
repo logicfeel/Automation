@@ -17,7 +17,7 @@
     - .sql 파일 FN, SP, Table 폴더별 분리 저장 
     - ALTER 문
 
-2. 소스 가공
+2. 소스 가공 
     - ALTER >> CREATE 문으로 교체
     - FN | SP | Table 별 파일 생성
         + 내부 ALTER >> CREATE 문으로 교체
