@@ -1,8 +1,0 @@
-{
-	"@mod-c/asp_common": [
-		{
-			"src": "node_modules/@mod-c/asp_common/dist/Common_Fnc.asp",
-			"dest": "install/Common_Fnc.asp"
-		}
-	]
-}
