@@ -29,7 +29,7 @@
             * NPM명.Table.sql
     - 통합 파일 생성
         + 내부 ALTER >> CREATE 문으로 교체
-        + 타입별 파일 합침 
+        + 타입별 파일 합침  
         + 폴더 : /dest           
         + 파일명 : NPM명.sql
     - 템플릿 적용 (handlebars )  .hbs       TODO :
