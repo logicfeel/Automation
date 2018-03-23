@@ -1,19 +1,14 @@
 {
-  "name": "master",
+  "name": "@mod-m/test_automodmodel",
   "version": "1.0.0",
-  "description": "- gulp 를 활용",
+  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/logicfeel/Automation.git"
-  },
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/logicfeel/Automation/issues"
-  },
-  "homepage": "https://github.com/logicfeel/Automation#readme"
+  "devDependencies": {
+    "r.0.1-auto-mod-model": "git+https://github.com/logicfeel/Automation.git#r.0.1-auto-mod-model"
+  }
 }
