@@ -107,12 +107,18 @@ AutoTempalte.prototype._pushMod = function(pTarget, pPattern, pReg) {
     
     var _arr = [];
     var parName = '';
+    var _this = this;
+    var _base;
+    var _dir;
 
     _arr = glob.sync(pPattern);
 
     _arr.forEach(function(value, index, arr){
         parName = value.replace(pReg[0], pReg[1]);
-        pTarget.pushAttr(require('./' + value), parName);
+        _base = _this._AutoBase.PATH['base'];
+        _dir = path.relative(__dirname, _base);
+        _dir = _dir =! '' ? _dir + '/' : _dir;
+        pTarget.pushAttr(require(_dir + value), parName);
     });
 };
 
