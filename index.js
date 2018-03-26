@@ -20,6 +20,6 @@ AutoClass.prototype.getDirname = function() {
 
 module.exports = {
     AutoClass: AutoClass,
-    TemplateClass: TemplateClass,
+    TemplateClass: TemplateClass
     // auto: new AutoClass()       // 인스턴스
 };

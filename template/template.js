@@ -18,8 +18,8 @@ TemplateClass.prototype.init = function() {
 
     // this.setPart_su_sub('제목이요' , '작성자요');
     
-    this.src['pages/page-one.html'].compile({private:"PRI.."});
-    this.src['testTemplate.sql'].compile({private:"PRI.."});
+    // this.src['pages/page-one.html'].compile({private:"PRI.."});
+    // this.src['testTemplate.sql'].compile({private:"PRI.."});
 
     // 작동함
     // this.src['testTemplate.sql'].partials('auto_i_module.json');

@@ -12,7 +12,7 @@
 		}
 	],
 	"engines": {
-		"type": "auto-mod-c",
+		"type": "auto-mod-m",
 		"version": "1.x.x"
 	},
 	"obj_name": "DB_OBJ",
