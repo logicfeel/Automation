@@ -1,16 +1,5 @@
 {
-	"_replace": [
-		{
-			"src": "@compile\\testTemplate.sql",
-			"string": "SELECT sstory40.MnAuth_FN_AuthChk('1')",
-			"replacement": "SELECT DB_OBJ.MnAuth_FN_AuthChk('1')"
-		},
-		{
-			"src": "@compile\\testTemplate.sql",
-			"string": "SELECT sstory40.MnAuth_FN_AuthChk('777')",
-			"replacement": "SELECT DB_OBJ.MnAuth_FN_AuthChk('777')"
-		}
-	],
+	"_replace": [],
 	"engines": {
 		"type": "auto-mod-m",
 		"version": "1.x.x"

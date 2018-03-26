@@ -35,6 +35,19 @@ TemplateClass.prototype.init = function() {
 
     // 이후 테스트 
     // this.src.push('inner.asp.hbs');
+    // this.src.pushAttr(require(new TemplateSource(this, 'src기준경로', '코드')), parName);
+    
+    // this.src.add('test/testTemplate.sql');
+    this.part.add('dy_1', '내용');
+    /**
+     * 경로에 파일 없으면 예외 처리도 함? => X
+     * 경로의 파일 생성함 타입별...
+     * src, template 는 생성
+     *  - 초기 삽입
+     *  - setter 이용시 복사됨
+     */
+    // this.src.push('기준경로');
+    
     // this.src['inner.asp.hbs'] = this.template['publish_test.asp.hbs'];
 
     console.log(':::::::::::::');
