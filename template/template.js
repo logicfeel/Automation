@@ -38,7 +38,7 @@ TemplateClass.prototype.init = function() {
     // this.src.pushAttr(require(new TemplateSource(this, 'src기준경로', '코드')), parName);
     
     // this.src.add('test/testTemplate.sql');
-    this.part.add('dy_1', '내용');
+    this.part.add('dy_1.txt', '내용');
     /**
      * 경로에 파일 없으면 예외 처리도 함? => X
      * 경로의 파일 생성함 타입별...
