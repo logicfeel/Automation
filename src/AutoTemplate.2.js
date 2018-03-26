@@ -67,17 +67,17 @@ LArray.prototype.add = function(pAttr, pContent) {
 
         // add 파일 생성 (기본파일 생성함)
         // mkdirp.sync(path.dirname(savePath + _dirname ));
-        mkdirp.sync(pathInfo.saveDir);
+        mkdirp.sync(pathInfo.savePath);
 
         // if (this._SCOPE === 'src' || this._SCOPE === 'template') {
         //     fs.writeFileSync(_savefile, pContent);    // TODO: 상위 속성으로 변경
         // } else if (this._SCOPE === 'part') {
         //     fs.writeFileSync(_savefile, pContent);   // TODO: 상위 속성으로 변경
         // }
-        fs.writeFileSync(pathInfo.savePath, pContent);   // TODO: 상위 속성으로 변경
+        fs.writeFileSync(pathInfo.saveFile, pContent);   // TODO: 상위 속성으로 변경
 
         this.pushAttr(
-            new TemplateSource(this._this, pathInfo.savePath),
+            new TemplateSource(this._this, pathInfo.saveFile),
             pathInfo.attrName,
             null,                       // Getter
             function(pIdx, newValue) {  // Setter
@@ -91,7 +91,7 @@ LArray.prototype.add = function(pAttr, pContent) {
     
                 // 저장 폴더가 없는 경우 생성
                 // mkdirp.sync(path.dirname(destPath));
-                copyFileSync(newValue.path, pathInfo.savePath);
+                copyFileSync(newValue.path, pathInfo.saveFile);
                 // console.log('::: > 임시 파일 복사..');
             }
         );
@@ -149,7 +149,7 @@ LArray.prototype.load = function(pPath) {
         // }
 
         this.pushAttr(
-            new TemplateSource(this._this, pathInfo.loadPath),
+            new TemplateSource(this._this, pathInfo.loadFile),
             pathInfo.attrName,
             null,                       // Getter
             function(pIdx, newValue) {  // Setter
@@ -161,7 +161,7 @@ LArray.prototype.load = function(pPath) {
                 // 저장 폴더가 없는 경우 생성
                 // mkdirp.sync(path.dirname(destPath));
                 // copyFileSync(newValue.path, destPath);
-                copyFileSync(newValue.path, pathInfo.savePath);
+                copyFileSync(newValue.path, pathInfo.saveFile);
                 // console.log('::: > 임시 파일 복사..');
             }
         ); 
@@ -297,68 +297,75 @@ AutoTempalte.prototype._getPathInfo = function(scope, pPath) {
     var AutoBase = this._AutoBase;
     var pathBase = AutoBase.PATH.base;    
     var _attrName;
-    var _relativeDir;
-    var _saveDir = '';
+    var _fileName;
+    var _dirname;   // TODO: 대소문자 통일
+    var _this = this;
+    var _savePath = '';
+    
     var _prefix = '';
     var _reg_exp = this.REG_EXP[scope];     // TODO scope 값  6개 중 검사
-    var _savePath; 
-    var _loadPath;
-    var _saveFile;
+    var _saveFile; 
     var _loadFile;
+    // var _obj;
 
     _attrName = pPath.replace(_reg_exp[0], _reg_exp[1]);
-    _relativeDir  = path.dirname(_attrName);
-    _relativeDir  = _relativeDir === '.' ? '' : _relativeDir;   // 현재 디렉토리 일 경우 
-    _relativeDir  = _relativeDir != '' ? _relativeDir + '/' : _relativeDir;
-    _loadFile = path.basename(_attrName) + '.hbs';
+    _dirname  = path.dirname(_attrName);
+    _dirname  = _dirname === '.' ? '' : _dirname;   // 현재 디렉토리 일 경우 
+    _dirname  = _dirname != '' ? _dirname + '/' : _dirname;
+    _fileName = path.basename(_attrName) + '.hbs';
+
 
     switch(scope) {
         case 'src':
-            _saveDir = pathBase + AutoBase.PATH.src + _relativeDir;
-            _prefix = '@';      //(__) 규칙
+            _savePath = pathBase + AutoBase.PATH.src + _dirname ;
+            _saveFile = _savePath + '@' + _fileName;
+            _prefix = '_';      //(__) 규칙
             break;
 
         case 'template':
-            _saveDir = pathBase + AutoBase.PATH.template_page + _relativeDir;
-            _prefix = '@';      //(__) 규칙
+            _savePath = pathBase + AutoBase.PATH.template_page + _dirname ;
+            _saveFile = _savePath + '@' + _fileName;
+            _prefix = '_';      //(__) 규칙
             break;
 
         case 'part':
-            _saveDir = pathBase + AutoBase.PATH.template_part + _relativeDir;
-            _prefix = '__';      //(__) 규칙
+            _savePath = pathBase + AutoBase.PATH.template_part + _dirname ;
+            _saveFile = _savePath + '__' + _fileName;
+            _prefix = '_';      //(__) 규칙
             break;
 
         case 'data':
-            _saveDir = pathBase + 'template/data/' + _relativeDir ;    // TODO : 전역설정에 추가
-            _prefix = '__';      //(__) 규칙
+            _savePath = pathBase + 'template/data/' + _dirname ;    // TODO : 전역설정에 추가
+            _saveFile = _savePath + '__' + _fileName;
+            _prefix = '_';      //(__) 규칙
             break;
 
         case 'helper':
-            _saveDir = pathBase + 'template/helpers/' + _relativeDir ; // TODO : 전역설정에 추가
-            _prefix = '__';      //(__) 규칙
+            _savePath = pathBase + 'template/helpers/' + _dirname ; // TODO : 전역설정에 추가
+            _saveFile = _savePath + '__' + _fileName;
+            _prefix = '_';      //(__) 규칙
             break;
 
         case 'decorator':
-            _saveDir = pathBase + 'template/decorators/' + _relativeDir ;  // TODO : 전역설정에 추가
-            _prefix = '__';      //(__) 규칙
+            _savePath = pathBase + 'template/decorators/' + _dirname ;  // TODO : 전역설정에 추가
+            _saveFile = _savePath + '__' + _fileName;
+            _prefix = '_';      //(__) 규칙
             break;
            
         default:
-            _saveDir = '';
-            _prefix = '__';      //(__) 규칙
+            _savePath = '';
+            _saveFile = _savePath + '__' + _fileName;
+            _prefix = '_';      //(__) 규칙
     }
 
-    _saveFile = _prefix + _loadFile;
-    _savePath = _saveDir + _saveFile;
-    _loadPath = _saveDir + _loadFile;
+    _loadFile = _savePath + _fileName;
 
     return  {
-        saveDir: _saveDir,
-        attrName: _attrName,
         savePath: _savePath,
-        loadPath: _loadPath,
-        saveFile: '',
-        loadFile: ''
+        saveFile: _saveFile,
+        attrName: _attrName,
+        loadFile: _loadFile
+
     }
 };
 
@@ -433,26 +440,26 @@ TemplateSource.prototype.compile = function(data) {
     // var compilePath = '@compile';
     var AutoBase = this._AutoTemplate._AutoBase;
     var pathBase = AutoBase.PATH.base;
-    var _saveDir = '';
+    var _savePath = '';
     var _this = this;
     var _dirname;
 
     // TODO: pCode 추소 검토 그리고 코드 값 this.AutoBase 참조 방식으로 변경
     if (this.code == 'src') {
-        // _saveDir = 'src/';
-        _saveDir = AutoBase.PATH['src'];
+        // _savePath = 'src/';
+        _savePath = AutoBase.PATH['src'];
     } else if  (this.code == 'part') {
-        // _saveDir = 'template/parts/';
-        _saveDir = AutoBase.PATH['template_part'];
+        // _savePath = 'template/parts/';
+        _savePath = AutoBase.PATH['template_part'];
     } else if  (this.code == 'template') {
-        // _saveDir = 'template/';
-        _saveDir = AutoBase.PATH['template_page'];
+        // _savePath = 'template/';
+        _savePath = AutoBase.PATH['template_page'];
     }
     
     // REVIEW: path 도 상대주소로 가져와야 할지?
-    _dirname = path.relative(_saveDir, path.dirname(this.path));
+    _dirname = path.relative(_savePath, path.dirname(this.path));
     _dirname = _dirname ? _dirname + '/' : '';
-    _saveDir = _saveDir + AutoBase.PATH['compile'] + _dirname;
+    _savePath = _savePath + AutoBase.PATH['compile'] + _dirname;
 
     // REVIEW: 파라메터 값을로 읽어와야 함 
     return gulp.src(this.path)
@@ -473,7 +480,7 @@ TemplateSource.prototype.compile = function(data) {
             .data(_this._data)
         )
         .pipe(rename({extname: ''}))                            // 파일명.확장자.hbs
-        .pipe(gulp.dest(pathBase + _saveDir)
+        .pipe(gulp.dest(pathBase + _savePath)
     );
 };
 
