@@ -302,7 +302,8 @@ AutoBase.prototype.getTemplateObj = function getTemplateObj() {
     // gulp-hp 전달 객체 조립 
     for(i = 0 ; this.TMP && i < this.TMP.part.length; i++) {
         _dirname = path.dirname(path.relative(this.PATH['template_part'], this.TMP.part[i].path));
-        _dirname = _dirname =! '' ? _dirname + '/' : _dirname;
+        _dirname  = _dirname === '.' ? '' : _dirname;   // 현재 디렉토리 일 경우 
+        _dirname  = _dirname != '' ? _dirname + '/' : _dirname;
         _basename =  path.basename(this.TMP.part[i].path, this.PATT_TEMP['ext']);  // 확장자 제거(.hbs)
         
         _parts[_dirname + _basename] = this.TMP.part[i].content.toString();
