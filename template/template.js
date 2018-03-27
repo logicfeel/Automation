@@ -37,8 +37,16 @@ TemplateClass.prototype.init = function() {
     // this.src.push('inner.asp.hbs');
     // this.src.pushAttr(require(new TemplateSource(this, 'src기준경로', '코드')), parName);
     
-    // this.src.add('test/testTemplate.sql');
+    // 파일 추가
     this.part.add('dy_1.txt', '내용');
+
+    // 파일 추가
+    this.page.add('dy_2.txt', '템플릿 내용');
+
+    // 파일 추가
+    // this.src.add('dy_3.txt', '템플릿 내용');
+    
+    
     /**
      * 경로에 파일 없으면 예외 처리도 함? => X
      * 경로의 파일 생성함 타입별...
@@ -50,13 +58,13 @@ TemplateClass.prototype.init = function() {
     
     // this.src['inner.asp.hbs'] = this.template['publish_test.asp.hbs'];
 
-    console.log(':::::::::::::');
+    // console.log(':::::::::::::');
 };
 
 // 추상메소드 >> 오버라이딩 
 TemplateClass.prototype.before_template = function() {
-    // console.log('TemplateClass.prototype.before_template');
-    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
+    console.log('TemplateClass.prototype.before_template');
+    // console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
 };
 
 
