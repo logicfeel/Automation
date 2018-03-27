@@ -36,7 +36,7 @@ gulp.task('default', ['handlebar']);           // 핸들바
 gulp.task('handlebar', function () {
     return gulp.src('./src/pages/*.hbs')
         .pipe(hb({debug: true})
-            .partials('./src/partials/**/*.hbs')
+            .partials('./src/partials/**/*.{hbs,js}')
             .partials({
                 far: '정의에서 부분 삽입',
                 // pa: './src/partials/includes/hero.1.hbs' // 파일명을 가져오지는 못함
