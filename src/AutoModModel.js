@@ -1,7 +1,5 @@
 'use strict';
 
-
-
 var util            = require('util');
 var gulp            = require('gulp');  // gulp 4.0 기준
 var DefaultRegistry = require('undertaker-registry');
