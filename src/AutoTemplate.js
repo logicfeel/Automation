@@ -28,7 +28,7 @@ LArray.prototype.add = function(pPath, pContent) {
     var pathInfo = this._this._getPathInfo(this._SCOPE, pPath);
     var _obj, _obj1, _obj2;
 
-    if (this._SCOPE === 'src' || this._SCOPE === 'template' || this._SCOPE === 'part') {
+    if (this._SCOPE === 'src' || this._SCOPE === 'page' || this._SCOPE === 'part') {
 
         this.pushAttr(
             new TemplateSource(this._this, pathInfo.loadPath, pathInfo, pContent),
@@ -135,7 +135,7 @@ AutoTempalte.prototype._getPathInfo = function(scope, pPath) {
             _prefix = '@';      //(__) 규칙
             break;
 
-        case 'template':
+        case 'page':
             _saveDir = pathBase + AutoBase.PATH.template_page + _relativeDir;
             _prefix = '@';      //(__) 규칙
             break;
