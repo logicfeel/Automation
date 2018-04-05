@@ -15,6 +15,12 @@
             "request": "launch",
             "name": "test load",
             "program": "${workspaceFolder}/test/load.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "test template",
+            "program": "${workspaceFolder}/template/index.js"
         }
     ]
 }
