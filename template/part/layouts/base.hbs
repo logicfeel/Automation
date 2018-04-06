@@ -1,0 +1,36 @@
+{{!-- layouts/base.hbs --}}
+<!doctype html>
+<html>
+  <head>
+    <title>
+      {{#if title}}
+        {{title}}
+      {{else}}
+        Base Page Title (title 입력 없음)
+      {{/if}}
+    </title>
+    <link rel="stylesheet" href="main.css">
+    {{#> head-block}}
+      {{!-- Custom <head> content per page could be added. --}}
+    {{/head-block}}
+  </head>
+  <body>
+    {{#> hero-block}}
+      {{!-- Hero content goes here. --}}
+    {{/hero-block}}
+
+    <footer>
+      {{#> footer-block}}
+        {{!--
+          The `includes/footer` partial is the default content,
+          but can be overridden.
+        --}}
+        {{> includes/footer }}
+      {{/footer-block}}
+    </footer>
+
+    {{#> scripts-block}}
+      {{!-- Custom scripts per page can be added. --}}
+    {{/scripts-block}}
+  </body>
+</html>

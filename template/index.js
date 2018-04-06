@@ -1,8 +1,11 @@
 'use strict';
 
-var AutoTemplate        = require('./AutoTemplate');
-var TemplateCollection  = require('./TemplateCollection');
-var TemplateSource      = require('./TemplateSource');
+var handlebars      = require('handlebars');
+var handlebarsWax   = require('handlebars-wax');
+var fs              = require('fs');
+var path            = require('path');
+
+var AutoTemplate    = require('./AutoTemplate');
 
 function AutoBase() {
 
@@ -28,7 +31,7 @@ function AutoBase() {
 
     
     this.PATH = {
-        base: _base,
+        base: '',
         nodes: 'node_modules/',
         // module: '../**/@mod*/',
         // i_module: '../**/@instance/',
@@ -44,5 +47,112 @@ function AutoBase() {
     this.TMP = new AutoTemplate(this);
 
 }
+
+AutoBase.prototype._template_publish = function _template_publish(cb) {
+
+    // var hbObj = this.getTemplateObj();
+
+    var hbObj = this.TMP._public.getTemplateInfo();
+
+    // // TODO: 아래 부분이 중복됨
+    // return gulp.src(this.PATH['base']  + this.PATT_GLOB['page'])
+    //     .pipe(hb({debug: this.LOG['debug']})
+    //         .partials(hbObj.part)
+    //         .helpers(hbObj.helper)
+    //         .decorators(hbObj.decorator)
+    //         .data(hbObj.data)
+    //         .data(this.PATH['base'] + this.FILE['PKG'])               // 패키지 정보
+    //         .data(this.PATH['base'] + this.FILE['CFG'])               // 설정 정보 (auto_module.json)
+    //     )
+    //     .pipe(rename({extname: ''}))                            // 파일명.확장자.hbs
+    //     .pipe(gulp.dest(this.PATH['base'] + this.PATT_GLOB['dist'])
+    // );
+    // var content = fs.readFileSync(pPath);
+
+
+    for(var i = 0; i < this.TMP.page.length; i++) {
+
+        var hb = handlebars.create();
+        var wax = handlebarsWax(hb);
+
+        // 전역
+        wax.partials(hbObj.part);
+        wax.helpers(hbObj.helpers);
+        wax.decorators(hbObj.decorator);
+        wax.data(hbObj.data);
+   
+        // 지역
+        wax.partials(this.TMP.page[i]._part);
+        wax.helpers(this.TMP.page[i]._helper);
+        wax.decorators(this.TMP.page[i]._decorator);
+        wax.data(this.TMP.page[i]._data);
+
+        var template = wax.compile(this.TMP.page[i].content);
+        
+        console.log(template());
+    }
+
+
+
+
+    // var h = Handlebars.create();
+    // // 전역, 지역
+    // h.registerPartial();    
+    // h.registerHelper();
+
+    // data 는 병합
+    // var template = wax.compile('{{>ccc}} {{lorem}} {{ipsum}} {{>ccc}}');
+    // // var template = h.compile('abc {{foo}} aaa');
+    // var result = template({foo: "VVV"});
+    // fs.writeFileSync(this.pathInfo.savePath, result);   // TODO: 상위 속성으로 변경
+
+
+};
+
+// AutoBase.prototype.getTemplateObj = function getTemplateObj() {
+    
+//     var i = 0;
+//     var _part = {};
+//     var _helper = {};
+//     var _decorator = {};
+//     var _data = {};
+//     var _propName = '';
+//     var _dirname = '';
+//     var _basename = ''
+
+//     // gulp-hp 전달 객체 조립 
+//     for(i = 0 ; this.TMP && i < this.TMP.part.length; i++) {
+//         _dirname = path.dirname(path.relative(this.PATH['template_part'], this.TMP.part[i].path));
+//         _dirname  = _dirname === '.' ? '' : _dirname;   // 현재 디렉토리 일 경우 
+//         _dirname  = _dirname != '' ? _dirname + '/' : _dirname;
+//         _basename =  path.basename(this.TMP.part[i].path, this.PATT_GLOB['ext']);  // 확장자 제거(.hbs)
+        
+//         _part[_dirname + _basename] = this.TMP.part[i].content.toString();
+//     }
+
+//     // REVEIW: 아래 문법이 무난? 검토 _helper = this.TMP ? Object.assign({}, this.TMP.helper.slice(0, this.TMP.helper.length - 1)) : {};
+//     for(i = 0 ; this.TMP && i < this.TMP.helper.length; i++) {
+//         _helper = Object.assign(_helper, this.TMP.helper[i]);
+//     }
+
+//     for(i = 0 ; this.TMP && i < this.TMP.decorator.length; i++) {
+//         _decorator = Object.assign(_decorator, this.TMP.decorator[i]);
+//     }
+
+//     for(i = 0 ; this.TMP && i < this.TMP.data.length; i++) {
+//         _data = Object.assign(_data, this.TMP.data[i]);
+//     }
+//     return {
+//         part: _part,
+//         helper: _helper,
+//         decorator: _decorator,
+//         data: _data
+//     }
+// };
+
+
+var auto = new AutoBase();
+
+auto._template_publish();
 
 console.log('End');

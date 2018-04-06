@@ -1,0 +1,16 @@
+{{!-- pages/page-one.hbs --}}
+...{{package.name}}...
+전달변수 :{{private}}
+{{#> layouts/base title="Page One" }}
+
+  {{#*inline "hero-block"}}
+    {{> includes/hero
+      hero-src="img/hero-1.png"
+      hero-alt="Hero 1 alt title"
+    }}
+  {{/inline}}
+
+{{/layouts/base}}
+
+
+

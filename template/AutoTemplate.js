@@ -2,94 +2,74 @@
 
 var EventEmitter        = require('events').EventEmitter;
 var util                = require('util');
-var TemplateCollection  = require('./TemplateCollection');
+var PublicCollection    = require('./');
+var LocalCollection     = require('./LocalCollection');
 var TemplateSource      = require('./TemplateSource');
+var BaseTemplate        = require('./BaseTemplate');
 
 
 function AutoTempalte(pAutoBase) {
     EventEmitter.call(this);
     
-    this._AutoBase  = pAutoBase;
-    
-    // 기본 템플릿소스
-    this._base      = new TemplateSource(this);
+    var autoBase = pAutoBase;
 
-    this.src      = new TemplateCollection(this);
-    this.page      = new TemplateCollection(this);
+    this._AutoBase  = autoBase;
     
+    this._base      = new BaseTemplate(this);
+    this._public    = this._base;
+    this.src        = new LocalCollection('src', this);
+    this.page       = new LocalCollection('page', this);
+    
+    this.src.pushPattern(autoBase.PATT_GLOB['src']);
+    this.page.pushPattern(autoBase.PATT_GLOB['page']);
+
+    // 참조 연결
+    this.data       = this._base.data;
+    this.decorator  = this._base.decorator;
+    this.helper     = this._base.helper;
+    this.part       = this._base.part;
 }
 util.inherits(AutoTempalte, EventEmitter);
 
 
-AutoTempalte.prototype.getPathInfo = function(scope, pPath) {
-
-    var AutoBase = this._AutoBase;
-    var pathBase = AutoBase.PATH.base;    
-    var _reg_exp = this.REG_EXP[scope];     // TODO scope 값  6개 중 검사
-    var _attrName;
-    var _prefix;
-    var _relativeDir;
-    var _saveDir;
-    var _savePath;
-    var _loadPath;
-    var _saveFile;
-    var _loadFile;
-
-    _attrName = pPath.replace(_reg_exp[0], _reg_exp[1]);
-    _relativeDir  = path.dirname(_attrName);
-    _relativeDir  = _relativeDir === '.' ? '' : _relativeDir;   // 현재 디렉토리 일 경우 
-    _relativeDir  = _relativeDir != '' ? _relativeDir + '/' : _relativeDir;
-    _loadFile = path.basename(_attrName) + '.hbs';
-
-    switch(scope) {
-        case 'src':
-            _saveDir = pathBase + AutoBase.PATH.src + _relativeDir;
-            _prefix = '@';      //(__) 규칙
-            break;
-
-        case 'page':
-            _saveDir = pathBase + AutoBase.PATH.template_page + _relativeDir;
-            _prefix = '@';      //(__) 규칙
-            break;
-
-        case 'part':
-            _saveDir = pathBase + AutoBase.PATH.template_part + _relativeDir;
-            _prefix = '__';      //(__) 규칙
-            break;
-
-        case 'data':
-            _saveDir = pathBase + 'template/data/' + _relativeDir ;    // TODO : 전역설정에 추가
-            _prefix = '__';      //(__) 규칙
-            break;
-
-        case 'helper':
-            _saveDir = pathBase + 'template/helper/' + _relativeDir ; // TODO : 전역설정에 추가
-            _prefix = '__';      //(__) 규칙
-            break;
-
-        case 'decorator':
-            _saveDir = pathBase + 'template/decorator/' + _relativeDir ;  // TODO : 전역설정에 추가
-            _prefix = '__';      //(__) 규칙
-            break;
-           
-        default:
-            _saveDir = '';
-            _prefix = '__';      //(__) 규칙
-    }
-    
-    // src, tempalte 의 재컴파일시
-    // if (_loadFile.indexOf("@") > 0) _prefix = '';
-
-    _saveFile = _prefix + _loadFile;
-    _savePath = _saveDir + _saveFile;
-    _loadPath = _saveDir + _loadFile;
-
-    return  {
-        saveDir: _saveDir,
-        attrName: _attrName,
-        savePath: _savePath,
-        loadPath: _loadPath,
-        saveFile: '',
-        loadFile: ''
-    };
+AutoTempalte.prototype.init = function() {
+    // 추상 메소드
 };
+
+/**
+ * 템플릿 처리전에 실행 
+ * i : update >> preinstall >> (실행) >> template-all >> install
+ * m : preinstall >> install >> (실행) >> template
+ */
+AutoTempalte.prototype.before_template = function() {
+    // 추상 메소드
+};
+
+AutoTempalte.prototype.import = function(pModName, pPublic) {
+    
+    if (pPublic) this._public = pPublic;
+    
+    // TODO: 없을시 예외 처리
+    return this._AutoBase.MOD[pModName];
+};
+
+
+/**
+ * gulp 오류 출력
+ * TODO: 위치 조정
+ * @param {*} errName 오류 구분 명칭
+ * @param {*} message 오류 메세지
+ */
+function gulpError(message, errName) {
+    // 제사한 오류 출력
+    // if (this.ERR_LEVEL === 1) {
+    //     throw new gutil.PluginError({
+    //         plugin: errName,
+    //         message: message
+    //     });                
+    // } else {
+        throw new Error(message);
+    // }
+}
+
+module.exports = AutoTempalte;
