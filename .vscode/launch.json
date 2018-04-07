@@ -19,8 +19,14 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "test template",
+            "name": "auto template",
             "program": "${workspaceFolder}/template/index.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "base template",
+            "program": "${workspaceFolder}/template/base.js"
         }
     ]
 }

@@ -4,12 +4,12 @@ var util                = require('util');
 var path                = require('path');
 var LArray              = require('larray');
 
-var AutoTemplate        = require('./AutoTemplate');
+var AutoTemplate        = require('./BaseTemplate');
 
 
-function TemplateSource(pAutoTemplate, pPath, pContent) {
+function TemplateSource(pBaseTemplate, pPath, pContent) {
 
-    this._AutoTemplate = pAutoTemplate;
+    this._BaseTemplate = pBaseTemplate;
     
     this._part = null;
     this._data = null;
@@ -47,7 +47,7 @@ TemplateSource.prototype.compile = function(pData) {
 
     // var args = Array.prototype.slice.call(arguments);
     // var compilePath = '@compile';
-    var AutoBase = this._AutoTemplate._AutoBase;
+    var AutoBase = this._BaseTemplate._AutoBase;
     var pathBase = AutoBase.PATH.base;
     var _saveDir = '';
     var _this = this;

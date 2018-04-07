@@ -6,11 +6,11 @@ var path                = require('path');
 var LArray              = require('larray');
 
 
-function BaseCollection(pAttr, pAutoTemplate) {
+function BaseCollection(pAttr, pBaseTemplate) {
     LArray.call(this, pAttr);
 
     // TODO: 타입 검사
-    this._AutoBase  = pAutoTemplate._AutoBase;
+    this._BaseTemplate  = pBaseTemplate;
     this._SCOPE     = pAttr;
 
     // [0] 정규식, [1] 캡쳐번호
@@ -32,8 +32,8 @@ BaseCollection.prototype.add = function(pAttr, pContent) {
 
 BaseCollection.prototype.getPathInfo = function(pScope, pPath) {
 
-    var autoBase = this._AutoBase;
-    var pathBase = autoBase.PATH.base;    
+    var baseTemplate = this._BaseTemplate;
+    var pathBase = baseTemplate.PATH.base;    
     var _reg_exp = this.REG_EXP[pScope];     // TODO scope 값  6개 중 검사
     var _attrName;
     var _prefix;
@@ -52,17 +52,17 @@ BaseCollection.prototype.getPathInfo = function(pScope, pPath) {
 
     switch(pScope) {
         case 'src':
-            _saveDir = pathBase + autoBase.PATH.src + _relativeDir;
+            _saveDir = pathBase + baseTemplate.PATH.src + _relativeDir;
             _prefix = '@';      //(__) 규칙
             break;
 
-        case 'page':
-            _saveDir = pathBase + autoBase.PATH.template_page + _relativeDir;
+        case 'page':    // TODO: 별도 분리 필요
+            _saveDir = pathBase + baseTemplate.PATH.template_page + _relativeDir;
             _prefix = '@';      //(__) 규칙
             break;
 
         case 'part':
-            _saveDir = pathBase + autoBase.PATH.template_part + _relativeDir;
+            _saveDir = pathBase + baseTemplate.PATH.template_part + _relativeDir;
             _prefix = '__';      //(__) 규칙
             break;
 

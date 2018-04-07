@@ -1,39 +1,36 @@
 'use strict';
 
-var EventEmitter        = require('events').EventEmitter;
 var util                = require('util');
-var PublicCollection    = require('./');
+var PublicCollection    = require('./PublicCollection');
 var LocalCollection     = require('./LocalCollection');
 var TemplateSource      = require('./TemplateSource');
 var BaseTemplate        = require('./BaseTemplate');
 
 
-function AutoTempalte(pAutoBase) {
-    EventEmitter.call(this);
+function AutoTemplate(pAutoBase) {
+    BaseTemplate.call(this);
     
     var autoBase = pAutoBase;
 
     this._AutoBase  = autoBase;
-    
-    this._base      = new BaseTemplate(this);
-    this._public    = this._base;
-    this.src        = new LocalCollection('src', this);
-    this.page       = new LocalCollection('page', this);
-    
-    this.src.pushPattern(autoBase.PATT_GLOB['src']);
-    this.page.pushPattern(autoBase.PATT_GLOB['page']);
 
-    // 참조 연결
-    this.data       = this._base.data;
-    this.decorator  = this._base.decorator;
-    this.helper     = this._base.helper;
-    this.part       = this._base.part;
+    // 기본 속성 오버라이딩
+    this.PATT_GLOB['page']      = 'template/page/**/!(__*)*.hbs';
+    this.PATT_GLOB['helper']    = 'template/helper/**/!(__*)*.js';
+    this.PATT_GLOB['decorator'] = 'template/decorator/**/!(__*)*.js';
+    this.PATT_GLOB['data']      = 'template/data/**/*.{js,json}';
+    
+    this.PATH['template_page']  = 'page/';
 }
-util.inherits(AutoTempalte, EventEmitter);
+util.inherits(AutoTemplate, BaseTemplate);
 
 
-AutoTempalte.prototype.init = function() {
-    // 추상 메소드
+AutoTemplate.prototype.init = function() {
+    // 상위 메소드 호출 : 데코레이션 패턴
+    BaseTemplate.prototype.init.call(this);
+
+    this.page       = new LocalCollection('page', this);
+    this.page.pushPattern(autoBase.PATT_GLOB['page']);
 };
 
 /**
@@ -41,16 +38,25 @@ AutoTempalte.prototype.init = function() {
  * i : update >> preinstall >> (실행) >> template-all >> install
  * m : preinstall >> install >> (실행) >> template
  */
-AutoTempalte.prototype.before_template = function() {
+AutoTemplate.prototype.before_template = function() {
     // 추상 메소드
 };
 
-AutoTempalte.prototype.import = function(pModName, pPublic) {
+AutoTemplate.prototype.import = function(pModName, pPublic) {
     
     if (pPublic) this._public = pPublic;
     
     // TODO: 없을시 예외 처리
     return this._AutoBase.MOD[pModName];
+};
+
+
+AutoTemplate.prototype.build_src = function() {
+    this.build(this.src);
+};
+
+AutoTemplate.prototype.build_page = function() {
+    this.build(this.page);
 };
 
 
@@ -72,4 +78,4 @@ function gulpError(message, errName) {
     // }
 }
 
-module.exports = AutoTempalte;
+module.exports = AutoTemplate;

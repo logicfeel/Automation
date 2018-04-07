@@ -1,11 +1,11 @@
 'use strict';
 
-var handlebars      = require('handlebars');
-var handlebarsWax   = require('handlebars-wax');
-var fs              = require('fs');
-var path            = require('path');
+var handlebars          = require('handlebars');
+var handlebarsWax       = require('handlebars-wax');
+var fs                  = require('fs');
+var path                = require('path');
 
-var AutoTemplate    = require('./AutoTemplate');
+var AutoTemplate        = require('./AutoTemplate');
 
 function AutoBase() {
 

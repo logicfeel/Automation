@@ -1,71 +1,120 @@
-
 'use strict';
 
-var path            = require('path');
+var EventEmitter        = require('events').EventEmitter;
+var util                = require('util');
+var handlebars          = require('handlebars');
+var handlebarsWax       = require('handlebars-wax');
+var fs                  = require('fs');
 
+var TemplateSource      = require('./TemplateSource');
+var PublicTemplate      = require('./PublicTemplate');
 var PublicCollection    = require('./PublicCollection');
 var LocalCollection     = require('./LocalCollection');
 
-function BaseTempalte(pAutoTemplate) {
-   
-    var autoTemplate = pAutoTemplate;
-    var autoBase = autoTemplate._AutoBase;
+
+function BaseTemplate() {
+    EventEmitter.call(this);
+
+    // 템플릿 패턴
+    this.PATT_GLOB = {
+        ext: '.hbs',                               // 템플릿 파일 확장자
+        dist: 'publish/',                          // 템플릿 배포 폴더 
+        src: 'src/**/!(__*)*.hbs',                 // 일반 배치 소스 (__시작하는 파일은 제외)
+        part: 'part/**/!(__*)*.{hbs,js}',          // partical명 : 파일명
+        helper: 'helper/**/!(__*)*.js',            // helper(메소드)명 : export 객체명
+        decorator: 'decorator/**/!(__*)*.js',      // decorators(메소드)명 : export 객체명            
+        data: 'data/**/*.{js,json}'                // data명 : 파일명.객체명  TODO: data/ 폴더 명 사용 불필요 할듯 이미 구분됨
+    };
+
+    this.PATH = {
+        base: '',
+        map: 'map/',
+        src: 'src/',
+        compile: '@compile/',
+        template: 'template/',
+        template_part: 'part/'
+    };
     
-    this._AutoBase  = autoBase;
-
-    this.data       = new PublicCollection('data', autoTemplate);
-    this.decorator  = new PublicCollection('decorator', autoTemplate);
-    this.helper     = new PublicCollection('helper', autoTemplate);
-    
-    this.part       = new LocalCollection('part', autoTemplate);
-
-    this.data.pushPattern(autoBase.PATT_GLOB['data']);
-    this.decorator.pushPattern(autoBase.PATT_GLOB['decorator']);
-    this.helper.pushPattern(autoBase.PATT_GLOB['helper']);
-
-    this.part.pushPattern(autoBase.PATT_GLOB['part']);
+    this._public    = null;
+    this._base      = null;
+    this.src        = null;
+    this.data       = null;
+    this.decorator  = null;
+    this.helper     = null;
+    this.part       = null;
 }
+util.inherits(BaseTemplate, EventEmitter);
 
-BaseTempalte.prototype.getTemplateInfo = function() {
+BaseTemplate.prototype.init = function() {
+
+    this._base      = new PublicTemplate(this);
+    this._public    = this._base;
+
+    this.src        = new LocalCollection('src', this);
+    this.src.pushPattern(this.PATT_GLOB['src']);
+
+    // 참조 연결
+    this.data       = this._base.data;
+    this.decorator  = this._base.decorator;
+    this.helper     = this._base.helper;
+    this.part       = this._base.part;
+};
+
+BaseTemplate.prototype.import = function(pModName, pPublic) {
     
-    var i = 0;
-    var _part = {};
-    var _helper = {};
-    var _decorator = {};
-    var _data = {};
-    var _propName = '';
-    var _dirname = '';
-    var _basename = '';
-    var autoBase = this._AutoBase;
+    if (pPublic) this._public = pPublic;
+    
+    // TODO: 없을시 예외 처리
+    return this._AutoBase.MOD[pModName];
+};
 
-    // gulp-hp 전달 객체 조립 
-    for(i = 0 ; this && i < this.part.length; i++) {
-        _dirname = path.dirname(path.relative(autoBase.PATH['template_part'], this.part[i].path));
-        _dirname  = _dirname === '.' ? '' : _dirname;   // 현재 디렉토리 일 경우 
-        _dirname  = _dirname != '' ? _dirname + '/' : _dirname;
-        _basename =  path.basename(this.part[i].path, autoBase.PATT_GLOB['ext']);  // 확장자 제거(.hbs)
+BaseTemplate.prototype.build = function(pLocalCollection) {
+
+    var hbObj = this._public.getTemplateInfo();
+
+    // TODO: 타입 검사
+    var local = pLocalCollection ? pLocalCollection : this.src;
+
+    for(var i = 0; i < local.length; i++) {
+
+        var hb = handlebars.create();
+        var wax = handlebarsWax(hb);
+
+        // 전역
+        wax.partials(hbObj.part);
+        wax.helpers(hbObj.helpers);
+        wax.decorators(hbObj.decorator);
+        wax.data(hbObj.data);
+   
+        // 지역
+        wax.partials(local[i]._part);
+        wax.helpers(local[i]._helper);
+        wax.decorators(local[i]._decorator);
+        wax.data(local[i]._data);
+
+        var template = wax.compile(local[i].content);
         
-        _part[_dirname + _basename] = this.part[i].content.toString();
-    }
-
-    // REVEIW: 아래 문법이 무난? 검토 _helper = this ? Object.assign({}, this.helper.slice(0, this.helper.length - 1)) : {};
-    for(i = 0 ; this && i < this.helper.length; i++) {
-        _helper = Object.assign(_helper, this.helper[i]);
-    }
-
-    for(i = 0 ; this && i < this.decorator.length; i++) {
-        _decorator = Object.assign(_decorator, this.decorator[i]);
-    }
-
-    for(i = 0 ; this && i < this.data.length; i++) {
-        _data = Object.assign(_data, this.data[i]);
-    }
-    return {
-        part: _part,
-        helper: _helper,
-        decorator: _decorator,
-        data: _data
+        console.log(template());
     }
 };
 
-module.exports = BaseTempalte;
+
+/**
+ * gulp 오류 출력
+ * TODO: 위치 조정
+ * @param {*} errName 오류 구분 명칭
+ * @param {*} message 오류 메세지
+ */
+function gulpError(message, errName) {
+    // 제사한 오류 출력
+    // if (this.ERR_LEVEL === 1) {
+    //     throw new gutil.PluginError({
+    //         plugin: errName,
+    //         message: message
+    //     });                
+    // } else {
+        throw new Error(message);
+    // }
+}
+
+module.exports = BaseTemplate;
