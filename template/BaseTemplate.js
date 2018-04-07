@@ -26,6 +26,16 @@ function BaseTemplate() {
         data: 'data/**/*.{js,json}'                // data명 : 파일명.객체명  TODO: data/ 폴더 명 사용 불필요 할듯 이미 구분됨
     };
 
+    // [0] 정규식, [1] 캡쳐번호 : 속명명 추출
+    this.REG_EXP = {
+        src:        [/(?:.*src\/)([\w\/\-.@]*)(?:\.hbs)\b/gi, '$1'], 
+        // page:       [/(?:.*template\/page\/)([\w\/\-.@]*)(?:\.hbs)\b/gi, '$1'], 
+        part:       [/(?:.*part\/)([\w\/\-.@]*)(?:\.hbs|\.js)\b/gi, '$1'], 
+        data:       [/(?:.*data\/)([\w\/\-.]*)(?:\.js|\.json)\b/gi, '$1'], 
+        helper:     [/(?:.*helper\/)([\w\/\-.]*)(?:\.js)\b/gi, '$1'], 
+        decorator:  [/(?:.*decorator\/)([\w\/\-.]*)(?:\.js)\b/gi, '$1']
+    };
+
     this.PATH = {
         base: '',
         map: 'map/',
@@ -60,12 +70,14 @@ BaseTemplate.prototype.init = function() {
     this.part       = this._base.part;
 };
 
-BaseTemplate.prototype.import = function(pModName, pPublic) {
+// TODO: pPublic 명칭 적정한 걸로 교체
+BaseTemplate.prototype.import = function(pBaseTemplate, pPublic) {
     
-    if (pPublic) this._public = pPublic;
+    // TODO: 타입검사 BaseTemplate, PublicTemplate
+
+    if (pPublic) pBaseTemplate._public = pPublic._base;
     
-    // TODO: 없을시 예외 처리
-    return this._AutoBase.MOD[pModName];
+    return pBaseTemplate;
 };
 
 BaseTemplate.prototype.build = function(pLocalCollection) {

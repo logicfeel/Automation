@@ -15,15 +15,26 @@ function LocalCollection(pAttr, pAutoTemplate) {
 }
 util.inherits(LocalCollection, BaseCollection);
 
-
-LocalCollection.prototype.add = function(pAttr) {
+/**
+ * 로컬 컬렉션 추가
+ *  - 파일경로를 추가하는 경우
+ *  - 속성명만 추가한 경우
+ *  - 속성명 및 값을 추가하는 경우
+ *  - pContent : LocalCollection 으로 가져온 경우
+ *      + 복사 일어나야 함
+ * @param {*} pAttr 
+ * @param {*} pContent 
+ */
+LocalCollection.prototype.add = function(pAttr, pContent) {
 
     var pathInfo = this.getPathInfo(this._SCOPE, pAttr);
-    var content;
+    var content = '';
+
     try {
         content = fs.readFileSync(pAttr);
     } catch (err) {
         // TODO: 예외 처리
+        content = pContent;
     }
 
     this.pushAttr(
@@ -32,6 +43,12 @@ LocalCollection.prototype.add = function(pAttr) {
         null,                       // Getter
         function(pIdx, newValue) {  // Setter
             this._items[pIdx] = newValue;
+
+            // TODO: 템플릿 소스의 경우 
+            /**
+             * - 파일만 복사할지?
+             * - 속성을 깊게 복사할지..
+             */
             copyFileSync(newValue.path, pathInfo.savePath);
         }
     ); 

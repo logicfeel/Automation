@@ -31,6 +31,10 @@ AutoTemplate.prototype.init = function() {
 
     this.page       = new LocalCollection('page', this);
     this.page.pushPattern(autoBase.PATT_GLOB['page']);
+
+    // auto PKG, CFG 데이터 지정
+    this._base.data.add(this._AutoBase.PKG);
+    this._base.data.add(this._AutoBase.CFG);
 };
 
 /**

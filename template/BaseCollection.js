@@ -12,16 +12,6 @@ function BaseCollection(pAttr, pBaseTemplate) {
     // TODO: 타입 검사
     this._BaseTemplate  = pBaseTemplate;
     this._SCOPE     = pAttr;
-
-    // [0] 정규식, [1] 캡쳐번호
-    this.REG_EXP = {
-        src:        [/(?:.*src\/)([\w\/\-.@]*)(?:\.hbs)\b/gi, '$1'], 
-        page:       [/(?:.*template\/page\/)([\w\/\-.@]*)(?:\.hbs)\b/gi, '$1'], 
-        part:       [/(?:.*template\/part\/)([\w\/\-.@]*)(?:\.hbs|\.js)\b/gi, '$1'], 
-        data:       [/(?:.*template\/data\/)([\w\/\-.]*)(?:\.js|\.json)\b/gi, '$1'], 
-        helper:     [/(?:.*template\/helper\/)([\w\/\-.]*)(?:\.js)\b/gi, '$1'], 
-        decorator:  [/(?:.*template\/decorator\/)([\w\/\-.]*)(?:\.js)\b/gi, '$1']
-    };
 }
 util.inherits(BaseCollection, LArray);
 
@@ -34,7 +24,7 @@ BaseCollection.prototype.getPathInfo = function(pScope, pPath) {
 
     var baseTemplate = this._BaseTemplate;
     var pathBase = baseTemplate.PATH.base;    
-    var _reg_exp = this.REG_EXP[pScope];     // TODO scope 값  6개 중 검사
+    var _reg_exp = baseTemplate.REG_EXP[pScope];     // TODO scope 값  6개 중 검사
     var _attrName;
     var _prefix;
     var _relativeDir;
