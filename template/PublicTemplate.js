@@ -28,6 +28,7 @@ function PublicTemplate(pBaseTemplate) {
 PublicTemplate.prototype.getTemplateInfo = function() {
     
     var i = 0;
+    
     var _part = {};
     var _helper = {};
     var _decorator = {};
@@ -37,14 +38,39 @@ PublicTemplate.prototype.getTemplateInfo = function() {
     var _basename = '';
     var baseTemplate = this._BaseTemplate;
 
+    function recursiveAttr(attr, content) {
+        
+        var buff = {};
+        
+        if (typeof content === 'function' || typeof content === 'string') {
+            buff[attr] = content;
+        } else if (typeof content === 'object') {
+            for(var prop in content) {
+                if (content.hasOwnProperty(prop)) {
+                    
+                    if (typeof content[prop] === 'object') {
+                        buff = recursiveAttr(prop, content[prop]);
+                    } else {
+                        buff[prop] = content[prop];
+                    }
+                }
+            }
+        }
+        
+        return buff;
+    }
+
     // gulp-hp 전달 객체 조립 
     for(i = 0 ; this && i < this.part.length; i++) {
-        _dirname = path.dirname(path.relative(baseTemplate.PATH['template_part'], this.part[i].path));
-        _dirname  = _dirname === '.' ? '' : _dirname;   // 현재 디렉토리 일 경우 
-        _dirname  = _dirname != '' ? _dirname + '/' : _dirname;
-        _basename =  path.basename(this.part[i].path, baseTemplate.PATT_GLOB['ext']);  // 확장자 제거(.hbs)
+        // _dirname = path.dirname(path.relative(baseTemplate.PATH['template_part'], this.part[i].path));
+        // _dirname  = _dirname === '.' ? '' : _dirname;   // 현재 디렉토리 일 경우 
+        // _dirname  = _dirname != '' ? _dirname + '/' : _dirname;
+        // _basename =  path.basename(this.part[i].path, baseTemplate.PATT_GLOB['ext']);  // 확장자 제거(.hbs)
         
-        _part[_dirname + _basename] = this.part[i].content.toString();
+        // buff = {};
+        // buff[this.part[i].attr] = this.part[i].content;
+        
+        _part = Object.assign(_part, recursiveAttr(this.part[i].attr, this.part[i].content));
     }
 
     // REVEIW: 아래 문법이 무난? 검토 _helper = this ? Object.assign({}, this.helper.slice(0, this.helper.length - 1)) : {};

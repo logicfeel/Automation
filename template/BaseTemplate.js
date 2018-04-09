@@ -57,7 +57,10 @@ util.inherits(BaseTemplate, EventEmitter);
 
 BaseTemplate.prototype.init = function() {
 
+    // 템플릿의 기본 public 템플릿 (고정)
     this._base      = new PublicTemplate(this);
+    
+    // 템플릿 build, compile 시 사용되는 public 템플릿 (동적)
     this._public    = this._base;
 
     this.src        = new LocalCollection('src', this);

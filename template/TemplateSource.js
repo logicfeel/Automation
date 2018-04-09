@@ -7,18 +7,31 @@ var LArray              = require('larray');
 var AutoTemplate        = require('./BaseTemplate');
 
 
-function TemplateSource(pBaseTemplate, pPath, pContent) {
+function TemplateSource(pBaseTemplate, pAttr, pPath, pContent) {
 
-    this._BaseTemplate = pBaseTemplate;
-    
+    this.base = pBaseTemplate;
+    this.public = this.base._public;
+
     this._part = null;
     this._data = null;
     this._helper = null;
     this._decorator = null;
     
+    this.attr = pAttr;
     this.path = pPath;
-    this.content = pContent;
+    // this.content = pContent.toString();
+    if (pContent instanceof Buffer || typeof pContent === 'string') {
+        this.content = pContent.toString();
+    } else {
+        this.content = pContent;
+    }
 }
+
+TemplateSource.prototype.clone = function(pPath) {
+    var newTS = new TemplateSource(this.base, this.attr, pPath, this.content);
+    return newTS;
+};
+
 
 TemplateSource.prototype.partials = function(pPattern) {
     this._part = this._part ? this._part : [];
@@ -47,7 +60,7 @@ TemplateSource.prototype.compile = function(pData) {
 
     // var args = Array.prototype.slice.call(arguments);
     // var compilePath = '@compile';
-    var AutoBase = this._BaseTemplate._AutoBase;
+    var AutoBase = this.base._AutoBase;
     var pathBase = AutoBase.PATH.base;
     var _saveDir = '';
     var _this = this;

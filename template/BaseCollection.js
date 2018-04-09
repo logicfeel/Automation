@@ -27,18 +27,21 @@ BaseCollection.prototype.getPathInfo = function(pScope, pPath) {
     var _reg_exp = baseTemplate.REG_EXP[pScope];     // TODO scope 값  6개 중 검사
     var _attrName;
     var _prefix;
+    var _ext = this._BaseTemplate.PATT_GLOB['ext'];
     var _relativeDir;
-    var _saveDir;
-    var _savePath; 
-    var _loadPath;
-    var _saveFile;
+    var _loadDir;
     var _loadFile;
+    var _loadPath;
+    var _saveDir;
+    var _saveFile;
+    var _savePath; 
 
     _attrName = pPath.replace(_reg_exp[0], _reg_exp[1]);
+    _loadDir = path.dirname(pPath);
+    _loadDir  = _loadDir === '.' ? '' : _loadDir + '/';
+    _loadFile = path.basename(pPath);
     _relativeDir  = path.dirname(_attrName);
-    _relativeDir  = _relativeDir === '.' ? '' : _relativeDir;   // 현재 디렉토리 일 경우 
-    _relativeDir  = _relativeDir != '' ? _relativeDir + '/' : _relativeDir;
-    _loadFile = path.basename(_attrName) + '.hbs';
+    _relativeDir  = _relativeDir === '.' ? '' : _relativeDir + '/';
 
     switch(pScope) {
         case 'src':
@@ -80,16 +83,22 @@ BaseCollection.prototype.getPathInfo = function(pScope, pPath) {
     // if (_loadFile.indexOf("@") > 0) _prefix = '';
 
     _saveFile = _prefix + _loadFile;
+    
+    if (_saveFile.indexOf(_ext) < 0) _saveFile = _saveFile + _ext;
+
     _savePath = _saveDir + _saveFile;
-    _loadPath = _saveDir + _loadFile;
+    _loadPath = _loadDir + _loadFile;
 
     return  {
-        saveDir: _saveDir,
-        attrName: _attrName,
-        savePath: _savePath,
-        loadPath: _loadPath,
-        saveFile: '',
-        loadFile: ''
+        attrName: _attrName,    // 속성명
+        // 파일에서 불러온 경우 (절대경로)
+        loadDir: _loadDir,      // 로딩 디렉토리
+        loadFile: _loadFile,    // 로딩 파일명
+        loadPath: _loadPath,    // 로딩 전체경로
+        // 파일생성시 경우 (상태경로)
+        saveDir: _saveDir,      // 저장할 디렉토리
+        saveFile: _saveFile,    // 저장할 파일명
+        savePath: _savePath     // 저장할 전체 경로 (디렉토리 + 파일명)
     };
 };
 

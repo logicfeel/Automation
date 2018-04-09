@@ -7,7 +7,7 @@ function BaseClass() {
     BaseTemplate.call(this);
     
     this.PATT_GLOB['src']       = 'template/page/**/!(__*)*.hbs';
-    this.PATT_GLOB['part']      = 'template/part/**/!(__*)*.hbs';
+    this.PATT_GLOB['part']      = 'template/part/**/!(__*)*.{hbs,js}';
     this.PATT_GLOB['helper']    = 'template/helper/**/!(__*)*.js';
     this.PATT_GLOB['decorator'] = 'template/decorator/**/!(__*)*.js';
     this.PATT_GLOB['data']      = 'template/data/**/*.{js,json}';
@@ -20,13 +20,28 @@ function BaseClass() {
 }
 util.inherits(BaseClass, BaseTemplate);
 
+BaseClass.prototype.init = function() {
+    BaseTemplate.prototype.init.call(this);
+    
+    console.log('BaseClass.prototype.init');
+
+    var base2 = new BaseClass2();
+    base2.init();
+
+    var t = this.import(base2, this);
+
+    
+    this.src.add('add', '동적으로 추가한 컨텐츠');
+};
+
+
 // ################################
 
 function BaseClass2() {
     BaseTemplate.call(this);
     
     this.PATT_GLOB['src']       = 'temp2/page/**/!(__*)*.hbs';
-    this.PATT_GLOB['part']      = 'temp2/part/**/!(__*)*.hbs';
+    this.PATT_GLOB['part']      = 'temp2/part/**/!(__*)*.{hbs,js}';
     this.PATT_GLOB['helper']    = 'temp2/helper/**/!(__*)*.js';
     this.PATT_GLOB['decorator'] = 'temp2/decorator/**/!(__*)*.js';
     this.PATT_GLOB['data']      = 'temp2/data/**/*.{js,json}';
@@ -44,21 +59,19 @@ util.inherits(BaseClass2, BaseTemplate);
 var base = new BaseClass();
 base.init();
 
-var base2 = new BaseClass2();
-base2.init();
 
-// base.build();
+
+base.build();
 // base2.build();
 
 // ####################
 
-var t = base.import(base2, base);
 // var t = base.import(base2);
 
-t.src.add('add', '동적으로 추가한 컨텐츠');
 
 
-t.build();
+
+// t.build();
 
 // ####################
 
