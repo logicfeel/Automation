@@ -42,22 +42,18 @@ LocalCollection.prototype.add = function(pAttr, pContent) {
     var pathInfo = this.getPathInfo(this._SCOPE, pAttr);
     var content;
 
-    // 1-1. 확장자가 .js  경우
+    // 1-1. 동적 로딩 (require) 확장자가 .js  경우
     if (this._Ext_JS.exec(pAttr)) {
         content = require(pAttr);
     } else {
         try {
-            // 1-2. 속성이 파일경로인 경우
+            // 1-2. 정적 파일 *.*  (*.js제외)
             content = fs.readFileSync(pAttr);
         } catch (err) {
     
-            // 1-3. content 가  TemplateSource 객체인 경우
-            if (pContent instanceof TemplateSource) {
-                copyFileSync(pContent.path, pathInfo.savePath);
-            
-            // 1-4-(1,2). 기타 (객체 or String)
-            } else {
-                content = pContent;
+            // 1-(3,4). String, Object 인 경우
+            if (!(pContent instanceof TemplateSource)) {
+                content = pContent ? pContent : '';
             }
         }
     }
@@ -68,19 +64,18 @@ LocalCollection.prototype.add = function(pAttr, pContent) {
         null,                       // Getter
         function(pIdx, newValue) {  // Setter
 
-            // 1. TemplateSource 를 삽입한경우
+            // 3-1. TemplateSource 를 삽입한경우
             if (newValue instanceof TemplateSource) {
                 // 파일 복사
                 copyFileSync(newValue.path, pathInfo.savePath);
-                this._items[pIdx] = newValue.clone(pathInfo.savePath);
+                
+                this._items[pIdx] = newValue.clone(pathInfo.attrName, pathInfo.savePath);
             
-            // 3. 기타 
+            // 3-(2,3) : String, function, Object
             } else {
-                content = pContent.toString();
                 this._items[pIdx] = newValue;
             }
-    
-            
+           
 
             // TODO: 템플릿 소스의 경우 
             /**
@@ -89,7 +84,13 @@ LocalCollection.prototype.add = function(pAttr, pContent) {
              */
             // copyFileSync(newValue.path, pathInfo.savePath);
         }
-    ); 
+    );
+    
+    // 1-5 content 가 TemplateSource 인 경우 (pushAttr.setter호출됨 )
+    if (pContent instanceof TemplateSource) {
+        this[pathInfo.attrName] = pContent;
+    }
+    
 };
 
 /**

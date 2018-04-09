@@ -12,14 +12,15 @@ function TemplateSource(pBaseTemplate, pAttr, pPath, pContent) {
     this.base = pBaseTemplate;
     this.public = this.base._public;
 
+    this.attr = pAttr;
+    this.path = pPath;
+    this.content = null;
+
     this._part = null;
     this._data = null;
     this._helper = null;
     this._decorator = null;
-    
-    this.attr = pAttr;
-    this.path = pPath;
-    // this.content = pContent.toString();
+
     if (pContent instanceof Buffer || typeof pContent === 'string') {
         this.content = pContent.toString();
     } else {
@@ -27,8 +28,16 @@ function TemplateSource(pBaseTemplate, pAttr, pPath, pContent) {
     }
 }
 
-TemplateSource.prototype.clone = function(pPath) {
+TemplateSource.prototype.clone = function(pAttr, pPath) {
+    
     var newTS = new TemplateSource(this.base, this.attr, pPath, this.content);
+
+    // REVIEW: 지역 설정은 복제 안됨으로 우선 처리함
+    // newTS._part = this._part; 
+    // newTS._data = this._data;
+    // newTS._helper = this._helper;
+    // newTS._decorator = this._decorator;
+    
     return newTS;
 };
 

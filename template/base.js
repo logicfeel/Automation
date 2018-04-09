@@ -30,6 +30,7 @@ BaseClass.prototype.init = function() {
 
     var t = this.import(base2, this);
 
+    // this.data = {'abc': 'ddd'};
     
     this.src.add('add', '동적으로 추가한 컨텐츠');
 };

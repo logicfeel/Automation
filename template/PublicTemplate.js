@@ -13,6 +13,9 @@ function PublicTemplate(pBaseTemplate) {
     this._BaseTemplate  = baseTemplate;
 
     this.data           = new PublicCollection('data', baseTemplate);
+    // this.data.set       = function(value) {
+    //     console.log('GOGO');
+    // };
     this.decorator      = new PublicCollection('decorator', baseTemplate);
     this.helper         = new PublicCollection('helper', baseTemplate);
     
