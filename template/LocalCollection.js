@@ -5,42 +5,41 @@ var copyFileSync        = require('fs-copy-file-sync');     // node 에 기본 �
 var fs                  = require('fs');
 
 var BaseCollection      = require('./BaseCollection');
-var TemplateSource      = require('./TemplateSource');
+var TemplateSource      = require('./Sources').TemplateSource;
 
 
 function LocalCollection(pAttr, pAutoTemplate) {
     BaseCollection.call(this, pAttr, pAutoTemplate);
 
-    this._AutoTemplate = pAutoTemplate;
+    // this._AutoTemplate = pAutoTemplate;
     this._Ext_JS = /\.js$/;
 }
 util.inherits(LocalCollection, BaseCollection);
 
 /**
  * 로컬 컬렉션 추가
- *  - 파일경로를 추가하는 경우
- *  - 속성명만 추가한 경우
- *  - 속성명 및 값을 추가하는 경우
- *  - pContent : LocalCollection 으로 가져온 경우
- *      + 복사 일어나야 함
- * 
- *  - 사례 : add
- *      + pAttr 이 파일 경로인 경우
- *          * 파일을 정보와, 파일 내용을 가져옴
- *              * content 가 있는 경우
- *                  - string 
- *                  - LocalCollection
- *      + pAttr 이 파일명이 아닌 경우
- *          * 저장할 파일 정보와
- *  - 사례 : = 대입
- *       
- * @param {*} pAttr 
- * @param {*} pContent 
+ * @param {String, id, LocalCollection, TemplateSource} pAttr     
+ *      - String : 속성명(가상)  ex> abc/bcde
+ *      - id : require ID 개념 동적으로 추가할 경우 파이롤 분리해서 로딩 (arg[1] 무시됨)
+ *      - LocalCollection : 컬렉션의 모든 값 복제 및 파일 복사 (arg[1] 무시됨)
+ *      - TemplateSource : TS 복제 및 파일 복사 (arg[1] 무시됨)
+ * @param {undefined, TemplateSource, String, Function} pContent  
+ *      - undefined : arg[0] 이 String이 아닌 경우,  *예외처리함
+ *      - TemplateSource :  TS 복제 및 파일 복사
+ *      - String : 컨텐츠 본문으로 삽입됨 (.hbs, return 'str')
+ *      - Function : 함수 수행후 리턴 String 을 통해서 2차 파싱함
  */
 LocalCollection.prototype.add = function(pAttr, pContent) {
 
     var pathInfo = this.getPathInfo(this._SCOPE, pAttr);
     var content;
+
+    // if (typeof pContent === 'string') {
+    //     _obj2 = require.resolve(pContent) === '' ? {} : require(pContent);
+    // } else if (typeof pContent === 'object') {
+    //     _obj2 = pContent;
+    // }
+
 
     // 1-1. 동적 로딩 (require) 확장자가 .js  경우
     if (this._Ext_JS.exec(pAttr)) {
@@ -59,30 +58,35 @@ LocalCollection.prototype.add = function(pAttr, pContent) {
     }
 
     this.pushAttr(
-        new TemplateSource(this._AutoTemplate, pathInfo.attrName, pathInfo.loadPath, content),
+        new TemplateSource(this._BaseTemplate, pathInfo.attrName, pathInfo.loadPath, content),
         pathInfo.attrName,
         null,                       // Getter
+        /** 
+         * Setter
+         * @param {TemplateSource, String, Function} newValue
+         *      - 1. TemplateSource : 의 복제 내용과 연결
+         *      - 2. String : 컨텐츠 본문에 삽입
+         *      - 3. Function : 함수 수행후 리턴 String 을 통해서 2차 파싱함
+         *                  module.exports일 경우 단일 
+         */
         function(pIdx, newValue) {  // Setter
 
-            // 3-1. TemplateSource 를 삽입한경우
+            // 1. TemplateSource 를 삽입한경우
             if (newValue instanceof TemplateSource) {
+                
+                // 객체 복제
+                this._items[pIdx] = newValue.clone(pathInfo.attrName, pathInfo.savePath);
+                
                 // 파일 복사
                 copyFileSync(newValue.path, pathInfo.savePath);
-                
-                this._items[pIdx] = newValue.clone(pathInfo.attrName, pathInfo.savePath);
             
-            // 3-(2,3) : String, function, Object
+            // 2/3. : String
+            } else if (newValue instanceof String ||  newValue instanceof Function) {
+                this._items[pIdx].content = newValue;
+            
             } else {
-                this._items[pIdx] = newValue;
+                throw new Error('입력 타입 오류 :' + typeof newValue);
             }
-           
-
-            // TODO: 템플릿 소스의 경우 
-            /**
-             * - 파일만 복사할지?
-             * - 속성을 깊게 복사할지..
-             */
-            // copyFileSync(newValue.path, pathInfo.savePath);
         }
     );
     

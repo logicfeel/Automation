@@ -7,7 +7,7 @@ var LArray              = require('larray');
 var AutoTemplate        = require('./BaseTemplate');
 
 
-function TemplateSource(pBaseTemplate, pAttr, pPath, pContent) {
+function BaseSource(pBaseTemplate, pAttr, pPath, pContent) {
 
     this.base = pBaseTemplate;
     this.public = this.base._public;
@@ -15,12 +15,7 @@ function TemplateSource(pBaseTemplate, pAttr, pPath, pContent) {
     this.attr = pAttr;
     this.path = pPath;
     this.content = null;
-
-    this._part = null;
-    this._data = null;
-    this._helper = null;
-    this._decorator = null;
-
+    
     if (pContent instanceof Buffer || typeof pContent === 'string') {
         this.content = pContent.toString();
     } else {
@@ -28,9 +23,11 @@ function TemplateSource(pBaseTemplate, pAttr, pPath, pContent) {
     }
 }
 
-TemplateSource.prototype.clone = function(pAttr, pPath) {
+BaseSource.prototype.clone = function(pAttr, pPath) {
     
-    var newTS = new TemplateSource(this.base, this.attr, pPath, this.content);
+    var newTS = new BaseSource(this.base, this.attr, pPath, this.content);
+    // REVIEW: 확인해야함
+    var newTS = new this(this.base, this.attr, pPath, this.content);
 
     // REVIEW: 지역 설정은 복제 안됨으로 우선 처리함
     // newTS._part = this._part; 
@@ -40,6 +37,30 @@ TemplateSource.prototype.clone = function(pAttr, pPath) {
     
     return newTS;
 };
+
+
+function TemplateSource(pBaseTemplate, pAttr, pPath, pContent) {
+    BaseSource.call(this, pBaseTemplate, pAttr, pPath, pContent);
+
+    // this.base = pBaseTemplate;
+    // this.public = this.base._public;
+
+    // this.attr = pAttr;
+    // this.path = pPath;
+    // this.content = null;
+
+    this._part = null;
+    this._data = null;
+    this._helper = null;
+    this._decorator = null;
+
+    // if (pContent instanceof Buffer || typeof pContent === 'string') {
+    //     this.content = pContent.toString();
+    // } else {
+    //     this.content = pContent;
+    // }
+}
+util.inherits(TemplateSource, BaseSource);
 
 
 TemplateSource.prototype.partials = function(pPattern) {
@@ -160,4 +181,7 @@ TemplateSource.prototype.getTemplateInfo = function() {
 };
 
 
-module.exports = TemplateSource;
+module.exports = {
+    BaseSource: BaseSource,
+    TemplateSource: TemplateSource
+};

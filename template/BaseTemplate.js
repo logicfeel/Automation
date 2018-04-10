@@ -6,7 +6,7 @@ var handlebars          = require('handlebars');
 var handlebarsWax       = require('handlebars-wax');
 var fs                  = require('fs');
 
-var TemplateSource      = require('./TemplateSource');
+var TemplateSource      = require('./Sources').TemplateSource;
 var PublicTemplate      = require('./PublicTemplate');
 var PublicCollection    = require('./PublicCollection');
 var LocalCollection     = require('./LocalCollection');
@@ -67,7 +67,15 @@ BaseTemplate.prototype.init = function() {
     this.src.pushPattern(this.PATT_GLOB['src']);
 
     // 참조 연결
-    this.data       = this._base.data;
+    // this.data       = this._base.data;
+    
+    Object.defineProperty(this, 'data', {
+        get: function() { return this._base.data; },
+        set: function(newValue) { this._base.data = newValue; },
+        enumerable: true,
+        configurable: true
+    });
+
     this.decorator  = this._base.decorator;
     this.helper     = this._base.helper;
     this.part       = this._base.part;

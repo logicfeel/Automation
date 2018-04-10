@@ -5,6 +5,8 @@ var path            = require('path');
 
 var PublicCollection    = require('./PublicCollection');
 var LocalCollection     = require('./LocalCollection');
+var BaseCollection      = require('./BaseCollection');
+var TemplateSource      = require('./Sources').TemplateSource;
 
 function PublicTemplate(pBaseTemplate) {
    
@@ -12,10 +14,36 @@ function PublicTemplate(pBaseTemplate) {
     
     this._BaseTemplate  = baseTemplate;
 
-    this.data           = new PublicCollection('data', baseTemplate);
+    var _this = this;
+
+    // this.data           = new PublicCollection('data', baseTemplate);
     // this.data.set       = function(value) {
     //     console.log('GOGO');
     // };
+    var _data = new PublicCollection('data', baseTemplate);
+    Object.defineProperty(this, 'data', {
+        get: function() { 
+            // console.log('GET >>>');
+            return _data; 
+        },
+        set: function(newValue) { 
+            if (this._this != newValue) {
+                if (newValue instanceof BaseCollection) {
+                    // 생성후 복사 진행함 : 여러개
+                } else if (newValue instanceof TemplateSource) {
+                    // 생성후 복사 진행함 : 한개    
+                } else {
+                    // 예외 발생 : 정해지지 않음 값
+                }
+    
+            }
+            // console.log('SET >>>');
+            _data = newValue;
+        },
+        enumerable: true,
+        configurable: true
+    });
+
     this.decorator      = new PublicCollection('decorator', baseTemplate);
     this.helper         = new PublicCollection('helper', baseTemplate);
     
