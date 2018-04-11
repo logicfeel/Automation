@@ -35,6 +35,7 @@ BaseCollection.prototype.getPathInfo = function(pScope, pPath) {
     var _saveDir;
     var _saveFile;
     var _savePath; 
+    var prohibitName = ['add', 'getPattInfo', 'pushPattern', '_SCOPE', '_BaseTemplate'];
 
     _attrName = pPath.replace(_reg_exp[0], _reg_exp[1]);
     _loadDir = path.dirname(pPath);
@@ -43,6 +44,11 @@ BaseCollection.prototype.getPathInfo = function(pScope, pPath) {
     _relativeDir  = path.dirname(_attrName);
     _relativeDir  = _relativeDir === '.' ? '' : _relativeDir + '/';
 
+    // 속성명 제한 검사
+    if (prohibitName.indexOf(_attrName) > -1) {
+        throw new Error('금지 속성명 :' + _attrName);
+    }
+    
     switch(pScope) {
         case 'src':
             _saveDir = pathBase + baseTemplate.PATH.src + _relativeDir;

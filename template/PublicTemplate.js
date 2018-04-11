@@ -47,7 +47,30 @@ function PublicTemplate(pBaseTemplate) {
     this.decorator      = new PublicCollection('decorator', baseTemplate);
     this.helper         = new PublicCollection('helper', baseTemplate);
     
-    this.part           = new LocalCollection('part', baseTemplate);
+    // this.part           = new LocalCollection('part', baseTemplate);
+    var _part           = new LocalCollection('part', baseTemplate);
+    Object.defineProperty(this, 'part', {
+        get: function() { 
+            // console.log('GET >>>');
+            return _part; 
+        },
+        set: function(newValue) { 
+            if (this._this != newValue) {
+                if (newValue instanceof BaseCollection) {
+                    // 생성후 복사 진행함 : 여러개
+                } else if (newValue instanceof TemplateSource) {
+                    // 생성후 복사 진행함 : 한개    
+                } else {
+                    // 예외 발생 : 정해지지 않음 값
+                }
+    
+            }
+            // console.log('SET >>>');
+            _part = newValue;
+        },
+        enumerable: true,
+        configurable: true
+    });
 
     this.data.pushPattern(baseTemplate.PATT_GLOB['data']);
     this.decorator.pushPattern(baseTemplate.PATT_GLOB['decorator']);
@@ -68,6 +91,7 @@ PublicTemplate.prototype.getTemplateInfo = function() {
     var _dirname = '';
     var _basename = '';
     var baseTemplate = this._BaseTemplate;
+    var obj;    
 
     function recursiveAttr(attr, content) {
         
@@ -106,15 +130,17 @@ PublicTemplate.prototype.getTemplateInfo = function() {
 
     // REVEIW: 아래 문법이 무난? 검토 _helper = this ? Object.assign({}, this.helper.slice(0, this.helper.length - 1)) : {};
     for(i = 0 ; this && i < this.helper.length; i++) {
-        _helper = Object.assign(_helper, this.helper[i]);
+        _helper = Object.assign(_helper, this.helper[i].content);
     }
 
     for(i = 0 ; this && i < this.decorator.length; i++) {
-        _decorator = Object.assign(_decorator, this.decorator[i]);
+        _decorator = Object.assign(_decorator, this.decorator[i].content);
     }
 
     for(i = 0 ; this && i < this.data.length; i++) {
-        _data = Object.assign(_data, this.data[i]);
+        obj = {};
+        obj[this.data[i].attr] = this.data[i].content;
+        _data = Object.assign(_data, obj);
     }
     return {
         part: _part,

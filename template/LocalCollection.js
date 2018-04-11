@@ -12,50 +12,106 @@ function LocalCollection(pAttr, pAutoTemplate) {
     BaseCollection.call(this, pAttr, pAutoTemplate);
 
     // this._AutoTemplate = pAutoTemplate;
-    this._Ext_JS = /\.js$/;
+    this._Ext_JS = /\.js$/i;
+    this._Ext_HBS = /\.hbs$/i;
 }
 util.inherits(LocalCollection, BaseCollection);
 
 /**
  * 로컬 컬렉션 추가
- * @param {String, id, LocalCollection, TemplateSource} pAttr     
- *      - String : 속성명(가상)  ex> abc/bcde
- *      - id : require ID 개념 동적으로 추가할 경우 파이롤 분리해서 로딩 (arg[1] 무시됨)
+ * @param {String, id, LocalCollection, TemplateSource} pAttr     속성의 명칭 정보 포함
+ *      - String : 
+ *          + 파일경로(.hbs) : 파일 읽기
+ *          + 가상명 : 가상 파일 ex> abc/bcde
  *      - LocalCollection : 컬렉션의 모든 값 복제 및 파일 복사 (arg[1] 무시됨)
  *      - TemplateSource : TS 복제 및 파일 복사 (arg[1] 무시됨)
- * @param {undefined, TemplateSource, String, Function} pContent  
+ * @param {undefined, String, TemplateSource, Function} pContent  내용
  *      - undefined : arg[0] 이 String이 아닌 경우,  *예외처리함
+ *      - String : 
+ *          + id(require) : 동적으로 추가할 경우 파일로 분리해서 로딩 (arg[1] 무시됨)
+ *          + String : 컨텐츠 본문으로 삽입됨
  *      - TemplateSource :  TS 복제 및 파일 복사
- *      - String : 컨텐츠 본문으로 삽입됨 (.hbs, return 'str')
  *      - Function : 함수 수행후 리턴 String 을 통해서 2차 파싱함
  */
 LocalCollection.prototype.add = function(pAttr, pContent) {
 
     var pathInfo = this.getPathInfo(this._SCOPE, pAttr);
     var content;
+    var baseTemplate = this._BaseTemplate;
+    var _this = this;
 
     // if (typeof pContent === 'string') {
     //     _obj2 = require.resolve(pContent) === '' ? {} : require(pContent);
     // } else if (typeof pContent === 'object') {
     //     _obj2 = pContent;
     // }
+   
+    // ****************************
 
+    // String 인 경우
+    if (typeof pAttr === 'string') {
 
-    // 1-1. 동적 로딩 (require) 확장자가 .js  경우
-    if (this._Ext_JS.exec(pAttr)) {
-        content = require(pAttr);
-    } else {
-        try {
-            // 1-2. 정적 파일 *.*  (*.js제외)
-            content = fs.readFileSync(pAttr);
-        } catch (err) {
-    
-            // 1-(3,4). String, Object 인 경우
-            if (!(pContent instanceof TemplateSource)) {
-                content = pContent ? pContent : '';
+        // 템플릿 경로인 경우
+        if (this._Ext_HBS.exec(pAttr)) {
+
+            try {
+                // 1-2. 정적 파일 *.*  (*.js제외)
+                content = fs.readFileSync(pAttr);
+            } catch (err) {
+                throw new Error('파일 읽기 오류 pAttr(*.hbs):' + pAttr);
             }
         }
+        
+        // arg[1] 조건
+        if (typeof pContent === 'string') {
+            
+            try {
+                obj = require(pContent);
+            } catch (err) {
+                content = pContent;
+            }
+        } 
+        
+    // TemplateSource (arg[1] 무시됨)
+    } else if (pAttr instanceof TemplateSource) {
+    
+    // LocalCollection (arg[1] 무시됨)
+    } else if (pAttr instanceof LocalCollection) {
+    
+    } else {
+        throw new Error('입력 타입 오류 pAttr:' + typeof pAttr);
     }
+  
+    // 파일 여부 확인
+    // fs.access(pAttr, fs.constants.R_OK, function(err) {
+
+    //     // 파일이 없는 경우
+    //     if (err) {
+
+    //     // 파일이 있는 경우
+    //     } else {
+            
+    //     }
+    // });
+
+    // 파일 유무 검사 후
+    // 
+
+    // 1-1. 동적 로딩 (require) 확장자가 .js  경우
+    // if (this._Ext_JS.exec(pAttr)) {
+    //     content = require(pAttr);
+    // } else {
+    //     try {
+    //         // 1-2. 정적 파일 *.*  (*.js제외)
+    //         content = fs.readFileSync(pAttr);
+    //     } catch (err) {
+    
+    //         // 1-(3,4). String, Object 인 경우
+    //         if (!(pContent instanceof TemplateSource)) {
+    //             content = pContent ? pContent : '';
+    //         }
+    //     }
+    // }
 
     this.pushAttr(
         new TemplateSource(this._BaseTemplate, pathInfo.attrName, pathInfo.loadPath, content),
@@ -75,14 +131,14 @@ LocalCollection.prototype.add = function(pAttr, pContent) {
             if (newValue instanceof TemplateSource) {
                 
                 // 객체 복제
-                this._items[pIdx] = newValue.clone(pathInfo.attrName, pathInfo.savePath);
+                _this._items[pIdx] = newValue.clone(pathInfo.attrName, pathInfo.savePath);
                 
                 // 파일 복사
                 copyFileSync(newValue.path, pathInfo.savePath);
             
             // 2/3. : String
             } else if (newValue instanceof String ||  newValue instanceof Function) {
-                this._items[pIdx].content = newValue;
+                _this._items[pIdx].content = newValue;
             
             } else {
                 throw new Error('입력 타입 오류 :' + typeof newValue);
@@ -91,9 +147,9 @@ LocalCollection.prototype.add = function(pAttr, pContent) {
     );
     
     // 1-5 content 가 TemplateSource 인 경우 (pushAttr.setter호출됨 )
-    if (pContent instanceof TemplateSource) {
-        this[pathInfo.attrName] = pContent;
-    }
+    // if (pContent instanceof TemplateSource) {
+    //     this[pathInfo.attrName] = pContent;
+    // }
     
 };
 

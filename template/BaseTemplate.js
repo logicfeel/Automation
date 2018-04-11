@@ -14,7 +14,21 @@ var LocalCollection     = require('./LocalCollection');
 
 function BaseTemplate() {
     EventEmitter.call(this);
+    
+    var _this = this;
 
+    this.PATH = {
+        base: '',
+        map: 'map/',
+        src: 'src/',
+        compile: '@compile/',
+        template: 'template/',
+        template_part: 'part/',
+        template_data: 'data/',
+        template_help: 'helper/',
+        template_deco: 'decorator/'
+    };
+    
     // 템플릿 패턴
     this.PATT_GLOB = {
         ext: '.hbs',                               // 템플릿 파일 확장자
@@ -26,6 +40,13 @@ function BaseTemplate() {
         data: 'data/**/*.{js,json}'                // data명 : 파일명.객체명  TODO: data/ 폴더 명 사용 불필요 할듯 이미 구분됨
     };
 
+    // Object.defineProperty(this.PATT_GLOB, 'src', {
+    //     // get: function() { return _this.PATH['src'] + '**/!(__*)*.hbs'; },
+    //     get: function() { return 'template/page/**/!(__*)*.hbs'; },
+    //     enumerable: true,
+    //     configurable: true
+    // });
+
     // [0] 정규식, [1] 캡쳐번호 : 속명명 추출
     this.REG_EXP = {
         src:        [/(?:.*src\/)([\w\/\-.@]*)(?:\.hbs)\b/gi, '$1'], 
@@ -36,14 +57,6 @@ function BaseTemplate() {
         decorator:  [/(?:.*decorator\/)([\w\/\-.]*)(?:\.js)\b/gi, '$1']
     };
 
-    this.PATH = {
-        base: '',
-        map: 'map/',
-        src: 'src/',
-        compile: '@compile/',
-        template: 'template/',
-        template_part: 'part/'
-    };
     
     this._public    = null;
     this._base      = null;
@@ -78,7 +91,15 @@ BaseTemplate.prototype.init = function() {
 
     this.decorator  = this._base.decorator;
     this.helper     = this._base.helper;
-    this.part       = this._base.part;
+    
+    // this.part       = this._base.part;
+    Object.defineProperty(this, 'part', {
+        get: function() { return this._base.part; },
+        set: function(newValue) { this._base.part = newValue; },
+        enumerable: true,
+        configurable: true
+    });
+
 };
 
 // TODO: pPublic 명칭 적정한 걸로 교체

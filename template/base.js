@@ -17,6 +17,8 @@ function BaseClass() {
     this.REG_EXP['data'] = [/(?:.*template\/data\/)([\w\/\-.]*)(?:\.js|\.json)\b/gi, '$1'];
     this.REG_EXP['helper'] = [/(?:.*template\/helper\/)([\w\/\-.]*)(?:\.js)\b/gi, '$1'];
     this.REG_EXP['decorator'] = [/(?:.*template\/decorator\/)([\w\/\-.]*)(?:\.js)\b/gi, '$1'];
+
+    this.PATH['src'] = 'template/page/';
 }
 util.inherits(BaseClass, BaseTemplate);
 
@@ -32,7 +34,15 @@ BaseClass.prototype.init = function() {
 
     // this.data = {'abc': 'ddd'};
     
-    this.src.add('add', '동적으로 추가한 컨텐츠');
+    this.src.add('add2', '동적으로 추가한 컨텐츠');
+    this.src.add('addv2', './testjs');
+    // this.src.add('testjs', '....');
+
+    // var a = {A: 'aaa'};
+    // a.get = function() {return 'kkk'};
+
+    // console.log(a);
+
 };
 
 
