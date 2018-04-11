@@ -33,6 +33,12 @@ gulp.task('default', ['handlebar']);           // 핸들바
  * 핸들바 테스트 
  * https://cloudfour.com/thinks/the-hidden-power-of-handlebars-partials/
  */
+
+// var a = {};
+// a['abc/ab'] = 'e';
+
+// console.log(a['abc/ab']);
+
 gulp.task('handlebar', function () {
     return gulp.src('./src/pages/*.hbs')
         .pipe(hb({debug: true})
@@ -56,6 +62,10 @@ gulp.task('handlebar', function () {
                     body: "My first post. Wheeeee!"
               })
             .data('package.json')
+            // .data('./src/data/**/*.{json,js}')
+            .data('./src/data/**/*.json')
+            .helpers('./src/helpers/**/*.js')
+            .decorators('./src/decorators/**/*.js')
         )
         .pipe(rename({
             extname: ".html"
