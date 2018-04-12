@@ -27,7 +27,7 @@ BaseSource.prototype.clone = function(pAttr, pPath) {
     
     var newTS = new BaseSource(this.base, this.attr, pPath, this.content);
     // REVIEW: 확인해야함
-    var newTS = new this(this.base, this.attr, pPath, this.content);
+    // var newTS = new this(this.base, this.attr, pPath, this.content);
 
     // REVIEW: 지역 설정은 복제 안됨으로 우선 처리함
     // newTS._part = this._part; 
@@ -63,6 +63,7 @@ function TemplateSource(pBaseTemplate, pAttr, pPath, pContent) {
 util.inherits(TemplateSource, BaseSource);
 
 
+// TODO: pattern 에 Template 소스를 추가한 경우
 TemplateSource.prototype.partials = function(pPattern) {
     this._part = this._part ? this._part : [];
     this._part.push(pPattern);

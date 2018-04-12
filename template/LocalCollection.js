@@ -19,7 +19,7 @@ util.inherits(LocalCollection, BaseCollection);
 
 /**
  * 로컬 컬렉션 추가
- * @param {String, id, LocalCollection, TemplateSource} pAttr     속성의 명칭 정보 포함
+ * @param {String, LocalCollection, TemplateSource} pAttr     속성의 명칭 정보 포함
  *      - String : 
  *          + 파일경로(.hbs) : 파일 읽기
  *          + 가상명 : 가상 파일 ex> abc/bcde

@@ -8,7 +8,7 @@ var LocalCollection     = require('./LocalCollection');
 var BaseCollection      = require('./BaseCollection');
 var TemplateSource      = require('./Sources').TemplateSource;
 
-function PublicTemplate(pBaseTemplate) {
+function CommonTemplate(pBaseTemplate) {
    
     var baseTemplate    = pBaseTemplate;
     
@@ -79,7 +79,7 @@ function PublicTemplate(pBaseTemplate) {
     this.part.pushPattern(baseTemplate.PATT_GLOB['part']);
 }
 
-PublicTemplate.prototype.getTemplateInfo = function() {
+CommonTemplate.prototype.getTemplateInfo = function() {
     
     var i = 0;
     
@@ -150,4 +150,4 @@ PublicTemplate.prototype.getTemplateInfo = function() {
     }
 };
 
-module.exports = PublicTemplate;
+module.exports = CommonTemplate;
