@@ -13,6 +13,12 @@ function CommonTemplate(pBaseTemplate) {
     var baseTemplate    = pBaseTemplate;
     
     this._BaseTemplate  = baseTemplate;
+    this._namespace = {
+        part: [],
+        data: [],
+        helper: [],
+        decorator: []
+    };
 
     var _this = this;
 
@@ -20,6 +26,8 @@ function CommonTemplate(pBaseTemplate) {
     // this.data.set       = function(value) {
     //     console.log('GOGO');
     // };
+    
+    // 상위 컬렉션 정의 getter/setter  
     var _data = new PublicCollection('data', baseTemplate);
     Object.defineProperty(this, 'data', {
         get: function() { 
@@ -72,11 +80,11 @@ function CommonTemplate(pBaseTemplate) {
         configurable: true
     });
 
+    // 폴더기준 기본 정보 등록
+    this.part.pushPattern(baseTemplate.PATT_GLOB['part']);
     this.data.pushPattern(baseTemplate.PATT_GLOB['data']);
     this.decorator.pushPattern(baseTemplate.PATT_GLOB['decorator']);
     this.helper.pushPattern(baseTemplate.PATT_GLOB['helper']);
-
-    this.part.pushPattern(baseTemplate.PATT_GLOB['part']);
 }
 
 CommonTemplate.prototype.getTemplateInfo = function() {

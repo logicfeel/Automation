@@ -65,6 +65,8 @@ function BaseTemplate() {
     this.decorator  = null;
     this.helper     = null;
     this.part       = null;
+
+    this.import     = [];
 }
 util.inherits(BaseTemplate, EventEmitter);
 

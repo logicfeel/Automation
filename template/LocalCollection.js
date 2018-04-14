@@ -8,8 +8,8 @@ var BaseCollection      = require('./BaseCollection');
 var TemplateSource      = require('./Sources').TemplateSource;
 
 
-function LocalCollection(pAttr, pAutoTemplate) {
-    BaseCollection.call(this, pAttr, pAutoTemplate);
+function LocalCollection(pAttr, pBaseTemplate) {
+    BaseCollection.call(this, pAttr, pBaseTemplate);
 
     // this._AutoTemplate = pAutoTemplate;
     this._Ext_JS = /\.js$/i;
@@ -151,6 +151,10 @@ LocalCollection.prototype.add = function(pAttr, pContent) {
     //     this[pathInfo.attrName] = pContent;
     // }
     
+    // 테스트
+    // if (ns ==='part/ns/..') {
+    //     this._part.ns.pushAttr
+    // }
 };
 
 /**
