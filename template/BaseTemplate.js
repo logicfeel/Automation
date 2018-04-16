@@ -6,6 +6,8 @@ var handlebars          = require('handlebars');
 var handlebarsWax       = require('handlebars-wax');
 var fs                  = require('fs');
 
+var LArray              = require('larray');
+
 var TemplateSource      = require('./Sources').TemplateSource;
 var CommonTemplate      = require('./CommonTemplate');
 var PublicCollection    = require('./PublicCollection');
@@ -66,7 +68,9 @@ function BaseTemplate() {
     this.helper     = null;
     this.part       = null;
 
-    this.import     = [];
+    this.ns         = new Namespace(this);
+
+    // this.import     = [];
 }
 util.inherits(BaseTemplate, EventEmitter);
 
@@ -162,5 +166,58 @@ function gulpError(message, errName) {
         throw new Error(message);
     // }
 }
+
+
+function Namespace(pBaseTemplate) {
+    
+    this.pBaseTemplate  = pBaseTemplate;
+
+    // this.part = this._CommonTemplate.part;
+    this.part = new NsCollection('part', this);
+    this.data = new NsCollection('data', this);
+    this.helper = new NsCollection('data', this);
+    this.decorator = new NsCollection('data', this);
+}
+
+function NsCollection(pAttr, pBaseTemplate) {
+    // LArray.call(this, pAttr);
+
+    this.pBaseTemplate  = pBaseTemplate;
+    this._SCOPE     = pAttr;
+
+    // this.part = this._CommonTemplate.part;
+}
+// util.inherits(NsCollection, LArray);
+
+NsCollection.prototype.add = function(pAttr, pBaseCollection) {
+    
+    console.log('ns add');
+
+    Object.defineProperty(this, pAttr, {
+        get: function() { 
+            // console.log('GET >>>');
+            return pBaseCollection[pAttr]; 
+        },
+        set: function(newValue) { 
+            // if (this._this != newValue) {
+            //     if (newValue instanceof BaseCollection) {
+            //         // 생성후 복사 진행함 : 여러개
+            //     } else if (newValue instanceof TemplateSource) {
+            //         // 생성후 복사 진행함 : 한개    
+            //     } else {
+            //         // 예외 발생 : 정해지지 않음 값
+            //     }
+    
+            // }
+            // console.log('SET >>>');
+            pBaseCollection[pAttr] = newValue;
+            // pBaseSource = newValue;
+        },
+        enumerable: true,
+        configurable: true
+    });
+
+};
+
 
 module.exports = BaseTemplate;

@@ -13,13 +13,14 @@ function CommonTemplate(pBaseTemplate) {
     var baseTemplate    = pBaseTemplate;
     
     this._BaseTemplate  = baseTemplate;
-    this._namespace = {
-        part: [],
-        data: [],
-        helper: [],
-        decorator: []
-    };
+    // this._namespace = {
+    //     part: [],
+    //     data: [],
+    //     helper: [],
+    //     decorator: []
+    // };
 
+    // this.ns = new Namespace(this);
     var _this = this;
 
     // this.data           = new PublicCollection('data', baseTemplate);
@@ -157,5 +158,6 @@ CommonTemplate.prototype.getTemplateInfo = function() {
         data: _data
     }
 };
+
 
 module.exports = CommonTemplate;

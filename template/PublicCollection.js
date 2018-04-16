@@ -5,8 +5,8 @@ var BaseCollection      = require('./BaseCollection');
 var BaseSource          = require('./Sources').BaseSource;
 
 
-function PublicCollection(pAttr, pAutoTemplate) {
-    BaseCollection.call(this, pAttr, pAutoTemplate);
+function PublicCollection(pAttr, pBaseTemplate) {
+    BaseCollection.call(this, pAttr, pBaseTemplate);
 
     // this._AutoTemplate = pAutoTemplate;
 }
@@ -29,8 +29,12 @@ PublicCollection.prototype.add = function(pAttr, pContent) {
     }
     _obj = Object.assign(_obj1, _obj2);
 
+
+    // ns 추가 부분
+    bs = new BaseSource(this._BaseTemplate, pathInfo.attrName, pathInfo.loadPath, _obj);
+
     this.pushAttr(
-        new BaseSource(this._BaseTemplate, pathInfo.attrName, pathInfo.loadPath, _obj),
+        bs,
         pathInfo.attrName,
         null,                       // Getter
         function(pIdx, newValue) {  // Setter
@@ -56,6 +60,14 @@ PublicCollection.prototype.add = function(pAttr, pContent) {
             // copyFileSync(newValue.path, pathInfo.savePath);
         }
     );
+    
+    // ns 영역일 경우 삽입
+    if (this._SCOPE === 'data' && /^ns/.exec(pathInfo.attrName)) {
+        // this._BaseTemplate.ns.add(this._SCOPE, this[pathInfo.attrName]);
+        this._BaseTemplate.ns.data.add(pathInfo.attrName, this);
+        console.log('ss');
+    }
+    
 };
 
 /**
