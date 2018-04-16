@@ -9,7 +9,7 @@ var fs                  = require('fs');
 var LArray              = require('larray');
 
 var TemplateSource      = require('./Sources').TemplateSource;
-var CommonScope      = require('./CommonScope');
+var CommonScope         = require('./CommonScope');
 var PublicCollection    = require('./PublicCollection');
 var LocalCollection     = require('./LocalCollection');
 var Namespace           = require('./Namespaces').Namespace;
@@ -71,7 +71,7 @@ function BaseTemplate() {
 
     this.ns         = new Namespace(this);
 
-    // this.import     = [];
+    this._import     = [];
 }
 util.inherits(BaseTemplate, EventEmitter);
 
