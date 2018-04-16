@@ -137,7 +137,7 @@ LocalCollection.prototype.add = function(pAttr, pContent) {
                 copyFileSync(newValue.path, pathInfo.savePath);
             
             // 2/3. : String
-            } else if (newValue instanceof String ||  newValue instanceof Function) {
+            } else if (typeof newValue === 'string' ||  typeof newValue === 'function') {
                 _this._items[pIdx].content = newValue;
             
             } else {

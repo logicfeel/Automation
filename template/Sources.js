@@ -5,10 +5,12 @@ var path                = require('path');
 var LArray              = require('larray');
 
 var AutoTemplate        = require('./BaseTemplate');
+var Namespace           = require('./Namespaces').Namespace;
 
 
 function BaseSource(pBaseTemplate, pAttr, pPath, pContent) {
 
+    // TODO: 타입검사
     this.base = pBaseTemplate;
     this.public = this.base._public;
 

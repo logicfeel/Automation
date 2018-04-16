@@ -9,9 +9,10 @@ var fs                  = require('fs');
 var LArray              = require('larray');
 
 var TemplateSource      = require('./Sources').TemplateSource;
-var CommonTemplate      = require('./CommonTemplate');
+var CommonScope      = require('./CommonScope');
 var PublicCollection    = require('./PublicCollection');
 var LocalCollection     = require('./LocalCollection');
+var Namespace           = require('./Namespaces').Namespace;
 
 
 function BaseTemplate() {
@@ -77,7 +78,7 @@ util.inherits(BaseTemplate, EventEmitter);
 BaseTemplate.prototype.init = function() {
 
     // 템플릿의 기본 public 템플릿 (고정)
-    this._base      = new CommonTemplate(this);
+    this._base      = new CommonScope(this);
     
     // 템플릿 build, compile 시 사용되는 public 템플릿 (동적)
     this._public    = this._base;
@@ -111,7 +112,7 @@ BaseTemplate.prototype.init = function() {
 // TODO: pPublic 명칭 적정한 걸로 교체
 BaseTemplate.prototype.import = function(pBaseTemplate, pPublic) {
     
-    // TODO: 타입검사 BaseTemplate, CommonTemplate
+    // TODO: 타입검사 BaseTemplate, CommonScope
 
     if (pPublic) pBaseTemplate._public = pPublic._base;
     
@@ -167,57 +168,6 @@ function gulpError(message, errName) {
     // }
 }
 
-
-function Namespace(pBaseTemplate) {
-    
-    this.pBaseTemplate  = pBaseTemplate;
-
-    // this.part = this._CommonTemplate.part;
-    this.part = new NsCollection('part', this);
-    this.data = new NsCollection('data', this);
-    this.helper = new NsCollection('data', this);
-    this.decorator = new NsCollection('data', this);
-}
-
-function NsCollection(pAttr, pBaseTemplate) {
-    // LArray.call(this, pAttr);
-
-    this.pBaseTemplate  = pBaseTemplate;
-    this._SCOPE     = pAttr;
-
-    // this.part = this._CommonTemplate.part;
-}
-// util.inherits(NsCollection, LArray);
-
-NsCollection.prototype.add = function(pAttr, pBaseCollection) {
-    
-    console.log('ns add');
-
-    Object.defineProperty(this, pAttr, {
-        get: function() { 
-            // console.log('GET >>>');
-            return pBaseCollection[pAttr]; 
-        },
-        set: function(newValue) { 
-            // if (this._this != newValue) {
-            //     if (newValue instanceof BaseCollection) {
-            //         // 생성후 복사 진행함 : 여러개
-            //     } else if (newValue instanceof TemplateSource) {
-            //         // 생성후 복사 진행함 : 한개    
-            //     } else {
-            //         // 예외 발생 : 정해지지 않음 값
-            //     }
-    
-            // }
-            // console.log('SET >>>');
-            pBaseCollection[pAttr] = newValue;
-            // pBaseSource = newValue;
-        },
-        enumerable: true,
-        configurable: true
-    });
-
-};
 
 
 module.exports = BaseTemplate;
