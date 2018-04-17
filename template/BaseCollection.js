@@ -10,7 +10,7 @@ function BaseCollection(pAttr, pBaseTemplate) {
     LArray.call(this, pAttr);
 
     // TODO: 타입 검사
-    this._BaseTemplate  = pBaseTemplate;
+    this._BT  = pBaseTemplate;
     this._SCOPE     = pAttr;
 }
 util.inherits(BaseCollection, LArray);
@@ -22,12 +22,13 @@ BaseCollection.prototype.add = function(pAttr, pContent) {
 
 BaseCollection.prototype.getPathInfo = function(pScope, pPath) {
 
-    var baseTemplate = this._BaseTemplate;
+    var baseTemplate = this._BT;
     var pathBase = baseTemplate.PATH.base;    
     var _reg_exp = baseTemplate.REG_EXP[pScope];     // TODO scope 값  6개 중 검사
+    var _delimiter = baseTemplate.DELIMITER[pScope];     // TODO scope 값  6개 중 검사
     var _attrName;
     var _prefix;
-    var _ext = this._BaseTemplate.PATT_GLOB['ext'];
+    var _ext = this._BT.PATT_GLOB['ext'];
     var _relativeDir;
     var _loadDir;
     var _loadFile;
@@ -38,6 +39,7 @@ BaseCollection.prototype.getPathInfo = function(pScope, pPath) {
     var prohibitName = ['add', 'getPattInfo', 'pushPattern', '_SCOPE', '_BaseTemplate'];
 
     _attrName = pPath.replace(_reg_exp[0], _reg_exp[1]);
+    _attrName = _attrName.replace(/\//g, _delimiter);    // 구분 문자 변경
     _loadDir = path.dirname(pPath);
     _loadDir  = _loadDir === '.' ? '' : _loadDir + '/';
     _loadFile = path.basename(pPath);

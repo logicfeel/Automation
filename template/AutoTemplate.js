@@ -12,7 +12,7 @@ function AutoTemplate(pAutoBase) {
     
     var autoBase = pAutoBase;
 
-    this._AutoBase  = autoBase;
+    this._AB  = autoBase;
 
     // 기본 속성 오버라이딩
     this.PATT_GLOB['page']      = 'template/page/**/!(__*)*.hbs';
@@ -33,8 +33,8 @@ AutoTemplate.prototype.init = function() {
     this.page.pushPattern(autoBase.PATT_GLOB['page']);
 
     // auto PKG, CFG 데이터 지정
-    this._base.data.add(this._AutoBase.PKG);
-    this._base.data.add(this._AutoBase.CFG);
+    this._base.data.add(this._AB.PKG);
+    this._base.data.add(this._AB.CFG);
 };
 
 /**
@@ -51,7 +51,7 @@ AutoTemplate.prototype.import = function(pModName, pPublic) {
     if (pPublic) this._public = pPublic;
     
     // TODO: 없을시 예외 처리
-    return this._AutoBase.MOD[pModName];
+    return this._AB.MOD[pModName];
 };
 
 

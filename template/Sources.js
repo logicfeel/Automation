@@ -11,12 +11,15 @@ var Namespace           = require('./Namespaces').Namespace;
 function BaseSource(pBaseTemplate, pAttr, pPath, pContent) {
 
     // TODO: 타입검사
-    this.base = pBaseTemplate;
-    this.public = this.base._public;
+    this._BT       = pBaseTemplate;
+    this.public     = this._BT._public;
 
-    this.attr = pAttr;
-    this.path = pPath;
-    this.content = null;
+    this.attr       = pAttr;
+    this.path       = pPath;
+    this.content    = null;
+
+    // 가상파일 여부
+    // this.vitual  = false;
     
     if (pContent instanceof Buffer || typeof pContent === 'string') {
         this.content = pContent.toString();
@@ -27,9 +30,9 @@ function BaseSource(pBaseTemplate, pAttr, pPath, pContent) {
 
 BaseSource.prototype.clone = function(pAttr, pPath) {
     
-    var newTS = new BaseSource(this.base, this.attr, pPath, this.content);
+    var newTS = new BaseSource(this._BT, this.attr, pPath, this.content);
     // REVIEW: 확인해야함
-    // var newTS = new this(this.base, this.attr, pPath, this.content);
+    // var newTS = new this(this._BT, this.attr, pPath, this.content);
 
     // REVIEW: 지역 설정은 복제 안됨으로 우선 처리함
     // newTS._part = this._part; 
@@ -44,8 +47,8 @@ BaseSource.prototype.clone = function(pAttr, pPath) {
 function TemplateSource(pBaseTemplate, pAttr, pPath, pContent) {
     BaseSource.call(this, pBaseTemplate, pAttr, pPath, pContent);
 
-    // this.base = pBaseTemplate;
-    // this.public = this.base._public;
+    // this._BT = pBaseTemplate;
+    // this.public = this._BT._public;
 
     // this.attr = pAttr;
     // this.path = pPath;
@@ -93,7 +96,7 @@ TemplateSource.prototype.compile = function(pData) {
 
     // var args = Array.prototype.slice.call(arguments);
     // var compilePath = '@compile';
-    var AutoBase = this.base._AutoBase;
+    var AutoBase = this._BT._AutoBase;
     var pathBase = AutoBase.PATH.base;
     var _saveDir = '';
     var _this = this;

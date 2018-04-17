@@ -37,7 +37,7 @@ LocalCollection.prototype.add = function(pAttr, pContent) {
 
     var pathInfo = this.getPathInfo(this._SCOPE, pAttr);
     var content;
-    var baseTemplate = this._BaseTemplate;
+    var baseTemplate = this._BT;
     var _this = this;
 
     // if (typeof pContent === 'string') {
@@ -114,7 +114,7 @@ LocalCollection.prototype.add = function(pAttr, pContent) {
     // }
 
     this.pushAttr(
-        new TemplateSource(this._BaseTemplate, pathInfo.attrName, pathInfo.loadPath, content),
+        new TemplateSource(this._BT, pathInfo.attrName, pathInfo.loadPath, content),
         pathInfo.attrName,
         null,                       // Getter
         /** 

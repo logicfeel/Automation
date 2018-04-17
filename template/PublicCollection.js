@@ -31,7 +31,7 @@ PublicCollection.prototype.add = function(pAttr, pContent) {
 
 
     // ns 추가 부분
-    bs = new BaseSource(this._BaseTemplate, pathInfo.attrName, pathInfo.loadPath, _obj);
+    bs = new BaseSource(this._BT, pathInfo.attrName, pathInfo.loadPath, _obj);
 
     this.pushAttr(
         bs,
@@ -63,8 +63,8 @@ PublicCollection.prototype.add = function(pAttr, pContent) {
     
     // ns 영역일 경우 삽입
     if (this._SCOPE === 'data' && /^ns/.exec(pathInfo.attrName)) {
-        // this._BaseTemplate.ns.add(this._SCOPE, this[pathInfo.attrName]);
-        this._BaseTemplate.ns.data.add(pathInfo.attrName, this);
+        // this._BT.ns.add(this._SCOPE, this[pathInfo.attrName]);
+        this._BT.ns.data.add(pathInfo.attrName, this);
         console.log('ss');
     }
     

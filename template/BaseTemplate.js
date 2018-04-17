@@ -60,18 +60,26 @@ function BaseTemplate() {
         decorator:  [/(?:.*decorator\/)([\w\/\-.]*)(?:\.js)\b/gi, '$1']
     };
 
+    this.DELIMITER = {
+        part:        '/',
+        data:        '.',
+        helper:      '-',
+        decorator:   '-'
+    };
+
     
     this._public    = null;
     this._base      = null;
+    this._import    = [];
+
     this.src        = null;
     this.data       = null;
     this.decorator  = null;
     this.helper     = null;
     this.part       = null;
-
     this.ns         = new Namespace(this);
-
-    this._import     = [];
+    this.namespace  = this.ns;
+    
 }
 util.inherits(BaseTemplate, EventEmitter);
 

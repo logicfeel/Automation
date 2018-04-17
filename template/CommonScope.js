@@ -12,7 +12,7 @@ function CommonScope(pBaseTemplate) {
    
     var baseTemplate    = pBaseTemplate;
     
-    this._BaseTemplate  = baseTemplate;
+    this._BT  = baseTemplate;
     // this._namespace = {
     //     part: [],
     //     data: [],
@@ -27,6 +27,32 @@ function CommonScope(pBaseTemplate) {
     // this.data.set       = function(value) {
     //     console.log('GOGO');
     // };
+
+    // this.part           = new LocalCollection('part', baseTemplate);
+    var _part           = new LocalCollection('part', baseTemplate);
+    Object.defineProperty(this, 'part', {
+        get: function() { 
+            // console.log('GET >>>');
+            return _part; 
+        },
+        set: function(newValue) { 
+            if (this._this != newValue) {
+                if (newValue instanceof BaseCollection) {
+                    // 생성후 복사 진행함 : 여러개
+                } else if (newValue instanceof TemplateSource) {
+                    // 생성후 복사 진행함 : 한개    
+                } else {
+                    // 예외 발생 : 정해지지 않음 값
+                }
+    
+            }
+            // console.log('SET >>>');
+            _part = newValue;
+        },
+        enumerable: true,
+        configurable: true
+    });
+
     
     // 상위 컬렉션 정의 getter/setter  
     var _data = new PublicCollection('data', baseTemplate);
@@ -53,33 +79,10 @@ function CommonScope(pBaseTemplate) {
         configurable: true
     });
 
-    this.decorator      = new PublicCollection('decorator', baseTemplate);
     this.helper         = new PublicCollection('helper', baseTemplate);
+    this.decorator      = new PublicCollection('decorator', baseTemplate);
     
-    // this.part           = new LocalCollection('part', baseTemplate);
-    var _part           = new LocalCollection('part', baseTemplate);
-    Object.defineProperty(this, 'part', {
-        get: function() { 
-            // console.log('GET >>>');
-            return _part; 
-        },
-        set: function(newValue) { 
-            if (this._this != newValue) {
-                if (newValue instanceof BaseCollection) {
-                    // 생성후 복사 진행함 : 여러개
-                } else if (newValue instanceof TemplateSource) {
-                    // 생성후 복사 진행함 : 한개    
-                } else {
-                    // 예외 발생 : 정해지지 않음 값
-                }
-    
-            }
-            // console.log('SET >>>');
-            _part = newValue;
-        },
-        enumerable: true,
-        configurable: true
-    });
+
 
     // 폴더기준 기본 정보 등록
     this.part.pushPattern(baseTemplate.PATT_GLOB['part']);
@@ -99,7 +102,7 @@ CommonScope.prototype.getTemplateInfo = function() {
     var _propName = '';
     var _dirname = '';
     var _basename = '';
-    var baseTemplate = this._BaseTemplate;
+    var baseTemplate = this._BT;
     var obj;    
 
     function recursiveAttr(attr, content) {

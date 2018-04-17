@@ -1,13 +1,14 @@
 'use strict';
-
+var copyFileSync        = require('fs-copy-file-sync');     // node 에 기본 추가됨
 
 var BaseCollection      = require('./BaseCollection');
+
 
 function Namespace(pBaseTemplate) {
     
     // TODO: 타입검사 pBaseTemplate
-    this._BaseTemplate  = pBaseTemplate;
-    this.import = this._BaseTemplate._import;
+    this._BT  = pBaseTemplate;
+    this.import = this._BT._import;
 
     // this.part = this._CommonTemplate.part;
     this.part = new NsCollection('part', this);
@@ -27,17 +28,17 @@ Namespace.prototype.import = function(pNamespace) {
 };
 
 
-function NsCollection(pAttr, pBaseTemplate) {
+function NsCollection(pAttr, pNamespace) {
 
     this._SCOPE     = pAttr;
-    this._BaseTemplate  = pBaseTemplate;
+    this._Ns        = pNamespace;
     
 }
 
 NsCollection.prototype.add = function(pAttr, pBaseCollection) {
     
-    if (!pNamespace instanceof BaseCollection) {
-        throw new Error('타입 오류 pNamespace:' + typeof pBaseCollection);
+    if (!pBaseCollection instanceof BaseCollection) {
+        throw new Error('타입 오류 pBaseCollection:' + typeof pBaseCollection);
     }
 
     Object.defineProperty(this, pAttr, {
@@ -56,6 +57,7 @@ NsCollection.prototype.add = function(pAttr, pBaseCollection) {
             
             // 2/3. : String
             } else if (typeof newValue === 'string' ||  typeof newValue === 'function') {
+                
                 // TODO: 파일 동적 수정이 로그 __파일명 남겨야 함
                 pBaseCollection[pAttr].content = newValue;
             
