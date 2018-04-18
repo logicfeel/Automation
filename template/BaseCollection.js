@@ -115,10 +115,14 @@ BaseCollection.prototype.pushPattern = function(pPattern) {
     var _arr = [];
     var _this = this;
 
-    _arr = glob.sync(pPattern, {absolute: true});
+console.log('__dirname:' + __dirname);
+console.log('-pushPattern:' + pPattern);
 
+    _arr = glob.sync(pPattern, {absolute: true});
+console.log('-_arr:' +_arr.length);
     _arr.forEach(function(value, index, arr){
         _this.add(value);
+console.log('-forEach:' +value);
     });
 };
 

@@ -19,14 +19,20 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "auto template",
+            "name": "index 독립",
             "program": "${workspaceFolder}/template/index.js"
         },
         {
             "type": "node",
             "request": "launch",
-            "name": "base template",
+            "name": "base 상속",
             "program": "${workspaceFolder}/template/base.js"
-        }
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "auto 연동",
+            "program": "${workspaceFolder}/template/auto.js"
+        }        
     ]
 }

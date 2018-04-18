@@ -117,7 +117,7 @@ TemplateSource.prototype.compile = function(pData) {
     // REVIEW: path 도 상대주소로 가져와야 할지?
     _dirname = path.relative(_saveDir, path.dirname(this.path));
     _dirname = _dirname ? _dirname + '/' : '';
-    _saveDir = _saveDir + AutoBase.PATH['compile'] + _dirname;
+    _saveDir = _saveDir + AutoBase.DIR['compile'] + _dirname;
 
     // REVIEW: 파라메터 값을로 읽어와야 함 
     return gulp.src(this.path)

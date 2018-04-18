@@ -8,7 +8,7 @@ var LocalCollection     = require('./LocalCollection');
 var BaseCollection      = require('./BaseCollection');
 var TemplateSource      = require('./Sources').TemplateSource;
 
-function CommonScope(pBaseTemplate) {
+function Scope(pBaseTemplate) {
    
     var baseTemplate    = pBaseTemplate;
     
@@ -91,7 +91,7 @@ function CommonScope(pBaseTemplate) {
     this.helper.pushPattern(baseTemplate.PATT_GLOB['helper']);
 }
 
-CommonScope.prototype.getTemplateInfo = function() {
+Scope.prototype.getTemplateInfo = function() {
     
     var i = 0;
     
@@ -163,4 +163,4 @@ CommonScope.prototype.getTemplateInfo = function() {
 };
 
 
-module.exports = CommonScope;
+module.exports = Scope;

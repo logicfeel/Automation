@@ -9,7 +9,7 @@ var fs                  = require('fs');
 var LArray              = require('larray');
 
 var TemplateSource      = require('./Sources').TemplateSource;
-var CommonScope         = require('./CommonScope');
+var Scope               = require('./Scope');
 var PublicCollection    = require('./PublicCollection');
 var LocalCollection     = require('./LocalCollection');
 var Namespace           = require('./Namespaces').Namespace;
@@ -20,22 +20,26 @@ function BaseTemplate() {
     
     var _this = this;
 
+    // 폴더명
+    // REVIEW: 뒤에 '/' 빠져야 맞을듯  @compile
+    this.DIR = {
+        compile: '@compile/'
+    };
+
+    // 경로
     this.PATH = {
-        base: '',
-        map: 'map/',
+        base: '',       // REVIEW: __dirname 으로 대체 가능한지 검토?
         src: 'src/',
-        compile: '@compile/',
-        template: 'template/',
         template_part: 'part/',
         template_data: 'data/',
         template_help: 'helper/',
         template_deco: 'decorator/'
     };
     
-    // 템플릿 패턴
+    // GLOB 검색 패턴
+    // TODO: PATT_GLOB => GLOB 로 변경하던지 다른이름 이로 변경 검토?
     this.PATT_GLOB = {
         ext: '.hbs',                               // 템플릿 파일 확장자
-        dist: 'publish/',                          // 템플릿 배포 폴더 
         src: 'src/**/!(__*)*.hbs',                 // 일반 배치 소스 (__시작하는 파일은 제외)
         part: 'part/**/!(__*)*.{hbs,js}',          // partical명 : 파일명
         helper: 'helper/**/!(__*)*.js',            // helper(메소드)명 : export 객체명
@@ -51,6 +55,7 @@ function BaseTemplate() {
     // });
 
     // [0] 정규식, [1] 캡쳐번호 : 속명명 추출
+    // REG_EXP => REG_EXP
     this.REG_EXP = {
         src:        [/(?:.*src\/)([\w\/\-.@]*)(?:\.hbs)\b/gi, '$1'], 
         // page:       [/(?:.*template\/page\/)([\w\/\-.@]*)(?:\.hbs)\b/gi, '$1'], 
@@ -60,6 +65,8 @@ function BaseTemplate() {
         decorator:  [/(?:.*decorator\/)([\w\/\-.]*)(?:\.js)\b/gi, '$1']
     };
 
+    // 구획(구분) 문자
+    // TODO : DELIMITER  => SECTION (section) 을 맞을지 검토
     this.DELIMITER = {
         part:        '/',
         data:        '.',
@@ -86,14 +93,15 @@ util.inherits(BaseTemplate, EventEmitter);
 BaseTemplate.prototype.init = function() {
 
     // 템플릿의 기본 public 템플릿 (고정)
-    this._base      = new CommonScope(this);
+    this._base      = new Scope(this);
     
     // 템플릿 build, compile 시 사용되는 public 템플릿 (동적)
     this._public    = this._base;
-
+console.log('##########################');
     this.src        = new LocalCollection('src', this);
     this.src.pushPattern(this.PATT_GLOB['src']);
-
+console.log('src::'+ this.src.length);
+console.log('##########################');
     // 참조 연결
     // this.data       = this._base.data;
     
@@ -120,7 +128,7 @@ BaseTemplate.prototype.init = function() {
 // TODO: pPublic 명칭 적정한 걸로 교체
 BaseTemplate.prototype.import = function(pBaseTemplate, pPublic) {
     
-    // TODO: 타입검사 BaseTemplate, CommonScope
+    // TODO: 타입검사 BaseTemplate, Scope
 
     if (pPublic) pBaseTemplate._public = pPublic._base;
     
@@ -155,6 +163,8 @@ BaseTemplate.prototype.build = function(pLocalCollection) {
         
         console.log(template());
     }
+    console.log('build():'+ local.length);
+    console.log('src:'+ this.src.length);
 };
 
 
