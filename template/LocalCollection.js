@@ -47,8 +47,8 @@ LocalCollection.prototype.add = function(pAttr, pContent) {
     // }
    
     // ****************************
-console.log('__dirname:' + __dirname);
-console.log('pAttr:' + pAttr);
+// console.log('__dirname:' + __dirname);
+// console.log('pAttr:' + pAttr);
     // String 인 경우
     if (typeof pAttr === 'string') {
 
@@ -146,7 +146,7 @@ console.log('pAttr:' + pAttr);
             }
         }
     );
-console.log('this:' + this.length);    
+// console.log('this:' + this.length);    
     // 1-5 content 가 TemplateSource 인 경우 (pushAttr.setter호출됨 )
     // if (pContent instanceof TemplateSource) {
     //     this[pathInfo.attrName] = pContent;

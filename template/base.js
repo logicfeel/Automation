@@ -3,8 +3,8 @@
 var util                = require('util');
 var BaseTemplate        = require('./BaseTemplate');
 
-function BaseClass() {
-    BaseTemplate.call(this);
+function TemplateClass() {
+    BaseTemplate.call(this, __dirname);
     
     this.PATT_GLOB['src']       = 'template/page/**/!(__*)*.hbs';
     this.PATT_GLOB['part']      = 'template/part/**/!(__*)*.{hbs,js}';
@@ -20,14 +20,14 @@ function BaseClass() {
 
     this.PATH['src'] = 'template/page/';
 }
-util.inherits(BaseClass, BaseTemplate);
+util.inherits(TemplateClass, BaseTemplate);
 
-BaseClass.prototype.init = function() {
+TemplateClass.prototype.init = function() {
     BaseTemplate.prototype.init.call(this);
     
-    console.log('BaseClass.prototype.init');
+    console.log('TemplateClass.prototype.init');
 
-    var base2 = new BaseClass2();
+    var base2 = new TemplateClass2();
     base2.init();
 
     var t = this.import(base2, this);
@@ -48,7 +48,7 @@ BaseClass.prototype.init = function() {
 
 // ################################
 
-function BaseClass2() {
+function TemplateClass2() {
     BaseTemplate.call(this);
     
     this.PATT_GLOB['src']       = 'temp2/page/**/!(__*)*.hbs';
@@ -63,11 +63,11 @@ function BaseClass2() {
     this.REG_EXP['helper'] = [/(?:.*temp2\/helper\/)([\w\/\-.]*)(?:\.js)\b/gi, '$1'];
     this.REG_EXP['decorator'] = [/(?:.*temp2\/decorator\/)([\w\/\-.]*)(?:\.js)\b/gi, '$1'];
 }
-util.inherits(BaseClass2, BaseTemplate);
+util.inherits(TemplateClass2, BaseTemplate);
 
 // ####################
 
-var base = new BaseClass();
+var base = new TemplateClass();
 base.init();
 
 

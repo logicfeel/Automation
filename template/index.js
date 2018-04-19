@@ -2,7 +2,7 @@
 
 var BaseTemplate        = require('./BaseTemplate');
 
-var bt = new BaseTemplate({auto: true});
+var bt = new BaseTemplate(__dirname);
 
 // bt.PATT_GLOB['src']       = 'template/page/**/!(__*)*.hbs';
 // bt.PATT_GLOB['part']      = 'template/part/**/!(__*)*.{hbs,js}';
@@ -21,4 +21,5 @@ var bt = new BaseTemplate({auto: true});
 bt.init();
 bt.build();
 
-console.log('-End' + bt.src.length);
+console.log('-End');
+

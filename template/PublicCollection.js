@@ -65,7 +65,7 @@ PublicCollection.prototype.add = function(pAttr, pContent) {
     if (this._SCOPE === 'data' && /^ns/.exec(pathInfo.attrName)) {
         // this._BT.ns.add(this._SCOPE, this[pathInfo.attrName]);
         this._BT.ns.data.add(pathInfo.attrName, this);
-        console.log('ss');
+        // console.log('ss');
     }
     
 };
