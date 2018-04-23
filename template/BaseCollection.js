@@ -38,7 +38,8 @@ BaseCollection.prototype.getPathInfo = function(pScope, pPath) {
     var _savePath; 
     var prohibitName = ['add', 'getPattInfo', 'pushPattern', '_SCOPE', '_BaseTemplate'];
 
-    _attrName = pPath.replace(_reg_exp[0], _reg_exp[1]);
+    _attrName = pPath.replace(_reg_exp[0], _reg_exp[2]);
+    // _attrName = pPath.replace(_reg_exp, '$1');
     _attrName = _attrName.replace(/\//g, _delimiter);    // 구분 문자 변경
     _loadDir = path.dirname(pPath);
     _loadDir  = _loadDir === '.' ? '' : _loadDir + '/';

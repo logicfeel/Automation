@@ -18,8 +18,6 @@ var bt = new BaseTemplate(__dirname);
 
 // bt.PATH['src'] = 'template/page/';
 
-bt.init();
 bt.build();
 
 console.log('-End');
-

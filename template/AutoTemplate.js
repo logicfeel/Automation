@@ -24,6 +24,9 @@ function AutoTemplate(pAutoBase) {
 }
 util.inherits(AutoTemplate, BaseTemplate);
 
+AutoTemplate.prototype.getDirname = function() {
+    return __dirname;
+};
 
 AutoTemplate.prototype.init = function() {
     // 상위 메소드 호출 : 데코레이션 패턴

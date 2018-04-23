@@ -23,7 +23,6 @@ function BaseTemplate(pBasePath) {
     
     // 절대경로
     var absolute = pBasePath ? pBasePath : this.getDirname();
-    
     // 상대경로
     var relative;
 
@@ -50,11 +49,11 @@ function BaseTemplate(pBasePath) {
     // [0] 정규식, [1] 캡쳐번호 : 속명명 추출
     // REG_EXP => REG_EXP
     var _REG_EXP = {
-        src:        ['(?:.*{{1}})([\\w\-./@]*)(?:.hbs)\\b', 'gi', '$1'], 
-        part:       ['(?:.*{{1}})([\\w\-./@]*)(?:.hbs|.js)\\b', 'gi', '$1'], 
-        data:       ['(?:.*{{1}})([\\w\-./@]*)(?:.js|.json)\\b', 'gi', '$1'], 
-        helper:     ['(?:.*{{1}})([\\w\-./@]*)(?:.js)\\b', 'gi', '$1'], 
-        decorator:  ['(?:.*{{1}})([\\w\-./@]*)(?:.js)\\b', 'gi', '$1']
+        src:        ['(?:.*{{1}})([\\w|/|-|.|@]*)(?:.hbs)/\b', 'gi', '$1'], 
+        part:       ['(?:.*{{1}})([\\w|/|-|.|@]*)(?:.hbs|.js)\\b', 'gi', '$1'], 
+        data:       ['(?:.*{{1}})([\\w|/|-|.]*)(?:.js|.json)\\b', 'gi', '$1'], 
+        helper:     ['(?:.*{{1}})([\\w|/|-|.]*)(?:.js)\\b', 'gi', '$1'], 
+        decorator:  ['(?:.*{{1}})([\\w|/|-|.]*)(?:.js)\\b', 'gi', '$1']
     };
     
     // 폴더명
@@ -67,26 +66,6 @@ function BaseTemplate(pBasePath) {
         templete: '.hbs'
     };
 
-    // 구획(구분) 문자
-    // TODO : DELIMITER  => SECTION (section) 을 맞을지 검토
-    this.DELIMITER = {
-        part:        '/',
-        data:        '.',
-        helper:      '-',
-        decorator:   '-'
-    };    
-
-    this._public    = null;
-    this._base      = null;
-    this._using     = [];
-
-    this.src        = null;
-    this.data       = null;
-    this.decorator  = null;
-    this.helper     = null;
-    this.part       = null;
-
-    this.PATH = {};
     absolute = absolute ? absolute.replace(/\\/g,'/') + '/' : '';    // 접근 '/' 경로 변경
     relative = path.relative(process.cwd(), absolute);
     relative = relative ? relative.replace(/\\/g,'/') + '/' : '';    // 접근 '/' 경로 변경
@@ -95,6 +74,11 @@ function BaseTemplate(pBasePath) {
     _PATH['absolute'] = absolute;
     _PATH['base'] = relative;
 
+
+
+
+    this.PATH = {};
+    
     // PATH 프로퍼티 설정 공통 함수
     function __PATH_Properties(pProp) {
         return {
@@ -104,6 +88,7 @@ function BaseTemplate(pBasePath) {
             configurable: true
         };
     }
+
     Object.defineProperties(this.PATH, {
         absolute: {
             get: function() { return _PATH.absolute },
@@ -124,7 +109,21 @@ function BaseTemplate(pBasePath) {
         decorator:  __PATH_Properties('decorator')
     });
 
+
+    // GLOB 검색 패턴
+    // TODO: PATT_GLOB => GLOB 로 변경하던지 다른이름 이로 변경 검토?
+    // this.PATT_GLOB = {
+    //     ext: '.hbs',                               // 템플릿 파일 확장자
+    //     src: 'src/**/!(__*)*.hbs',                 // 일반 배치 소스 (__시작하는 파일은 제외)
+    //     part: 'part/**/!(__*)*.{hbs,js}',          // partical명 : 파일명
+    //     data: 'data/**/*.{js,json}',               // data명 : 파일명.객체명  TODO: data/ 폴더 명 사용 불필요 할듯 이미 구분됨
+    //     helper: 'helper/**/!(__*)*.js',            // helper(메소드)명 : export 객체명
+    //     decorator: 'decorator/**/!(__*)*.js'       // decorators(메소드)명 : export 객체명            
+
+    // };
+    
     this.PATT_GLOB = {};
+
     // PATT_GLOB 프로퍼티 설정 공통 함수
     function __PATH_GLOB_Properties(pProp) {
         return  {
@@ -134,6 +133,7 @@ function BaseTemplate(pBasePath) {
             configurable: true
         };
     }
+    
     Object.defineProperties(this.PATT_GLOB, {
         src:        __PATH_GLOB_Properties('src'),
         part:       __PATH_GLOB_Properties('part'),
@@ -142,7 +142,26 @@ function BaseTemplate(pBasePath) {
         decorator:  __PATH_GLOB_Properties('decorator')
     });
 
+    // Object.defineProperty(this.PATT_GLOB, 'src', {
+    //     // get: function() { return _this._PATH['src'] + '**/!(__*)*.hbs'; },
+    //     get: function() { return 'template/page/**/!(__*)*.hbs'; },
+    //     enumerable: true,
+    //     configurable: true
+    // });
+
+    // var _REG_EXP = {
+    //     src:        [/(?:.*{{1}})([\w\/\-.@]*)(?:\.hbs)\b/gi, '$1'], 
+    //     // page:       [/(?:.*template\/page\/)([\w\/\-.@]*)(?:\.hbs)\b/gi, '$1'], 
+    //     part:       [/(?:.*{{1}})([\w\/\-.@]*)(?:\.hbs|\.js)\b/gi, '$1'], 
+    //     data:       [/(?:.*{{1}})([\w\/\-.]*)(?:\.js|\.json)\b/gi, '$1'], 
+    //     helper:     [/(?:.*{{1}})([\w\/\-.]*)(?:\.js)\b/gi, '$1'], 
+    //     decorator:  [/(?:.*{{1}})([\w\/\-.]*)(?:\.js)\b/gi, '$1']
+    // };
+
+
+    
     this.REG_EXP = {};
+
     // REG_EXP 프로퍼티 설정 공통 함수
     function __REG_EXP_Properties(pProp) {
         return   {
@@ -156,6 +175,7 @@ function BaseTemplate(pBasePath) {
             configurable: true
         };
     }
+
     Object.defineProperties(this.REG_EXP, {
         src:        __REG_EXP_Properties('src'),
         part:       __REG_EXP_Properties('part'),
@@ -164,8 +184,28 @@ function BaseTemplate(pBasePath) {
         decorator:  __REG_EXP_Properties('decorator')  
     });
 
+    // 구획(구분) 문자
+    // TODO : DELIMITER  => SECTION (section) 을 맞을지 검토
+    this.DELIMITER = {
+        part:        '/',
+        data:        '.',
+        helper:      '-',
+        decorator:   '-'
+    };
+
+    
+    this._public    = null;
+    this._base      = null;
+    this._import    = [];
+
+    this.src        = null;
+    this.data       = null;
+    this.decorator  = null;
+    this.helper     = null;
+    this.part       = null;
     this.ns         = new Namespace(this);
     this.namespace  = this.ns;
+    
 }
 util.inherits(BaseTemplate, EventEmitter);
 
@@ -205,99 +245,30 @@ BaseTemplate.prototype.init = function() {
 };
 
 // TODO: pPublic 명칭 적정한 걸로 교체
-BaseTemplate.prototype.import = function(pMod, pPublic) {
+BaseTemplate.prototype.import = function(pBaseTemplate, pPublic) {
     
-    var TemplateClass;
-    var imp;
+    // TODO: 타입검사 BaseTemplate, Scope
 
-    if (typeof pMod != 'string') throw new Error('pMod 타입 오류 pMod:' + typeof pMod);
+    if (pPublic) pBaseTemplate._public = pPublic._base;
     
-    TemplateClass = require(pMod);
-    imp = new TemplateClass();
-
-    if (imp instanceof BaseTemplate) {
-        imp.init();
-        if (pPublic) {
-            if (!pPublic instanceof BaseTemplate) throw new Error('pPublic 타입 오류 pPublic:' + pPublic);
-            imp._public = pPublic._base;
-        }
-    } else {
-        throw new Error('pMod 타입 오류 pMod:' + typeof pMod);
-    }
-   
-    return imp;
+    return pBaseTemplate;
 };
-
-BaseTemplate.prototype.using = function(pNamespace) {
-    
-    // TODO: pNamespace 타입 검사 
-    if (!pNamespace instanceof Namespace) {
-        throw new Error('타입 오류 pNamespace:' + typeof pNamespace);
-    }
-    
-    this._using.push(pNamespace);
-};
-
-// package.json 종속 모듈중 템플릿 로딩
-BaseTemplate.prototype.load = function() {
-
-};
-
 
 BaseTemplate.prototype.build = function(pLocalCollection) {
 
-    var hb;
-    var wax;
-    var ns_wax;
-    var hbObj;
-    var local;
+    // this.init();
 
-    this.init();
-
-    // hbObj = this._public.getTemplateInfo();
+    var hbObj = this._public.getTemplateInfo();
 
     // TODO: 타입 검사
-    local = pLocalCollection ? pLocalCollection : this.src;
-
-    // 네임스페이스 
-    // TODO:
-    // wax.partials(_wax.handlebars.partials);
-    // wax.helpers(hbObj.helpers);
-    // wax.decorators(hbObj.decorator);
-    // wax.data(_wax.data);
-    
-    hb = handlebars.create();
-    ns_wax = handlebarsWax(hb);
-    // ns_wax = handlebarsWax();
-    ns_wax.partials({
-        lorem: 'dolor',
-        ipsum: 'sit amet'
-    });
-    ns_wax.data({
-        lorem: '네임스페이스.door',
-        ipsum: 'sit amet'
-    });
-
-    // 네임스페이스 로딩
-    var nsOjb;
-    for(var i = 0; i < this._using.length; i++) {
-        nsOjb = this._using[i].getTemplateInfo();
-        ns_wax.data(nsOjb.data);
-    }
+    var local = pLocalCollection ? pLocalCollection : this.src;
 
     for(var i = 0; i < local.length; i++) {
 
-        hb = handlebars.create();
-        wax = handlebarsWax(hb);
-
-        // 네임스페이스 
-        wax.partials(ns_wax.handlebars.partials);
-        wax.helpers(ns_wax.handlebars.helpers);
-        wax.decorators(ns_wax.handlebars.decorator);
-        wax.data(ns_wax.context);
+        var hb = handlebars.create();
+        var wax = handlebarsWax(hb);
 
         // 전역
-        hbObj = local[i].public.getTemplateInfo();
         wax.partials(hbObj.part);
         wax.helpers(hbObj.helpers);
         wax.decorators(hbObj.decorator);

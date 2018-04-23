@@ -2,6 +2,8 @@
 ...{{package.name}}...
 :: template ::
 전달변수 :{{private}}
+ns :{{lorem}}
+ns.space2 :{{ns.space2.SS}}
 {{#> layouts/base title="Page One" }}
 
   {{#*inline "hero-block"}}
@@ -12,6 +14,7 @@
   {{/inline}}
 
 {{/layouts/base}}
+
 
 
 
