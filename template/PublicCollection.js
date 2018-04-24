@@ -62,12 +62,13 @@ PublicCollection.prototype.add = function(pAttr, pContent) {
     );
     
     // ns 영역일 경우 삽입
-    if (this._SCOPE === 'data' && /^ns/.exec(pathInfo.attrName)) {
-        // this._BT.ns.add(this._SCOPE, this[pathInfo.attrName]);
+    if (this._SCOPE === 'data' && /^ns\./.exec(pathInfo.attrName)) {
         this._BT.ns.data.add(pathInfo.attrName, this);
-        // console.log('ss');
+    } else if (this._SCOPE === 'helper' && /^ns-/.exec(pathInfo.attrName)) {
+        this._BT.ns.helper.add(pathInfo.attrName, this);
+    } else if (this._SCOPE === 'decorator' && /^ns-/.exec(pathInfo.attrName)) {
+        this._BT.ns.decorator.add(pathInfo.attrName, this);
     }
-    
 };
 
 /**

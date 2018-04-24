@@ -28,7 +28,7 @@ function Namespace(pBaseTemplate) {
 //     this._BT._using.push(pNamespace);
 // };
 
-Namespace.prototype.getTemplateInfo = function() {
+Namespace.prototype.getNamespaceInfo = function() {
     
     var i = 0;
     
@@ -41,20 +41,21 @@ Namespace.prototype.getTemplateInfo = function() {
     var _basename = '';
     var baseTemplate = this._BT;
     var obj;    
-/*
-    // gulp-hp 전달 객체 조립 
-    for(i = 0 ; this && i < this.part.length; i++) {
-        // _dirname = path.dirname(path.relative(baseTemplate.PATH['template_part'], this.part[i].path));
-        // _dirname  = _dirname === '.' ? '' : _dirname;   // 현재 디렉토리 일 경우 
-        // _dirname  = _dirname != '' ? _dirname + '/' : _dirname;
-        // _basename =  path.basename(this.part[i].path, baseTemplate.PATT_GLOB['ext']);  // 확장자 제거(.hbs)
-        
-        // buff = {};
-        // buff[this.part[i].attr] = this.part[i].content;
-        
-        _part = Object.assign(_part, recursiveAttr(this.part[i].attr, this.part[i].content));
-    }
+    var data = this.data;
+    var part = this.part;
+    var helper = this.helper;
+    var decorator = this.decorator;
+    var prohibitName = ['_Ns', '_SCOPE'];
+    var prop;
 
+    
+    for (prop in part) {
+        if (part.hasOwnProperty(prop) && prohibitName.indexOf(prop) < 0) {
+
+            _part = Object.assign(_part, part[prop].content);
+        }
+    }
+/*
     // REVEIW: 아래 문법이 무난? 검토 _helper = this ? Object.assign({}, this.helper.slice(0, this.helper.length - 1)) : {};
     for(i = 0 ; this && i < this.helper.length; i++) {
         _helper = Object.assign(_helper, this.helper[i].content);
@@ -64,43 +65,23 @@ Namespace.prototype.getTemplateInfo = function() {
         _decorator = Object.assign(_decorator, this.decorator[i].content);
     }
 */
-    var data = this.data;
-    var prohibitName = ['_Ns', '_SCOPE'];
-    // var nm = '';
-    var NS = {};
 
-    for (var prop in data) {
+    // var nm = '';
+    var namespace;
+
+    for (prop in data) {
         if (data.hasOwnProperty(prop) && prohibitName.indexOf(prop) < 0) {
 
-            // nm = prop.split('.');
-            NS = {};
-
-            obj = setNamespace(prop, this.data[prop].content);
-            // obj = this.data[prop].content;
-            // obj[prop] = this.data[prop].content;
-            _data = Object.assign(_data, NS);
-
-            console.log(prop);
-            // if (typeof content[prop] === 'object') {
-            //     buff = recursiveAttr(prop, content[prop]);
-            // } else {
-            //     buff[prop] = content[prop];
-            // }
+            namespace = { ns: {}};
+            setNamespace(namespace['ns'], prop, data[prop].content);
+            _data = Object.assign(_data, namespace);
         }
     }
-    // function namespaceSub(pStr) {
-    //     var parts = pStr.split('.');
-        
-    //     if (parts[0] === 'ns') {
-    //         parts =parts.slice(1);
-    //     }
-    //     return parts.co
-    // }
 
-    // 객체 이름을 객체로 만드는 함수
-    function setNamespace(pStr, pObj) {
+    // 객체 이름을 객체로 만드는 함수 (네임스페이스)
+    function setNamespace(pNS, pStr, pObj) {
         var parts = pStr.split('.');
-        var parent = NS;
+        var parent = pNS;
 
         if (parts[0] === 'ns') {
             parts =parts.slice(1);
@@ -119,17 +100,11 @@ Namespace.prototype.getTemplateInfo = function() {
         return parent;
     }
 
-    // for(i = 0 ; this && i < this.data.length; i++) {
-    //     obj = {};
-    //     obj[this.data[i].attr] = this.data[i].content;
-    //     _data = Object.assign(_data, obj);
-    // }
-
     return {
         part: _part,
         helper: _helper,
         decorator: _decorator,
-        data: {ns: _data}
+        data: _data
     }
 };
 

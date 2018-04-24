@@ -38,12 +38,12 @@ function BaseTemplate(pBasePath) {
     };
 
     var _PATT_GLOB = {
-        // ext: '.hbs',                               // 템플릿 파일 확장자
-        src: '{{1}}**/!(__*)*.hbs',                 // 일반 배치 소스 (__시작하는 파일은 제외)
-        part: '{{1}}**/!(__*)*.{hbs,js}',          // partical명 : 파일명
-        data: '{{1}}**/*.{js,json}',               // data명 : 파일명.객체명  TODO: data/ 폴더 명 사용 불필요 할듯 이미 구분됨
-        helper: '{{1}}**/!(__*)*.js',            // helper(메소드)명 : export 객체명
-        decorator: '{{1}}**/!(__*)*.js'       // decorators(메소드)명 : export 객체명            
+        // ext: '.hbs',                         // 템플릿 파일 확장자
+        src: '{{1}}**/!(__*)*.hbs',             // 일반 배치 소스 (__시작하는 파일은 제외)
+        part: '{{1}}**/!(__*)*.{hbs,js}',       // partical명 : 파일명
+        data: '{{1}}**/*.{js,json}',            // data명 : 파일명.객체명  TODO: data/ 폴더 명 사용 불필요 할듯 이미 구분됨
+        helper: '{{1}}**/!(__*)*.js',           // helper(메소드)명 : export 객체명
+        decorator: '{{1}}**/!(__*)*.js'         // decorators(메소드)명 : export 객체명            
 
     };
 
@@ -281,7 +281,7 @@ BaseTemplate.prototype.build = function(pLocalCollection) {
     // 네임스페이스 로딩
     var nsOjb;
     for(var i = 0; i < this._using.length; i++) {
-        nsOjb = this._using[i].getTemplateInfo();
+        nsOjb = this._using[i].getNamespaceInfo();
         ns_wax.data(nsOjb.data);
     }
 

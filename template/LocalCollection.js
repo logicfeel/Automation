@@ -156,6 +156,9 @@ LocalCollection.prototype.add = function(pAttr, pContent) {
     // if (ns ==='part/ns/..') {
     //     this._part.ns.pushAttr
     // }
+    if (this._SCOPE === 'part' && /^ns\//.exec(pathInfo.attrName)) {
+        this._BT.ns.part.add(pathInfo.attrName, this);
+    }    
 };
 
 /**

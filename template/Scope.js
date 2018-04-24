@@ -1,7 +1,8 @@
 
 'use strict';
 
-var path            = require('path');
+var path                = require('path');
+var deepmerge           = require('deepmerge');
 
 var PublicCollection    = require('./PublicCollection');
 var LocalCollection     = require('./LocalCollection');
@@ -142,18 +143,59 @@ Scope.prototype.getTemplateInfo = function() {
 
     // REVEIW: 아래 문법이 무난? 검토 _helper = this ? Object.assign({}, this.helper.slice(0, this.helper.length - 1)) : {};
     for(i = 0 ; this && i < this.helper.length; i++) {
-        _helper = Object.assign(_helper, this.helper[i].content);
+        obj = {};
+        obj[this.helper[i].attr] = this.helper[i].content;
+        _helper = Object.assign(_helper, obj);
     }
 
     for(i = 0 ; this && i < this.decorator.length; i++) {
-        _decorator = Object.assign(_decorator, this.decorator[i].content);
+        obj = {};
+        obj[this.decorator[i].attr] = this.decorator[i].content;
+        _decorator = Object.assign(_decorator, obj);
     }
 
     for(i = 0 ; this && i < this.data.length; i++) {
         obj = {};
-        obj[this.data[i].attr] = this.data[i].content;
-        _data = Object.assign(_data, obj);
+        var __attr = this.data[i].attr.toString();
+
+        // 폴더속성의 경우 병합 (네임스페이스 포함)
+        if ( __attr.indexOf('.') > 0 ) {
+            setNamespaceOut(obj, __attr, this.data[i].content);
+        } else {
+            obj[this.data[i].attr] = this.data[i].content;
+        }
+        
+        _data = deepmerge(_data, obj, { arrayMerge: overwriteMerge });
+        // _data = Object.assign(_data, obj);
     }
+
+    // 객체 이름을 객체로 만드는 함수 (네임스페이스)
+    function setNamespaceOut(pNS, pStr, pObj) {
+        var parts = pStr.split('.');
+        var parent = pNS;
+
+        // if (parts[0] === 'ns') {
+        //     parts =parts.slice(1);
+        // }
+
+        for (var i = 0; i < parts.length; i++) {
+            if (typeof parent[parts[i]] === 'undefined') {
+                if (i === parts.length - 1) {
+                    parent[parts[i]] = pObj;
+                } else {
+                    parent[parts[i]] = {};
+                }
+            }
+            parent = parent[parts[i]];
+        }
+        return parent;
+    }
+    
+    // 콜백 함수
+    function overwriteMerge(destinationArray, sourceArray, options) {
+        return sourceArray
+    }
+
     return {
         part: _part,
         helper: _helper,
