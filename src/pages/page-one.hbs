@@ -9,6 +9,24 @@
     }}
   {{/inline}}
 
+
+  {{#*inline "includes/sub"}}
+    *inline one 에서의 인라인
+    {{#> includes/sub}}
+      {includes/sub 의 기본값
+        {{#*inline "sub-block"}}
+          sub-block 의 오버라이딩
+        {{/inline}}
+    {{/includes/sub}}
+
+  {{/inline}}
+
+{{!-- 
+  {{#> includes/sub title="Page One" }}
+  #> 로 처리 
+  {{/includes/sub}}
+--}}
+
 {{/layouts/base}}
 
 

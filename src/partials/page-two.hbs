@@ -25,6 +25,7 @@
     <script src="new-script.js"></script>
   {{/inline}}
 
+
   {{/layouts/base}}
 
 
@@ -44,6 +45,22 @@
     내부 스크립트 
   {{/inline}}
 
+
 {{#> ff2-block}}
+
    ff 파이날 블럭 내부
+  {{#> includes/sub}}
+    { includes/sub 의 기본값
+{{!--      
+      {{#*inline "sub-block"}}
+      오버 서브 블럭
+      {{/inline}}
+ --}} 
+
+  {{/includes/sub}}
+
+  {{#> includ}}
+    includ 기본값
+  {{/includ}}
+
 {{/ff2-block}}
