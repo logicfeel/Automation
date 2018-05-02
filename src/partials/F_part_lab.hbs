@@ -1,0 +1,18 @@
+//**************************
+File_part_lab 정의:기본값 (File)
+  {{#> part_1.task }}
+  
+    {{#*inline "block" }}
+    block 오버 (File)
+    {{/inline}}
+
+  {{/part_1.task }}
+  {{#> part_1.task }}
+  part_1 사용:기본값 (File) => 로딩안됨
+  {{/part_1.task }}
+  {{#> virual }}
+  virual 사용:기본값 (File)
+    {{#> part_1.task }}
+  virual.part_1 사용:기본값 (File) => 로딩안됨
+    {{/part_1.task }}  
+  {{/virual }}

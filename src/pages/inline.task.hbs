@@ -1,0 +1,59 @@
+{{!-- pages/inline.hbs --}}
+
+{{! 조각이 있는 경우 }}
+{{#> part_1.task }}
+  part_1 사용:기본값 (inline) => 로딩안됨
+{{/part_1.task}}
+
+{{! 조각이 없는 경우 }}
+{{#> part_1_not }}
+  part_1_not 사용:기본값 (inline) .....
+{{/part_1_not}}
+
+{{! 조각이 있는 경우 : lab }}
+{{#> part_lab }}
+  part_lab 사용:기본값 (inline) => 로딩안됨
+{{/part_lab}}
+
+{{! 조각이 있는 경우 : lab2 }}
+{{#> part_lab2 }}
+  part_lab2 사용:기본값 (inline) => 로딩안됨
+{{/part_lab2}}
+
+
+{{! ************* 내부정의 *************** }}
+{{#*inline "part_lab" }}
+//**************************
+part_lab 정의:기본값 (inline)
+  {{#> part_1.task }}
+  
+    {{#*inline "block" }}
+    block 오버 (inline)
+    {{/inline}}
+
+  {{/part_1.task }}
+  {{#> part_1.task }}
+  part_1 사용:기본값 (inline) => 로딩안됨
+  {{/part_1.task }}
+{{/inline}}
+
+{{#*inline "part_lab2" }}
+//**************************
+part_lab2 정의:기본값 (inline)
+  {{#> part_1.task }}
+  
+    {{#*inline "block" }}
+    block 하위-오버 (inline)
+    {{/inline}}
+
+  {{/part_1.task }}
+  {{#> part_1.task }}
+  part_1 사용:기본값 (inline) => 로딩안됨
+  {{/part_1.task }}
+  {{#*inline "block" }}
+    block 상위-오버 (inline)
+  {{/inline}}
+
+{{/inline}}
+
+

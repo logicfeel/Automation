@@ -1,0 +1,9 @@
+
+{{#*inline "ff2-block"}}
+  ff2-block 인라인 정의 : page-two (inline)
+
+  {{#> includes/sub }}  {{!--오버--}}
+    #> includes/sub 의 기본값 : page-two (inline)
+  {{/includes/sub}}
+
+{{/inline}}

@@ -22,45 +22,54 @@
 
   {{!-- Let's add a script for this layout. --}}
   {{#*inline "scripts-block"}}
-    <script src="new-script.js"></script>
+    <script src="..new-script.js"></script>
   {{/inline}}
+{{/layouts/base}}
+
+______
+{{#> final-block}}
+  파이널 블럭(기본값)
+{{/final-block}}
+
+{{#> final2-block}}
+  {{#> ff-block }}
+  ...
+  {{/ff-block}}
+{{/final2-block}}
+
+{{!-- 
+{{#*inline "ff-block"}}
+  ff 내부 스크립트 
+{{/inline}}
+--}}
+
+{{!-- 
+{{#*inline "includes/sub"}}
+  includes/sub 의 오버라이딩2 : page-two
+{{/inline}}
+--}}
 
 
-  {{/layouts/base}}
-
-
-  {{#> final-block}}
-    파이날 블럭
-  {{/final-block}}
-
-
-  {{#> final2-block}}
-    {{#> ff-block }}
-    ...
-    {{/ff-block}}
-  {{/final2-block}}
-
-
- {{#*inline "ff-block"}}
-    내부 스크립트 
-  {{/inline}}
-
-
-{{#> ff2-block}}
-
-   ff 파이날 블럭 내부
-  {{#> includes/sub}}
-    { includes/sub 의 기본값
-{{!--      
-      {{#*inline "sub-block"}}
-      오버 서브 블럭
-      {{/inline}}
- --}} 
-
-  {{/includes/sub}}
+{{#> ff2-block }} {{!--내용--}}
+  ff 파이날 블럭 내부 : page-two
+ 
+  {{#> includes/sub }}  {{!--오버--}}
+  
+    #> includes/sub 의 기본값
+{{!--
+    {{#*inline "sub-block" }}
+      오버 서브 블럭 : page-two
+    {{/inline}}
+--}}
+  {{/includes/sub }}
 
   {{#> includ}}
     includ 기본값
   {{/includ}}
 
 {{/ff2-block}}
+
+
+{{#> includ}}
+  includ 기본값
+{{/includ}}
