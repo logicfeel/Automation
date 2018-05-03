@@ -17,16 +17,20 @@
 {{#> F_part_lab }}
 
   {{#*inline "block" }}
-    F_lab 에서 :: block 오버 
+    F_lab 에서 :: block 지역:오버 
   {{/inline}}
   
   {{#> virual }}
-    F_lab 에서 virual 오버
+    F_lab 에서 virual 오버 => 로딩안됨
   {{/virual }}
 
   {{#> virual2 }}
-    F_lab 에서 virual2 오버
+    F_lab 에서 virual2 오버 => 로딩안됨
   {{/virual2 }}
+
+  {{#*inline "virual2" }}
+    F_lab 에서 :: virual2 지역:오버 
+  {{/inline}}
 
 {{/F_part_lab }}
 
