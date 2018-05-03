@@ -4,7 +4,7 @@
 {{#> part_1.task }}
   part_1 사용:기본값 (inline) => 로딩안됨
   {{#*inline "block" }}
-    part_1 에서 block 오버 (inline) => 로딩안됨
+    part_1 에서 block 오버 (inline)
   {{/inline}}  
 {{/part_1.task}}
 
@@ -13,40 +13,54 @@
   part_1_not 사용:기본값 (inline) .....
 {{/part_1_not}}
 
-{{! 조각이 있는 경우 : lab }}
-{{#> part_lab }}
-  part_lab 사용:기본값 (inline) => 로딩안됨
-{{/part_lab}}
-
 {{! 조각이 있는 경우 : lab 오버라이딩 }}
 {{#> F_part_lab }}
-  {{#*inline "virual" }}
-    lab 에서 virual 오버 (inline) => 로딩안됨
+
+  {{#*inline "block" }}
+    F_lab 에서 :: block 오버 (inline)
   {{/inline}}
+
+  {{#*inline "virual" }}
+    F_lab 에서 virual 오버 (inline)
+  {{/inline}}
+
+{{/F_part_lab }}
+
+{{! ************* 사례 *************** }}
+{{! inline 조각이 있는 경우 : lab }}
+{{#> part_lab }}
+
   {{#*inline "block" }}
     lab 에서 :: block 오버 (inline)
   {{/inline}}
-{{/F_part_lab}}
 
+  {{#*inline "virual" }}
+    lab 에서 virual 오버 (inline) => 로딩안됨
+  {{/inline}}
+
+{{/part_lab }}
 
 {{! ************* 내부정의 *************** }}
 {{#*inline "part_lab" }}
 //**************************
 part_lab 정의:기본값 (inline)
+[ inline 정의된 곳에서 inline 오버라이딩은 안됨 !!! ]
+
   {{#> part_1.task }}
-  
     {{#*inline "block" }}
     block 오버 (inline)
     {{/inline}}
-
   {{/part_1.task }}
+
   {{#> part_1.task }}
   part_1 사용:기본값 (inline) => 로딩안됨
   {{/part_1.task }}
+
   {{#> virual }}
   virual 사용:기본값 (inline)
     {{#> part_1.task }}
   virual.part_1 사용:기본값 (inline) => 로딩안됨
     {{/part_1.task }}  
   {{/virual }}
+
 {{/inline}}

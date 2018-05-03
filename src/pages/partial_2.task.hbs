@@ -1,0 +1,34 @@
+{{!-- pages/partial.hbs --}}
+
+{{! 조각이 있는 경우 }}
+{{#> part_1.task }}
+  part_1 사용:기본값 => 로딩안됨
+  {{#*inline "block" }}
+    part_1 에서 block 오버
+  {{/inline}}  
+{{/part_1.task}}
+
+{{! 조각이 없는 경우 }}
+{{#> part_1_not }}
+  part_1_not 사용:기본값
+{{/part_1_not}}
+
+{{! 조각이 있는 경우 : lab 오버라이딩 }}
+{{#> F_part_lab }}
+
+  {{#*inline "block" }}
+    F_lab 에서 :: block 오버 
+  {{/inline}}
+  
+  {{#> virual }}
+    F_lab 에서 virual 오버
+  {{/virual }}
+
+  {{#> virual2 }}
+    F_lab 에서 virual2 오버
+  {{/virual2 }}
+
+{{/F_part_lab }}
+
+
+{{! ************* 내부정의 *************** }}
