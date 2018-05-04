@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "- gulp 를 활용",
   "main": "index.js",
+  "typings": "@types/template/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -15,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/logicfeel/Automation/issues"
   },
-  "homepage": "https://github.com/logicfeel/Automation#readme"
+  "homepage": "https://github.com/logicfeel/Automation#readme",
+  "dependencies": {
+    "@types/gulp": "^4.0.5"
+  }
 }
