@@ -1,10 +1,10 @@
 
-/// <reference path="@types/template/index.d.ts" />
+// <reference path="@types/template/index.d.ts" />
 
 'use strict';
 
 // C:/Users/Young/AppData/Local/Microsoft/TypeScript/2.8/node_modules/@types/... 을 참조함
-var gulp            = require('gulp');          // gulp 4.0 기준
+// var gulp            = require('gulp');          // gulp 4.0 기준
 
 // D:\PJ-GitHub\Automation\node_modules\@types\.. 을 참조함
 // var GreeterS        = require('template');
@@ -34,6 +34,13 @@ t.c;
 
 // 타입스크립트 형식 검사됨
 // let a = new GreeterS();
+
+
+var TemplateClass        = require('./auto/TemplateClass');
+
+var tt = new TemplateClass();
+tt.layout_base;
+tt.footer;
 
 
 console.log('-End-');
