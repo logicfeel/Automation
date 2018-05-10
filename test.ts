@@ -47,7 +47,51 @@ tt.web = tt.web2;
 tt.web_in = tt.web; // __빨간줄
 
 
-// b.template2(aaa)
+namespace NS {
+    export namespace View {
+        export class TemplateClass {
+            /**
+             * 기본 형태 값
+             */
+            base: string;
+
+            /**
+             * 타이틀 정보
+             */
+            head: string;
+            
+            /**
+             * 생성자
+             * @param message 해더 메세지
+             */
+            constructor(message: string) {
+                this.head = message;
+            }
+    
+            /**
+             * @param abc 입력값
+             */
+            greet(abc: string) {
+                return "Hello, " + this.head;
+            }
+            /**
+             * 이벤트
+             */
+            on() {
+
+            }
+        }
+    } 
+}
+
+
+var aa = NS.View.TemplateClass;
+
+/**
+ * 기본값과 네임스페이스 값을 2개를 내보내야 함
+ *  - 기본값 : .js 에서 사용할 경우
+ *  - 네임스페이스 : .ts 에서 로딩할 경우
+ */
 
 
 
