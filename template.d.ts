@@ -36,6 +36,12 @@ declare namespace AAA {
         template(ttt: MyClassMethodOptions): MyClassMethodOptions2;
 
         template2(tt: CCC.CCC_Type): MyClassMethodOptions2;
+
+
+        // 속성 기본값 안됨
+        // table : string = 'aabc';           
+        // readonly table2 : string = 'aabc';    // 속성 기본값 안됨
+        // const table2 : string = 'aabc';    // 속성 기본값 안됨
     }
 
 

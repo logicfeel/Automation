@@ -59,6 +59,11 @@ namespace NS {
              * 타이틀 정보
              */
             head: string;
+
+            // 속성 기본값 안됨
+            table : string = 'aabc';           
+            const table2 : string = 'aabc';    // 속성 기본값 안됨
+            readonly table3 : string = 'aabc'; // 속성 기본값 안됨
             
             /**
              * 생성자
