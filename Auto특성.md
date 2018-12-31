@@ -8,7 +8,7 @@
     - /external 외부 종속모듈의 수입 (>gulp external)
     - VS.CODE 의 개발툴 제공
         + typescript : 타입검사
-    - 편리한 스토리지 : *NPM 규칙
+    - 편리한 스토리지 : GitHub (*NPM 규칙)
 
 ## 가장 높은 생산성/신속성
     - 한줄 명령 설치 : ()>gulp install)
@@ -34,7 +34,7 @@
     - 개발환경 : win, osx, linux 외 (npm 지원 플랫폼) & VS.CODE
     - 기존 파일(코드)의 모듈화 : 모든 프로젝트/기능/파일들 가능
         + API, Page, 함수, 클래스, 페이지, 파일, 패턴
-
+    - 스타일 : 웹, 네이티브(cpp/pas), java, .Net, iOS, 안드로이드, 플러그인(크롬, VS, starUML ...) ...
 
 ## 가장 많이 사용하는 표준성
     - 폴더규칙 : /src /dist 의 GitHub(jqery/angular..)의 슈퍼셋(포함)
