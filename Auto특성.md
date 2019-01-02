@@ -3,17 +3,18 @@
 > 범용성 : 넓은 분야에 응할수 있는 성질
 
 ## 가장 쉬운 편이성
-    - AutoClass의 프로퍼티 설정 방식 (winform 디자인 방식)
-    - 모듈 관리 : 명령어(gulp)로 모듈의 추가/제거/업데이트
+    - 사용법 : AutoClass의 프로퍼티 설정 방식 (winform 디자인 방식)
+    - 모듈관리 : 명령어(gulp)로 모듈의 추가/제거/업데이트
     - /external 외부 종속모듈의 수입 (>gulp external)
     - VS.CODE 의 개발툴 제공
         + typescript : 타입검사
-    - 편리한 스토리지 : GitHub (*NPM 규칙)
-    - 테스크 명령 : gulp relation | external | install | publish 
-    - T/SQL | PL/SQL 구문의 스토리지에 관리 (create | alter)
+    - 스토리지 : GitHub, git(path, url, tar)
+    - 설치 : NPM 이 관리
+    - 테스크 : gulp relation | external | install | publish 
+    - DDL : T/SQL, PL/SQL 구문의 스토리지에 관리 (create | alter)
 
 ## 가장 높은 생산성/신속성
-    - 한줄 명령 설치 : ()>gulp install)
+    - 한줄 명령 설치 : >gulp install
     - 제품의 패키징(묶음) : 다양한 형태로 묶음 제공 (설치)
         + "하나로 묶거나 vs 모듈로 쪼개서 묶거나"
     - Template 영역을 통한 코드 자동 생성 (타입만 매칭)
@@ -31,11 +32,12 @@
 
 > 컴포넌트 = 컴포넌트(뷰) + 컴포넌트(컨트롤) + 컴포넌트(모델) 
 > 컴포넌트(뷰) : 패키지(모듈)1 + 패키지(모듈)2 ...
+> 패키지(모듈) : 파일(뷰) + 파일(컨트롤) ..
 
 | \           | Store(STO) | Member(MEB) | Board(BOD) |
 |:-----------:|:----------:|:-----------:|:----------:|
-| **컴포넌트(뷰)** | List.asp, View.asp | MemberFrm.cpp | List.cpp |
-| **컴포넌트(컨트롤)** | Cb.asp | MemberCls.cs | Member.cpp |
+| **컴포넌트(뷰)** | `V` List.asp , `C` Main.js | `VC` MemberFrm.cpp | `MVC` List.cpp |
+| **컴포넌트(컨트롤)** | `M` Cb.asp | `M` MemberCls.cs | `M` Member.cpp |
 | `메타` | MetaClass | - | - |
 | **컴포넌트(모델)** | STO_Info-U.sql | Meb_List-U.sql | BOD_List-SP.sql |
 | `DB` | asp, mssql2008 | .Net, Oracle8i | c++, mysql5.6 |
@@ -59,22 +61,22 @@
 ## 가장 많이 사용하는 표준성
     - 폴더규칙 : /src /dist 의 GitHub(jqery/angular..)의 슈퍼셋(포함)
     - 많이사용 : 
-        + 제어 : javscript, handlebars
+        + 제어 : javscript(기능제어-외부), handlebars (파일제어-내부)
         + 저장소 : GitHub(git)
         + 설치 : NPM(node), gulp
         + 타입 : typescript
-        + 버전 : semver
+        + 버전 : semver (주.부.수)
     - 정규표현식 : Auto 파일들 제어
 
 
 ## 가장 확장성/다양성
 
     - 모델(DB)의 Meta 관리
-        + 아이템 : 뷰기준의 항목
+        + 아이템 : 뷰 기준의 항목
         + 코드명령규칙 : 컬럼의 코드와 의미를 매핑
         + 모델(DB)의 규칙 : CRUDL, SP, FN, TF, VW, U(CRUDL 규칙)
     - semver규칙 주.부.수 버전체계로 다양성 관리
-    - typescript 을 활용한 타입 관리 (auto, template)    
+    - typescript을 활용한 타입 관리 (auto, template)    
     - 컴포넌트(모델)의 메타(인터페이스/상위)를 활용하여 다양성 제공
     - AutoTask
         + 사용자용 확장 : 특별한 파일 형식
