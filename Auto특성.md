@@ -29,11 +29,16 @@
     - 컴포넌트 조립으로 다양한 비즈니스 로직 구현
         + DB(4~) * 언어(8) * 컴포넌트(12~) * 모듈수(4~) : 1,536가지 ~
 
-| 컴포넌트(뷰) | 컴포넌트(컨트롤) | 메타 | 컴포넌트(모델) |
-|:------------------:|:---------------:|:-------:|:-----------:|
-| List.asp, View.asp | Cb.asp, Frm.asp | 메타종류 | STO, MEB... |
-| html, css | asp, js, php, winform | - | MSSQL, Oracle |
+> 컴포넌트 = 컴포넌트(뷰) + 컴포넌트(컨트롤) + 컴포넌트(모델) 
+> 컴포넌트(뷰) : 패키지(모듈)1 + 패키지(모듈)2 ...
 
+| \           | Store(STO) | Member(MEB) | Board(BOD) |
+|:-----------:|:----------:|:-----------:|:----------:|
+| **컴포넌트(뷰)** | List.asp, View.asp | MemberFrm.cpp | List.cpp |
+| **컴포넌트(컨트롤)** | Cb.asp | MemberCls.cs | Member.cpp |
+| `메타` | MetaClass | - | - |
+| **컴포넌트(모델)** | STO_Info-U.sql | Meb_List-U.sql | BOD_List-SP.sql |
+| `DB` | asp, mssql2008 | .Net, Oracle8i | c++, mysql5.6 |
 ## 가장 넓은 범용성/이식성
 
     - 모든 파일
