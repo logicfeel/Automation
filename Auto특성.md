@@ -41,6 +41,8 @@
 | `메타` | MetaClass | - | - |
 | **컴포넌트(모델)** | STO_Info-U.sql | Meb_List-U.sql | BOD_List-SP.sql |
 | `DB` | asp, mssql2008 | .Net, Oracle8i | c++, mysql5.6 |
+
+
 ## 가장 넓은 범용성/이식성
 
     - 모든 파일
