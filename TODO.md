@@ -20,3 +20,6 @@
 - [ ] DataSet, Entity 의 통합성 검토
 
 
+# 아이디어 (업무 정의)
+- gulp list  // auto 목록 출력 기능
+- Meta => MetaType 으로 명칭 변경 
