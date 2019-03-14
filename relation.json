@@ -1,0 +1,50 @@
+{
+    "source": [
+        {
+            "/src/path1": {                     // 경로 + 파일명 = 키, 모듈명/경로 = 키
+                "clone": true,                  // 복제(복사) 플래그 true, false, null
+                "path": null,                   // 배포 파일명, 파일명 지정시 해당이름으로 파싱됨
+                "dependencies": [               // 종속 정보
+                    "mod1",                     // 간접 참조 (외부)
+                    {
+                        "mod2": {               // 직접 참조(외부)
+                            "index": 10,
+                            "length": 20
+                        }
+                    },
+                    "/src/path2",               // 간접 참조(내부)
+                    {
+                        "/src/sub/path3": {     // 직접 참조(내부)
+                            "index": 10,
+                            "length": 20
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "/src/path2": {
+                "copy": true,
+                "path": null,                   
+                "dependencies": ["mod1", "/src/path1"] // 배열 사용, 내부 종속 사용
+                
+            }
+        },
+        {
+            "/src/sub/path3": {
+                "copy": true,
+                "path": ["/dist/all.sql"],      // 2개 파일의 통합
+                "dependencies": "mod1"          // 문자열 사용
+                
+            }
+        },
+        {
+            "/src/sub/path4": {
+                "copy": true,
+                "path": ["/dist/all.sql"],      // 2개 파일의 통합
+                "dependencies": "mod1"
+                
+            }
+        }
+    ]
+}
