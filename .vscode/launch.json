@@ -9,6 +9,12 @@
             "request": "launch",
             "name": "temp",
             "program": "${workspaceFolder}/temp.js"
-        }  
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "typeOOP",
+            "program": "${workspaceFolder}/typeOop.ts"
+        }            
     ]
 }
