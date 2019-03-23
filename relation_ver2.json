@@ -1,0 +1,37 @@
+{
+    "local": [
+        {
+            "/src/aaa.css": 
+            {
+                "clone": true,              // 복제(복사) 플래그 true, false, null
+                "depend": [
+                    "mod1/ccc.css",         // 간접 종속(외부)
+                    "/src/bbb.css",         // 간접 종속(내부)
+                    {
+                        "mod2/ddd.css": {   // 직접 종속(외부)
+                            "index": 10,
+                            "length": 20
+                        }
+                    },
+                    {
+                        "/src/eee.css": {   // 직접 종속(내부)
+                            "index": 10,
+                            "length": 20
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "global": [
+        {
+            "mod1/ccc.css": 
+            {
+                "onwer": ["sub/bbb.css"],   // 배열(통합의 경우)
+                "clone": true,
+                "distPath": null,
+                "instPath": "css/Top.css"
+            }
+        }
+    ]    
+}
