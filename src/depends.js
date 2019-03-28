@@ -48,6 +48,8 @@ function LocalSource(pPath) {
     this.clone          = null;
     this.directDepend   = [];
     this.dist           = [];
+
+    console.log('localSource..');
 }
 util.inherits(LocalSource, InternalDepend);
 
