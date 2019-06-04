@@ -14,6 +14,7 @@
             "type": "node",
             "request": "launch",
             "name": "typeOOP",
+            "outFiles": [],
             "program": "${workspaceFolder}/typeOop.ts"
         }            
     ]

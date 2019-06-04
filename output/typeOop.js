@@ -5,4 +5,4 @@ class ClassWithStaticMethod {
 }
 console.log(ClassWithStaticMethod.staticMethod());
 // expected output: "static method has been called."
-//# sourceMappingURL=typeOop.js.map
+//# sourceMappingURL=typeoop.js.map
