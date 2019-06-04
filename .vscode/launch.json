@@ -9,6 +9,12 @@
             "request": "launch",
             "name": "Launch Program",
             "program": "${workspaceFolder}\\index.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "ts Ltunch Program",
+            "program": "${workspaceFolder}\\test1\\use2.ts"
         }
     ]
 }
