@@ -1,0 +1,57 @@
+<html>
+<head></head>
+<body>
+
+    <input id="acc_idx" type="hidden" />
+    <input id="admName" type="text" />
+    <input name="acc_type" type="radio"  value="G" /> 방문자
+    <input name="acc_type" type="radio"  vlaue="A" /> 관리자
+
+    <button id="btn_Delete">삭제</button>
+    <button id="btn_List">목록</button>
+
+<script src="../Jquery.js"></script>
+<script src="../BindModel_ReadDelete.js"></script>
+<script>
+////////////////////////////////////
+// 조회, 삭제 바인드 모델 객체 생성
+var m = new BindModel("Callback.asp");
+
+// 설정 변경
+m.delete.msg = "삭제할꺼야 말꺼야?";
+
+////////////////////////////////////
+// 이벤트 등록 : 초기화
+$(document).ready(function () { // 페이지를 다 읽은 후 처리
+    m.init(); 
+    // 로딩시 자동으로 m.read.execute(); 호출
+});
+// 목록 버튼 클릭
+$("#btn_List").click(function () {
+    location.href = "ListURL...";
+});
+// 삭제 버튼 클릭
+$("#btn_Delete").click(function () {
+    m.delete.execute();
+});
+
+////////////////////////////////////
+// 아이템 : 타입 정의
+
+
+////////////////////////////////////
+// 아이템 : 마스터 아이템 등록
+m.items.add(new Item("acc_idx"), ["read", "delete"]);   // read, delete 에 전체에 등록
+m.items.add(new Item("admName", $("#admName")));        // 인스턴스 참조값 추가함
+m.items.add(new Item("accType"));
+// ..... 아이템 갯수 만큼 늘어남
+
+// 아이템 : 명령과 매핑
+m.read.view.add(m.items["accName"]);    // 마스터 아이템과 매핑
+m.read.view.add(new Item("accType"));   // 명령 아이템에 등록 (마스터아이템에 등록후 참조값 등록됨)
+// REVIEW 상위에서 적재했으므로 제거 가능
+//m.delete.add(m.items["acc_idx"]);
+
+</script>
+</body>
+</html>
