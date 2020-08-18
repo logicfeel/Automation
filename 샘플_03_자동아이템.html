@@ -40,19 +40,20 @@ $("#btn_Delete").click(function () {
 
 
 ////////////////////////////////////
-// 아이템 : 마스터 아이템 등록
-// items.add(Item [, <string>Arrary] [, value])
-m.items.add(new Item("acc_idx"), ["read", "delete"]);           // read, delete 에 전체에 등록
-m.items.add(new Item("admName", null, $("#admName").val()));    // 인스턴스 참조값 추가함
-m.items.add(new Item("accType"));
-// ..... 아이템 갯수 만큼 늘어남
+// 아이템 : 명령바인딩에 직접 등록
+// 객체 생성 
+var bm = new BindManager("../MEB_Account.json");
 
-// 아이템 : 명령과 매핑
-// view.add(Item)
-m.read.view.add(m.items["accName"]);                            // 마스터 아이템과 매핑
-m.read.view.add(new Item("accType"));                           // 명령 아이템에 등록 (마스터아이템에 등록후 참조값 등록됨)
-// REVIEW 상위에서 적재했으므로 제거 가능
-//m.delete.add(m.items["acc_idx"]);
+m.read.valid = bm.getItems("MEB_Account_R", "NOTNULL");
+m.read.bind = bm.getItems("MEB_Account_R");
+m.read.view[1] = bm.getItems("MEB_Account_R", "OUTPUT", 2); // 배열[1]에 2번째 결과 매핑
+// OR
+// m.read.view = bm.getItems("MEB_Account_R", "OUTPUT");    // 배열형태로 순서대로 등록됨
+
+// 1> 전체 로딩후 view 배열을 제어하여 이용 => view를 사용자화 오버라이딩시에 적합
+// 2> 지정된 view 배열에 각각 매핑 => 이미구현된 view 에 매핑에 적합
+
+m.delete = bm.getItems("MEB_Account_D", "PK");              // valid, bind 에 한번에 매핑함
 
 </script>
 </body>

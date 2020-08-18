@@ -1,0 +1,87 @@
+<html>
+<head></head>
+<body>
+
+    <input id="acc_idx" type="hidden" />
+    <input id="admName" type="text" />
+    <input name="acc_type" type="radio"  value="G" /> 방문자
+    <input name="acc_type" type="radio"  vlaue="A" /> 관리자
+
+    <button id="btn_Delete">삭제</button>
+    <button id="btn_List">목록</button>
+
+<script src="../Jquery.js"></script>
+<script src="../BindModel_ReadDelete.js"></script>
+<script>
+////////////////////////////////////
+// 조회, 삭제 바인드 모델 객체 생성
+var m = new BindModel("Callback.asp");
+
+// 설정 변경
+m.delete.msg = "삭제할꺼야 말꺼야?";
+
+////////////////////////////////////
+// 이벤트 등록 : 초기화
+$(document).ready(function () { // 페이지를 다 읽은 후 처리
+    m.init(); 
+    // 로딩시 자동으로 m.read.execute(); 호출
+});
+// 목록 버튼 클릭
+$("#btn_List").click(function () {
+    location.href = "ListURL...";
+});
+// 삭제 버튼 클릭
+$("#btn_Delete").click(function () {
+    m.delete.execute();
+});
+
+////////////////////////////////////
+// 아이템 : 타입 정의
+
+
+////////////////////////////////////
+// 아이템 : 명령바인딩에 직접 등록
+// 객체 생성 
+var bm = new BindManager("../MEB_Account.json");
+
+m.read.valid = bm.getItems("MEB_Account_R", "NOTNULL");
+m.read.bind = bm.getItems("MEB_Account_R");
+m.read.view[1] = bm.getItems("MEB_Account_R", "OUTPUT", 2); // 배열[1]에 2번째 결과 매핑
+// OR
+// m.read.view = bm.getItems("MEB_Account_R", "OUTPUT");    // 배열형태로 순서대로 등록됨
+
+// 1> 전체 로딩후 view 배열을 제어하여 이용 => view를 사용자화 오버라이딩시에 적합
+// 2> 지정된 view 배열에 각각 매핑 => 이미구현된 view 에 매핑에 적합
+
+m.delete = bm.getItems("MEB_Account_D", "PK");              // valid, bind 에 한번에 매핑함
+
+// view 오버라이딩 => REVIEW 템플릿 메소드임
+// onwer 는  m.read 임
+m.read.execView = function(onwer) {
+
+    $("#admName") = onwer.output["admName"] + " 님";
+    
+    if (onwer.output["accType"] === "G") {
+        $("acc_type")[0].checked;
+    } else {
+        $("acc_type")[1].checked;
+    }
+}
+
+// 아이템을 새로 구성해서 작동
+var vaild2 = m.read.valid;          // 아이템을 복제함
+valid2.add(new Item("another"));    // 마스터 아이템에 영향없이 조건 수행
+valid2.remove("admName");
+
+for(var i = 0; valid2.length; i++) {
+    // valid2[i]  이런식으로 사용도 가능
+}
+
+/*
+ TODO:: 메소드 중복 이슈
+ - 속성명과 메소드명은 달라야함
+*/
+
+</script>
+</body>
+</html>

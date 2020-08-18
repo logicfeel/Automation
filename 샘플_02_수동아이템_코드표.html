@@ -1,0 +1,75 @@
+<html>
+<head></head>
+<body>
+
+    <input id="acc_idx" type="hidden" />
+    <input id="admName" type="text" />
+    <template id="type_template">
+        <input name="acc_type" type="radio"  value="G" /> 방문자
+    </template>
+
+    <button id="btn_Delete">삭제</button>
+    <button id="btn_List">목록</button>
+
+<script src="../Jquery.js"></script>
+<script src="../BindModel_ReadDelete.js"></script>
+<script>
+////////////////////////////////////
+// 조회, 삭제 바인드 모델 객체 생성
+var m = new BindModel("Callback.asp");
+
+// 설정 변경
+m.delete.msg = "삭제할꺼야 말꺼야?";
+
+////////////////////////////////////
+// 이벤트 등록 : 초기화
+$(document).ready(function () { // 페이지를 다 읽은 후 처리
+    m.init(); 
+    // 로딩시 자동으로 m.read.execute(); 호출
+});
+// 목록 버튼 클릭
+$("#btn_List").click(function () {
+    location.href = "ListURL...";
+});
+// 삭제 버튼 클릭
+$("#btn_Delete").click(function () {
+    m.delete.execute();
+});
+
+////////////////////////////////////
+// 아이템 : 타입 정의
+var t = new CodeTable();
+t.add(new CodeValue("G", "방문자"));
+t.add(new CodeValue("A", "관리자"));
+
+
+////////////////////////////////////
+// 아이템 : 마스터 아이템 등록
+// items.add(Item [, <string>Arrary] [, value])
+m.items.add(new Item("acc_idx"), ["read", "delete"]);                // read, delete 에 전체에 등록
+m.items.add(new Item("admName", null, $("#admName").val()));         // html요소 참조값 추가함
+m.items.add(new Item("accType", "회원종류", $("acc_type").val(), t));  // 타이틀, 타입 지정, html복수 요소 참조함
+// ..... 아이템 갯수 만큼 늘어남
+
+// 아이템 : 명령과 매핑
+m.read.view.add(m.items["accName"]);                                // 마스터 아이템과 매핑
+m.read.view.add(new Item("accType"));                               // 명령 아이템에 등록 (마스터아이템에 등록후 참조값 등록됨)
+
+// 코드테이블을 바인딩 하는 부분?
+// 예시 샘플
+// 1) 자동으로 html 이 구성 만들어 지던지
+// 2) 각각의 html에 매핑한는 방식
+// * 코드는 어디에서 필요한가? (관점)
+/*
+    코드테이블의 사용 위치
+    1) 데이터를 해석해서 VIEW 하는데 사용함
+    2) 코드테이블 컬렉션을 구성하는데 사용함
+*/
+
+// 코드 생성기 추가 => 템플릿을 사용한건 임시 사례임
+codeTemplate($("type_template"), m.items["accType"].type);
+
+
+</script>
+</body>
+</html>
