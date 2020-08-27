@@ -4,6 +4,7 @@
 
     <input id="acc_idx" type="hidden" />
     <input id="admName" type="text" />
+
     <template id="type_template">
         <input name="acc_type" type="radio"  value="G" /> 방문자
     </template>
@@ -69,6 +70,11 @@ m.read.view.add(new Item("accType"));                               // 명령 �
 // 코드 생성기 추가 => 템플릿을 사용한건 임시 사례임
 codeTemplate($("type_template"), m.items["accType"].type);
 
+// 코드를 생성하는 방법
+// 1) string 형식으로 구성 후 붙이는 방식
+// 2) object 형식으로 구성 후 붙이는 방식
+// 3) template 태그를 활용하여 인스턴스화 하여 붙이는 방식
+// 4) function 를 제작하여 붙이는 방식
 
 </script>
 </body>
