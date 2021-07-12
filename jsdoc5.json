@@ -1,0 +1,83 @@
+{
+    "tags": {
+      "allowUnknownTags": false
+    },
+    "source": {
+      "include": ["./src"],
+      "includePattern": ".js$",
+      "exclude": ["./docs"],
+      "excludePattern": "(node_modules/|docs)"
+    },
+    "plugins": [
+      "plugins/markdown"
+    ],
+    "opts": {
+      "template": "node_modules/ink-",
+      "theme_opts": {
+        "theme": "dark"
+      },
+      "encoding": "utf8",
+      "destination": "docs5/",
+      "recurse": true,
+      "verbose": true
+    },
+    "templates": {
+      "cleverLinks": false,
+      "monospaceLinks": false,
+      "default": {
+        "outputSourceFiles": false
+      }
+    },
+    "docdash": {
+      "static": false,
+      "sort": false,
+      "sectionOrder": [
+        "Classes",
+        "Modules",
+        "Externals",
+        "Events",
+        "Namespaces",
+        "Mixins",
+        "Tutorials",
+        "Interfaces"
+      ],
+      "disqus": "", /* disqus의 짧은 이름(사이트 생성 중 하위 도메인) */
+      "openGraph": {
+          "title": "",
+          "type": "website",
+          "image": "",
+          "site_name": "",
+          "url": ""
+      },
+      "meta": {
+          "title": "",
+          "description": "",
+          "keyword": ""
+      },
+      "search": true,
+      "commonNav": true,
+      "collapse": true,
+      "wrap": true,
+      "navLevel": 0,
+      "private": false,
+      "removeQuotes": true,
+      "scripts": [],
+      "menu": {
+          "Project Website": {
+              "href":"https://myproject.com",
+              "target":"_blank",
+              "class":"menu-item",
+              "id":"website_link"
+          },
+          "Forum": {
+              "href":"https://myproject.com.forum",
+              "target":"_blank",
+              "class":"menu-item",
+              "id":"forum_link"
+          }
+      },
+      "scopeInOutputPath": true,
+      "nameInOutputPath": true,
+      "versionInOutputPath": true
+    }
+  }

@@ -1,0 +1,36 @@
+{
+    "templates": {
+        "applicationName": "_W",
+        "disqus": "",
+        "googleAnalytics": "",
+        "openGraph": {
+            "title": "_w",
+            "type": "website",
+            "image": "",
+            "site_name": "",
+            "url": ""
+        },
+        "meta": {
+            "title": "_W",
+            "description": "White",
+            "keyword": ""
+        },
+        "linenums": true
+    },        
+    "source": {
+        "include": [
+            "./src"
+        ],
+        "includePattern": ".+\\.js(doc)?$",
+        "exclude": ["./src/old"],
+        "excludePattern": "(^|\\/|\\\\)_"
+    },
+    "opts": {
+        "encoding": "utf8",
+        "recurse": true,
+        "private": false,
+        "lenient": true,
+        "destination": "./docs2",
+        "template": "./node_modules/jaguarjs-jsdoc"
+    }
+}

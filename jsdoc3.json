@@ -1,0 +1,82 @@
+{
+    "tags": {
+      "allowUnknownTags": false
+    },
+    "source": {
+      "include": ["./src"],
+      "includePattern": ".js$",
+      "exclude": ["./docs"],
+      "excludePattern": "(node_modules/|docs)"
+    },
+    "plugins": [
+      "plugins/markdown"
+    ],
+    "opts": {
+      "template": "node_modules/docdash",
+      "encoding": "utf8",
+      "destination": "docs3/",
+      "recurse": true,
+      "verbose": true
+    },
+    "templates": {
+      "cleverLinks": false,
+      "monospaceLinks": false,
+      "default": {
+        "outputSourceFiles": false
+      }
+    },
+    "docdash": {
+      "static": false,
+      "sort": false,
+      "sectionOrder": [
+        "Namespaces",
+        "Classes",
+        "Modules",
+        "Externals",
+        "Mixins",
+        "Tutorials",
+        "Interfaces",
+        "Events"        
+      ],
+      "disqus": "",     // disqus의 짧은 이름(사이트 생성 중 하위 도메인)
+      "openGraph": {    // 그래프 옵션 열기(대부분 Facebook 및 기타 사이트에서 메타 정보를 쉽게 추출할 수 있음)
+          "title": "",        //  웹사이트 제목
+          "type": "website",
+          "image": "",        // 메인 이미지/로고 
+          "site_name": "",    // 사이트 이름 
+          "url": ""           // 사이트의 메인 페이지에 대한 메인 표준 URL
+      },
+      "meta": {   // 메타 정보 옵션 
+          "title": "",        // 또한 객체 / 문서 이름 접두사, actualy 페이지 제목에 접미사로 사용됩니다 
+          "description": "",  // 웹사이트의 전체 내용에 대한 설명
+          "keyword": ""       // 검색 엔진용 키워드 
+      },
+      "search": true,       // 탐색 항목을 검색/필터링할 수 있는 탐색 상자를 탐색 위에 표시 
+      "commonNav": true,    // 각 페이지에서 가져온 nav.inc.html의 <nav>에 대한 모든 html 코드를 그룹화합니다(각 html 페이지에 포함하는 대신 {navSize}×{nb html 페이지}를 저장합니다. 프로젝트) 
+      "collapse": true,     // 현재 페이지의 현재 객체 탐색을 제외하고 기본적으로 탐색 축소 
+      "wrap": true,         // 긴 탐색 이름을 트리밍하는 대신 래핑합니다. 
+      "typedef" : true,     // 메뉴에 typedef 포함
+      "navLevel": -1,        // navbar에 표시할 깊이 수준, 0부터 시작(false 또는 비활성화하려면 -1) 
+      "private": true,     // navbar에 @private를 표시하지 않으려면 false로 설정
+      "removeQuotes": true, // 작은 따옴표와 큰 따옴표를 제거하고 주변만 제거하는 trim
+      "scripts": [],        // HTML에 삽입할 외부(또는 templates.default.staticFiles.include를 사용하여 복사한 상대 로컬) js 또는 css 파일의 배열
+      "menu": {             // Home 다음에 추가 메뉴 항목 추가
+          "Project Website": {                // 메뉴 항목 이름
+              "href":"https://myproject.com", //메뉴 항목에 추가할 나머지 HTML 속성
+              "target":"_blank",
+              "class":"menu-item",
+              "id":"website_link"
+          },
+          "Forum": {
+              "href":"https://myproject.com.forum",
+              "target":"_blank",
+              "class":"menu-item",
+              "id":"forum_link"
+          }
+      },
+      "scopeInOutputPath": true,    // 패키지 파일(있는 경우)의 범위를 출력 경로에 추가합니다. 기본적으로 true입니다.
+      "nameInOutputPath": true,     // 패키지 파일의 이름을 출력 경로에 추가합니다. 기본적으로 true입니다.
+      "versionInOutputPath": true   // 기본적으로 true인 출력 경로에 패키지 버전을 추가합니다.
+    }
+    
+  }

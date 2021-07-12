@@ -1,0 +1,32 @@
+{
+    "tags": {
+      "allowUnknownTags": false
+    },
+    "source": {
+      "include": ["./src"],
+      "includePattern": ".js$",
+      "exclude": ["./docs"],
+      "excludePattern": "(node_modules/|docs)"
+    },
+    "plugins": [
+      "plugins/markdown"
+    ],
+    "opts": {
+      "template": "node_modules/jaguarjs-jsdoc",
+      "encoding": "utf8",
+      "destination": "docs2-1/",
+      "recurse": true,
+      "verbose": true
+    },
+    "templates": {
+      "cleverLinks": false,
+      "monospaceLinks": false,
+      "default": {
+        "outputSourceFiles": false
+      }
+    },
+    "docdash": {
+      "static": false,
+      "sort": false
+    }
+  }
