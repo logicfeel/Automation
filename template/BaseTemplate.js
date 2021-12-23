@@ -277,6 +277,7 @@ BaseTemplate.prototype.build = function(pLocalCollection) {
         lorem: '네임스페이스.door',
         ipsum: 'sit amet'
     });
+    ns_wax.data(function(){return { abc: "ABC"}});
 
     // 네임스페이스 로딩
     var nsOjb;
@@ -299,7 +300,8 @@ BaseTemplate.prototype.build = function(pLocalCollection) {
         // 전역
         hbObj = local[i].public.getTemplateInfo();
         wax.partials(hbObj.part);
-        wax.helpers(hbObj.helpers);
+        // wax.helpers(hbObj.helpers);
+        wax.helpers(hbObj.helper);
         wax.decorators(hbObj.decorator);
         wax.data(hbObj.data);
    

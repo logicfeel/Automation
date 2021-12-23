@@ -144,6 +144,7 @@ Scope.prototype.getTemplateInfo = function() {
     // REVEIW: 아래 문법이 무난? 검토 _helper = this ? Object.assign({}, this.helper.slice(0, this.helper.length - 1)) : {};
     for(i = 0 ; this && i < this.helper.length; i++) {
         obj = {};
+        // REVIEW 확인 필요
         obj[this.helper[i].attr] = this.helper[i].content;
         _helper = Object.assign(_helper, obj);
     }

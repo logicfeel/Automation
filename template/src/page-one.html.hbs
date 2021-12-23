@@ -2,8 +2,15 @@
 ...{{package.name}}...
 :: template ::
 private(없음) :{{private}}
-lorem :{{lorem}}
-ns.space2 :{{ns.space2.SS}}
+data lorem :{{lorem}}
+part lorem :{{>lorem}}
+ns.space :{{ns.space.SS}}
+ns/space :{{ns/space/SS}}
+ns/space. :{{ns/space.SS}}
+baseTemplate 정의 abc :{{abc}}
+{{#bold}}진한 스타일{{/bold}}
+{{#ns-bold}}진한 스타일{{/ns-bold}}
+
 {{#> layouts/base title="Page One" }}
 
   {{#*inline "hero-block"}}
