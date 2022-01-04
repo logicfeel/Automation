@@ -300,8 +300,15 @@ BaseTemplate.prototype.build = function(pLocalCollection) {
         // 전역
         hbObj = local[i].public.getTemplateInfo();
         wax.partials(hbObj.part);
+
+        wax.partials({"abc.bb": "AA.BB"})
         // wax.helpers(hbObj.helpers);
         wax.helpers(hbObj.helper);
+        
+        wax.helpers({"abc-b_bb": function(options) {
+            return new handlebars.SafeString('<div class="abc-b_bb">' + options.fn(this) + "</div>");
+        }});
+
         wax.decorators(hbObj.decorator);
         wax.data(hbObj.data);
    

@@ -16,5 +16,5 @@ var Handlebars          = require('handlebars');
 
 
 module.exports = function(options) {
-        return new Handlebars.SafeString('<div class="ns-mybold">' + options.fn(this) + "</div>");
+        return new Handlebars.SafeString('<div class="ns-mybold2">' + options.fn(this) + "</div>");
 }; 
