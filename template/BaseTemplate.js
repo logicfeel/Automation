@@ -278,6 +278,34 @@ BaseTemplate.prototype.build = function(pLocalCollection) {
         ipsum: 'sit amet'
     });
     ns_wax.data(function(){return { abc: "ABC"}});
+    
+    ns_wax.data(function(){
+        var abcd = "내부변수"
+        return { abc: abcd}}
+    );
+    
+
+    function classA() {
+        this.abc = "ABCwww";
+    }
+    function SubClass(){
+        this.sub = new classA();
+    }
+
+
+
+    // 객체 변수만 설정한다.
+    classA.prototype.func = function() {
+        return "FUNC";
+    }
+
+    var a = new classA();
+    ns_wax.data(a);
+    
+    // ns_wax.data({sub: {abc: "sub-abc"}});
+    var b = new SubClass();
+    ns_wax.data(b);
+
 
     // 네임스페이스 로딩
     var nsOjb;
