@@ -17,7 +17,10 @@ var bt = new BaseTemplate(__dirname);
 // bt.REG_EXP['decorator'] = [/(?:.*template\/decorator\/)([\w\/\-.]*)(?:\.js)\b/gi, '$1'];
 
 // bt.PATH['src'] = 'template/page/';
+bt._isWrite = true;
+bt.data2 = {in: "index"};
 
 bt.build();
 
 console.log('-End');
+

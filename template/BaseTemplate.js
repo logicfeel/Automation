@@ -86,6 +86,8 @@ function BaseTemplate(pBasePath) {
     this.helper     = null;
     this.part       = null;
 
+    this._isWrite   = false;
+
     this.PATH = {};
     absolute = absolute ? absolute.replace(/\\/g,'/') + '/' : '';    // 접근 '/' 경로 변경
     relative = path.relative(process.cwd(), absolute);
@@ -306,6 +308,8 @@ BaseTemplate.prototype.build = function(pLocalCollection) {
     var b = new SubClass();
     ns_wax.data(b);
 
+    // 오토에 임시 자료 삽입
+    ns_wax.data(this.data2);
 
     // 네임스페이스 로딩
     var nsOjb;
@@ -348,7 +352,14 @@ BaseTemplate.prototype.build = function(pLocalCollection) {
 
         var template = wax.compile(local[i].content);
         
-        console.log(template());
+        var data = template();
+        var writeFile = local[i].path.replace('.hbs', '');
+        if (this._isWrite) {
+            fs.writeFile(writeFile, data, 'utf8', function(error){ 
+                console.log('write end') 
+            });
+        }
+        console.log(data);
     }
     // console.log('build():'+ local.length);
     // console.log('src:'+ this.src.length);
