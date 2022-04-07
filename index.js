@@ -3,7 +3,7 @@
 var AutoBase            = require('./src/AutoBase');
 var AutoTempalte        = require('./src/AutoTemplate');
 var AutoModule          = require('./src/AutoModule');
-var BaseTemplate        = require('./BaseTemplate');
+var BaseTemplate        = require('./template/BaseTemplate');
 
 
 module.exports = {
