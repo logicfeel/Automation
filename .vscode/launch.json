@@ -33,6 +33,15 @@
             "request": "launch",
             "name": "auto 연동",
             "program": "${workspaceFolder}/template/auto.js"
-        }        
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "커서-mac",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${file}"
+        },        
     ]
 }
