@@ -13,5 +13,14 @@
             ],
             "program": "${file}"
         },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "src/test.js 실행",
+            "program": "${workspaceFolder}/src/test.js",
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
+        },
     ]
 }

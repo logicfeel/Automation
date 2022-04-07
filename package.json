@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/logicfeel/Automation#readme",
   "dependencies": {
-    "entitybind": "github:logicfeel/EntityBind"
+    "entitybind": "github:logicfeel/EntityBind",
+    "r.x.x-auto": "github:logicfeel/Automation#r.x.x-auto"
   }
 }

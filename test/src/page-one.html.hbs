@@ -1,0 +1,68 @@
+{{!-- pages/page-one.hbs --}}
+...{{package.name}}...
+:: template ::
+private(없음) :{{private}}
+data lorem :{{lorem}}
+part lorem :{{>lorem}}
+ns.space :{{ns.space.SS}}
+ns/space :{{ns/space/SS}}
+ns/space. :{{ns/space.SS}}
+baseTemplate 정의 abc :{{abc}}
+baseTemplate 정의 func :{{func}}
+baseTemplate 정의 abc.func :{{abc.func}}
+baseTemplate 정의 sub.abc :{{sub.abc}}
+{{#bold}}진한 스타일{{/bold}}
+{{#ns-bold}}진한 스타일{{/ns-bold}}
+{{#ns-bold2}}진한 스타일{{/ns-bold2}}
+{{#if entity.AA}}
+AA 있음
+{{/if}}
+
+{{#if entity.BB}}
+  BB 있음
+{{else}}
+  BB 없음
+{{/if}}
+
+{{#if entity.AA}}
+AA 있음
+  {{#if entity.BB}}
+    BB 있음
+  {{else}}
+    BB 없음
+  {{/if}}
+
+{{/if}}
+
+{{#abc}}
+abc 헬퍼 블럭
+{{/abc}}
+
+{{#>abc.bb}}
+abc 없어요
+{{/abc.bb}}
+
+----
+{{#abc-b_bb }}
+헬퍼 :: abc 없어요
+{{~/abc-b_bb }}
+
+----
+
+없는 part :{{#>lorem2}}
+part 없음
+{{/lorem2}}
+{{#> layouts/base title="Page One" }}
+
+  {{#*inline "hero-block"}}
+    {{> includes/hero
+      hero-src="img/hero-1.png"
+      hero-alt="Hero 1 alt title"
+    }}
+  {{/inline}}
+
+{{/layouts/base}}
+
+
+
+
