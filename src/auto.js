@@ -18,20 +18,13 @@ class Automation extends MetaElement {
         };
 
         // 속성 생성
-        this.mod = new AutoCollection(this);
-        this.src = new SourceCollection(this);
+        this.mod = new AutoCollection(this);        // 하위 모듈
+        this.src = new SourceCollection(this);      // 소스
+        this.dep = {};                              // 의존 모듈 소스
         this.template = new BaseTemplate(this.dirname)
+        
         // 속성 설정
-        this.template._isWrite = true;
-
-        // 임시 참조파일 받기
-        var _this = this;
-        this.depend = function(filePath, bbb) {
-            /**
-             * 파일명을 받아서 수행하는 부분을 넣는다.
-             */
-            return 'DEPEND';
-        }
+        this.template._isWrite = true;              // 템플릿 저장
     }
     getObject(p_context) {
 
@@ -45,7 +38,7 @@ class Automation extends MetaElement {
             }
         }
         return obj;                        
-    };
+    }
 
 }
 
@@ -75,7 +68,7 @@ class SourceCollection extends PropertyCollection {
             // 대상 파일의 필터  TODO::
             
             // 컬렉션에 등록
-            f = new FileInfo(arr[i]);
+            f = new AutoSource(arr[i]);
             f.fullPath = path + '/' + arr[i];
             this.add(arr[i], f);
         }
@@ -84,8 +77,10 @@ class SourceCollection extends PropertyCollection {
     }
 }
 
-class FileInfo {
+class AutoSource extends MetaElement {
     constructor(filename, content) {
+        super();
+        
         // 원본 전체 경로
         this.fullPath = '';        
         // 파일명
@@ -116,6 +111,28 @@ class FileInfo {
             return target.path + '/' + target.name;
         }
     
+    }
+    /**
+     * 템플릿에 제공하는 객체 기준
+     * @param {*} p_context 
+     * @returns 
+     */
+    getObject(p_context) {
+
+        var obj     = {
+            fullPath: this.fullPath,
+            filename: this.filename(),
+            filePath: null,
+            file: null, /** 현재 파일을 기준  */
+        };
+
+        return obj;                        
+    }
+    /**
+     * obj J
+     */
+    filename() {
+
     }
     /**
      * 

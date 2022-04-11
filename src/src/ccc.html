@@ -1,10 +1,28 @@
 ccc
 
-1.
+1.aaa.html
 2.aaa.html
-3.
+3.aaa.html
+3.aaa.html
 4.aaa.html
 
 5./install/aaa.html
 
-6.DEPEND
+
+방식으로 모듈을 참조한다.
+
+// 이방식은 오토에 제공하면 안된다.
+
+mod.[별칭].src.[파일명].filename  // 전체를 참조하므로, 가능하지만 우회하도록
+
+mod.[별칭].mod.[별칭].src.[파일명].filename  // 전체를 참조하므로, 가능하지만 우회하도록
+
+dep.[모듈명].src.[파일명].filename  // super, sub 의 경우
+
+dep.[모듈명].[별칭].src.[파일명].filename  // super, sub 인스턴스의 경우 1
+
+dep.[모듈명.별칭].src.[파일명].filename  // super, sub 인스턴스의 경우 2
+
+src.[파일명].filename   // 내부접근
+
+

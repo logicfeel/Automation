@@ -36,6 +36,9 @@ class Automation extends MetaElement {
 var p = new PropertyCollection();
 var a = new Automation();
 
+var Abc = function(aa=1, bb='3'){
+    console.log(0)
+}
 
 var BaseTemplate    = require('r.x.x-auto').BaseTemplate;
 
@@ -47,5 +50,7 @@ bt.data2 = a.getObject();
 
 
 bt.build();
+
+
 
 console.log(1)
