@@ -1,10 +1,10 @@
 
+const { MetaObject } = require('entitybind');
 var fs = require('fs');
 
-var PropertyCollection = require('entitybind').PropertyCollection;
-var MetaElement = require('entitybind').MetaElement;
-
-var BaseTemplate    = require('r.x.x-auto').BaseTemplate;
+var PropertyCollection  = require('entitybind').PropertyCollection;
+var MetaElement         = require('entitybind').MetaElement;
+var BaseTemplate        = require('r.x.x-auto').BaseTemplate;
 
 class Automation extends MetaElement {
     constructor(basePath){
@@ -23,6 +23,8 @@ class Automation extends MetaElement {
         this.dep = {};                              // 의존 모듈 소스
         this.template = new BaseTemplate(this.dirname)
         
+        this.package = require('./package.json');
+
         // 속성 설정
         this.template._isWrite = true;              // 템플릿 저장
     }
@@ -46,6 +48,43 @@ class Automation extends MetaElement {
 class AutoCollection extends PropertyCollection {
     constructor(onwer) {
         super(onwer);
+        
+        this._super = [];
+        this._sub = [];
+    }
+    add(alias, obj) {
+        super.add(alias, obj);
+    }
+    sub(alias, obj) {
+        this.add(alias, obj);
+        // 별칭 이름 등록
+        this._sub.push(alias);
+        // 의존 모듈 등록
+        // this._onwer.dep[`${obj.package.name}.${alias}`] = obj;
+    }
+    super(alias, obj) {
+        this.add(alias, obj);
+        // 별칭 이름 등록
+        this._super.push(alias);
+        // 의존 모듈 등록  하위로 
+        // this._onwer.dep[`${obj.package.name}.${alias}`] = obj;
+        // 
+    }
+    getSuper() {
+        var arr = [];
+        var elm;
+        var obj;
+
+        for(var i = 0; i < this._super.length; i++) {
+            elm = this[this._super[i]];
+            obj = {
+                key: `${elm.package.name}.${this._super[i]}`,
+                value: elm
+            }
+            arr.push(obj);
+            arr = arr.concat(elm.mod.getSuper());
+        }
+        return arr;
     }
 }
 
@@ -77,6 +116,7 @@ class SourceCollection extends PropertyCollection {
     }
 }
 
+
 class AutoSource extends MetaElement {
     constructor(filename, content) {
         super();
@@ -95,6 +135,15 @@ class AutoSource extends MetaElement {
         //     depend: '/depend',      // 자신의 경로 기준
         //     install: '/install',    // 엔트리 경로 기준
         // },
+        // 상위에
+        var basePath = {
+            dist: '/dist',
+            install: '/install',
+            depend: '/depend',
+            publish: '/publish',
+        };
+        var targetDir = {};
+
         this.target = {
             dist: { path: '/dist', name: this.filename },
             depend: { path: '/depend', name: this.filename },
@@ -155,6 +204,21 @@ class AutoSource extends MetaElement {
     }
 }
 
+class AutoTask extends MetaObject {
+    constructor(onwer) {
+        super();
+
+        this._onwer = onwer;
+    }
+    doDist() {
+        // 소스 로딩
+        this._onwer.src.load();
+        // 템플릿 객체 구성
+        this._onwer.template.data2 = this._onwer.getObject();
+        // 템플릿 빌드
+        this._onwer.template.build();
+    }
+}
 
 module.exports = {
     Automation: Automation,
