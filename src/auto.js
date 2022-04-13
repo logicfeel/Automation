@@ -34,7 +34,7 @@ class Automation extends MetaElement {
 
         for (var prop in this) {
             if (this[prop] instanceof MetaElement) {
-                obj[prop] = this[prop].getObject(p_context);
+                obj[prop] = this[prop].getSuperObject(p_context);
             } else if (prop.substr(0, 1) !== '_') {
                 obj[prop] = this[prop];
             }
@@ -70,7 +70,7 @@ class AutoCollection extends PropertyCollection {
         // this._onwer.dep[`${obj.package.name}.${alias}`] = obj;
         // 
     }
-    getSuper() {
+    getSuperObject() {
         var arr = [];
         var elm;
         var obj;
@@ -82,7 +82,7 @@ class AutoCollection extends PropertyCollection {
                 value: elm
             }
             arr.push(obj);
-            arr = arr.concat(elm.mod.getSuper());
+            arr = arr.concat(elm.mod.getSuperObject());
         }
         return arr;
     }

@@ -14,6 +14,10 @@ class CoAuto extends Automation {
     }
 }
 
+var fun = function() {};
+
+var Fun2 = function Fun2() {
+}
 
 // var a = new CoAuto(process.cwd());
 var a = new CoAuto();

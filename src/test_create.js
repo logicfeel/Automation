@@ -24,6 +24,6 @@ a.src.load();
 a.template.data2 = a.getObject();
 a.template.build();
 
-var b = a.mod.getSuper();
+var b = a.mod.getSuperObject();
 
 console.log(1);
