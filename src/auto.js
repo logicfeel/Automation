@@ -1,10 +1,7 @@
 
-const { MetaObject } = require('entitybind');
-var fs = require('fs');
-
-var PropertyCollection  = require('entitybind').PropertyCollection;
-var MetaElement         = require('entitybind').MetaElement;
-var BaseTemplate        = require('r.x.x-auto').BaseTemplate;
+const fs = require('fs');
+const { MetaElement, PropertyCollection, MetaObject} = require('entitybind');
+const { BaseTemplate } = require('r.x.x-auto');
 
 class Automation extends MetaElement {
     constructor(basePath){
@@ -17,22 +14,27 @@ class Automation extends MetaElement {
             dist: this.dirname + '/dist',
         };
 
+        this.PATH = {
+            base: '',
+            src: 'src'
+        };
+
         // 속성 생성
         this.mod = new AutoCollection(this);        // 하위 모듈
         this.src = new SourceCollection(this);      // 소스
         this.dep = {};                              // 의존 모듈 소스
-        this.template = new BaseTemplate(this.dirname)
-        
-        this.package = require('./package.json');
+        this.template   = new BaseTemplate(this.dirname)
+        this.task       = AutoTask.getInstance();
+        this.package    = require('./package.json');
 
         // 속성 설정
         this.template._isWrite = true;              // 템플릿 저장
     }
     getObject(p_context) {
 
-        var obj     = {};
+        let obj     = {};
 
-        for (var prop in this) {
+        for (let prop in this) {
             if (this[prop] instanceof MetaElement) {
                 obj[prop] = this[prop].getSuperObject(p_context);
             } else if (prop.substr(0, 1) !== '_') {
@@ -40,6 +42,11 @@ class Automation extends MetaElement {
             }
         }
         return obj;                        
+    }
+
+    init() {
+        // src 원시소스 로딩
+        this.src.load(this.PATH.src);
     }
 
 }
@@ -71,11 +78,11 @@ class AutoCollection extends PropertyCollection {
         // 
     }
     getSuperObject() {
-        var arr = [];
-        var elm;
-        var obj;
+        let arr = [];
+        let elm;
+        let obj;
 
-        for(var i = 0; i < this._super.length; i++) {
+        for(let i = 0; i < this._super.length; i++) {
             elm = this[this._super[i]];
             obj = {
                 key: `${elm.package.name}.${this._super[i]}`,
@@ -95,19 +102,19 @@ class SourceCollection extends PropertyCollection {
     }
     load() {
         // 타입 검사해야함
-        var arr;
-        var path = this._onwer.BASE_PATH.src;
-        var f;
+        let arr;
+        let path = this._onwer.BASE_PATH.src;
+        let f;
 
         // REVIEW:: 비동기 성능이슈 있음
         arr = fs.readdirSync(path);
         
-        for (var i = 0; i < arr.length; i++) {
+        for (let i = 0; i < arr.length; i++) {
             
             // 대상 파일의 필터  TODO::
             
             // 컬렉션에 등록
-            f = new AutoSource(arr[i]);
+            f = new BaseSource(path+ '/' + arr[i]);
             f.fullPath = path + '/' + arr[i];
             this.add(arr[i], f);
         }
@@ -117,14 +124,17 @@ class SourceCollection extends PropertyCollection {
 }
 
 
-class AutoSource extends MetaElement {
-    constructor(filename, content) {
+class BaseSource extends MetaElement {
+    constructor(filename) {
         super();
         
+        let content = fs.readFileSync(filename,'utf-8');
+
         // 원본 전체 경로
         this.fullPath = '';        
         // 파일명
         this.filename = filename || '';
+
         // 원본 파일 내용
         this.content = content || '';
         // 참조 파일
@@ -136,13 +146,13 @@ class AutoSource extends MetaElement {
         //     install: '/install',    // 엔트리 경로 기준
         // },
         // 상위에
-        var basePath = {
+        let basePath = {
             dist: '/dist',
             install: '/install',
             depend: '/depend',
             publish: '/publish',
         };
-        var targetDir = {};
+        let targetDir = {};
 
         this.target = {
             dist: { path: '/dist', name: this.filename },
@@ -150,13 +160,13 @@ class AutoSource extends MetaElement {
             install: { path: '/install', name: this.filename },
         }
         
-        var _this = this;
+        let _this = this;
 
         this.flag = 'dist'; // dist, depend, install 
 
 
         this.rfile = function(aa, bbb) {
-            var target = _this.target[_this.flag];
+            let target = _this.target[_this.flag];
             return target.path + '/' + target.name;
         }
     
@@ -168,7 +178,7 @@ class AutoSource extends MetaElement {
      */
     getObject(p_context) {
 
-        var obj     = {
+        let obj     = {
             fullPath: this.fullPath,
             filename: this.filename(),
             filePath: null,
@@ -189,7 +199,7 @@ class AutoSource extends MetaElement {
      * @param {*} tag 목적 위치
      */
     copy(org, tar) {
-        var obj = {
+        let obj = {
             file: '',
             ref: [],
         };
@@ -197,7 +207,7 @@ class AutoSource extends MetaElement {
         // 원본 복사
         obj.file  = this.target[org].path + '/' + this.target[org].name;
         // 참조 정보
-        for(var i =0; i < this.ref.length; i++) {
+        for(let i =0; i < this.ref.length; i++) {
             obj.ref.push(this.ref[i].target[tar].path + '/' + this.ref[i].target[tar].name );
         }
         fileMap.push(obj);
@@ -205,12 +215,30 @@ class AutoSource extends MetaElement {
 }
 
 class AutoTask extends MetaObject {
-    constructor(onwer) {
+    
+    static instance;
+    
+    constructor() {
         super();
 
-        this._onwer = onwer;
+        this.cursor = '';
+        this.entryPath = '';
+        this.entry = null;
     }
-    doDist() {
+    
+    static getInstance(){
+        const coClass = this;
+        if (!coClass.instance) coClass.instance = new coClass();
+        return coClass.instance;        
+    }
+    init(auto) {
+        // 엔트리 등록
+        this.entry = auto;
+    }
+
+    do_dist(auto) {
+        // 초기화
+        this.init(this);
         // 소스 로딩
         this._onwer.src.load();
         // 템플릿 객체 구성
