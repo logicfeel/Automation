@@ -253,6 +253,7 @@ BaseTemplate.prototype.build = function(pLocalCollection) {
     var ns_wax;
     var hbObj;
     var local;
+    var returnObj = {}; // 회신객체
 
     this.init();
 
@@ -352,6 +353,7 @@ BaseTemplate.prototype.build = function(pLocalCollection) {
 
         var template = wax.compile(local[i].content);
         
+        // 파일 저장
         var data = template();
         var writeFile = local[i].path.replace('.hbs', '');
         if (this._isWrite) {
@@ -359,7 +361,9 @@ BaseTemplate.prototype.build = function(pLocalCollection) {
                 console.log('write end') 
             });
         }
-        console.log(data);
+
+        returnObj[writeFile] = {data};
+
     }
     // console.log('build():'+ local.length);
     // console.log('src:'+ this.src.length);
