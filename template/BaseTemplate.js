@@ -365,6 +365,7 @@ BaseTemplate.prototype.build = function(pLocalCollection) {
         returnObj[writeFile] = {data};
 
     }
+    return returnObj;
     // console.log('build():'+ local.length);
     // console.log('src:'+ this.src.length);
 };
