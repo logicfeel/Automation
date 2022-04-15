@@ -253,7 +253,7 @@ BaseTemplate.prototype.build = function(pLocalCollection) {
     var ns_wax;
     var hbObj;
     var local;
-    var returnObj = {}; // 회신객체
+    var returnArr = []; // 회신객체
 
     this.init();
 
@@ -361,11 +361,14 @@ BaseTemplate.prototype.build = function(pLocalCollection) {
                 console.log('write end') 
             });
         }
-
-        returnObj[writeFile] = {data};
-
+        // 회신 객체 만들기
+        var relative = path.relative(this.PATH.absolute, local[i].path.replace);
+        returnArr.push({
+            key: relative,
+            value: data
+        })
     }
-    return returnObj;
+    return returnArr;
     // console.log('build():'+ local.length);
     // console.log('src:'+ this.src.length);
 };
