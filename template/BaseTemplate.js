@@ -362,7 +362,7 @@ BaseTemplate.prototype.build = function(pLocalCollection) {
             });
         }
         // 회신 객체 만들기
-        var relative = path.relative(this.PATH.absolute, local[i].path.replace);
+        var relative = path.relative(this.PATH.absolute, local[i].path);
         returnArr.push({
             key: relative,
             value: data
