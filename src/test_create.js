@@ -4,11 +4,13 @@ var path            = require('path');
 var CoAuto1         = require('./A1/auto');
 var CoAuto2         = require('./A2/auto');
 
-class CoAuto extends Automation {
-    constructor(basePath) {
-        super(basePath);
+let vv = new CoAuto1();
 
-        this.mod.sub('vv1', new CoAuto1());
+class CoAuto extends Automation {
+    constructor() {
+        super(__dirname);
+
+        this.mod.sub('vv1', vv);
         this.mod.super('vv2', new CoAuto2());
     }
     doDist(){
@@ -19,11 +21,13 @@ class CoAuto extends Automation {
 
 var a = new CoAuto();
 
-a.src.load();
+// a.src.load();
 // a.src[0].flag = 'install'
-a.template.data2 = a.getObject();
-a.template.build();
+// a.template.data2 = a.getObject();
+// a.template.build();
 
-var b = a.mod.getSuperObject();
+a.task.do_dist(a);
+
+
 
 console.log(1);

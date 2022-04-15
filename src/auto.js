@@ -1,7 +1,10 @@
 
 const fs = require('fs');
+const path            = require('path');
+
 const { MetaElement, PropertyCollection, MetaObject} = require('entitybind');
 const { BaseTemplate } = require('r.x.x-auto');
+
 
 class Automation extends MetaElement {
     constructor(basePath){
@@ -28,7 +31,7 @@ class Automation extends MetaElement {
         this.package    = require('./package.json');
 
         // 속성 설정
-        this.template._isWrite = true;              // 템플릿 저장
+        // this.template._isWrite = true;              // 템플릿 저장
     }
     getObject(p_context) {
 
@@ -36,8 +39,8 @@ class Automation extends MetaElement {
 
         for (let prop in this) {
             if (this[prop] instanceof MetaElement) {
-                obj[prop] = this[prop].getSuperObject(p_context);
-            } else if (prop.substr(0, 1) !== '_') {
+                obj[prop] = this[prop].getObject(p_context);
+            } else if (prop.substring(0, 1) !== '_') {
                 obj[prop] = this[prop];
             }
         }
@@ -47,6 +50,12 @@ class Automation extends MetaElement {
     init() {
         // src 원시소스 로딩
         this.src.load(this.PATH.src);
+        // 객체 로딩
+        this.template.data2 = this.getObject();
+
+        for (let i = 0; i < this.mod.count; i++) {
+            this.mod[i].init();
+        }
     }
 
 }
@@ -77,7 +86,7 @@ class AutoCollection extends PropertyCollection {
         // this._onwer.dep[`${obj.package.name}.${alias}`] = obj;
         // 
     }
-    getSuperObject() {
+    getObject() {
         let arr = [];
         let elm;
         let obj;
@@ -89,7 +98,7 @@ class AutoCollection extends PropertyCollection {
                 value: elm
             }
             arr.push(obj);
-            arr = arr.concat(elm.mod.getSuperObject());
+            arr = arr.concat(elm.mod.getObject());
         }
         return arr;
     }
@@ -102,24 +111,34 @@ class SourceCollection extends PropertyCollection {
     }
     load() {
         // 타입 검사해야함
-        let arr;
+        
         let path = this._onwer.BASE_PATH.src;
+
+        this.readSource(path);
+    }
+
+    readSource(path, dir = '') {
+        
+        let arr;
         let f;
 
-        // REVIEW:: 비동기 성능이슈 있음
         arr = fs.readdirSync(path);
-        
+
         for (let i = 0; i < arr.length; i++) {
             
-            // 대상 파일의 필터  TODO::
+            // REVIEW:: 비동기 성능이슈 있음
             
-            // 컬렉션에 등록
-            f = new BaseSource(path+ '/' + arr[i]);
-            f.fullPath = path + '/' + arr[i];
-            this.add(arr[i], f);
+            // 대상 파일의 필터  TODO::
+            if (fs.statSync(path+'/'+arr[i]).isFile()) {
+                // 컬렉션에 등록
+                f = new BaseSource(path + '/' + arr[i]);
+                f.fullPath = path + '/' + arr[i];
+                f._onwer = this._onwer;
+                this.add(dir + arr[i], f);
+            } else if (fs.statSync(path +'/'+arr[i]).isDirectory()) {
+                this.readSource(path + '/' + arr[i], arr[i] + '/');
+            } 
         }
-
-        console.log(2)
     }
 }
 
@@ -169,7 +188,11 @@ class BaseSource extends MetaElement {
             let target = _this.target[_this.flag];
             return target.path + '/' + target.name;
         }
-    
+
+        // 개발 2단계
+        this.dist = new TargetSource('dist');
+        this.dist.path = basePath.dist +'/' + path.basename(this.filename);
+        this.dist._onwer = this;
     }
     /**
      * 템플릿에 제공하는 객체 기준
@@ -213,6 +236,35 @@ class BaseSource extends MetaElement {
         fileMap.push(obj);
     }
 }
+class TargetSource {
+    constructor(depend) {
+        this._onwer = null;
+        this.path = '';
+        this.content = '';
+        this.dependTarget = depend;
+    }
+    
+    getPath() {
+
+    }
+
+    save(data = this.content) {
+        
+        var dir = this._onwer._onwer.dirname;
+
+        const  dirname = path.parse(dir + this.path).dir;
+    
+        // 디렉토리 만들기
+        const isExists = fs.existsSync( dirname );
+        if( !isExists ) {
+            fs.mkdirSync( dirname, { recursive: true } );
+        }
+
+        fs.writeFile(dir + this.path, data, 'utf8', function(error){ 
+            console.log('write end');
+        });        
+    }
+}
 
 class AutoTask extends MetaObject {
     
@@ -234,17 +286,37 @@ class AutoTask extends MetaObject {
     init(auto) {
         // 엔트리 등록
         this.entry = auto;
+        // 오토 초기화
+        this.entry.init();
     }
 
     do_dist(auto) {
         // 초기화
-        this.init(this);
-        // 소스 로딩
-        this._onwer.src.load();
+        this.init(auto);
+        
+        this._dist(auto);
+    }
+
+    _dist(auto) {
+      
+        for(let i = 0; i < auto.mod.count; i++) {
+            // 재귀 호출
+            this._dist(auto.mod[i]);
+        }
         // 템플릿 객체 구성
-        this._onwer.template.data2 = this._onwer.getObject();
+        auto.template.data2 = auto.getObject();
         // 템플릿 빌드
-        this._onwer.template.build();
+        let build = auto.template.build();
+        let a_path = '';
+
+        for (let i = 0; i < build.length; i++) {
+            a_path = path.relative('src', build[i].key);
+            if (auto.src[a_path]) {
+                auto.src[a_path].dist.save(build[i].value);
+                console.log('있음');
+            }
+        }
+        console.log(1);
     }
 }
 
