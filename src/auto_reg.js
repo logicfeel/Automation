@@ -34,6 +34,9 @@ class Automation extends MetaElement {
         this.template   = new BaseTemplate(this.dirname)
         this.task       = AutoTask.getInstance();
         this.package    = require(this.dirname +'/package.json');
+        // 파서
+        this.map =  new SourceMap(this);
+        this.parser =  new RegExpParser(this);
 
         // 속성 설정
     }
@@ -425,6 +428,23 @@ class AutoTask extends MetaObject {
     do_update() {}
     do_publish() {}
 
+
+}
+
+class SourceMap {
+    constructor(auto){
+        this._auto = auto;
+    }
+
+    getSource(path) {
+
+    }
+}
+
+class RegExpParser {
+    constructor(auto){
+        this._auto = auto;
+    }
 
 }
 

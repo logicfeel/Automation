@@ -1,6 +1,5 @@
 const { Automation } = require('../auto');
-var path            = require('path');
-var CoAuto3         = require('../A3/auto');
+const CoAuto3        = require('../A3/auto');
 
 class CoAuto2 extends Automation {
     constructor() {

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XPD:PROJECT xmlns:XPD="http://www.staruml.com" version="1">
+<XPD:HEADER>
+<XPD:SUBUNITS>
+</XPD:SUBUNITS>
+<XPD:PROFILES>
+</XPD:PROFILES>
+</XPD:HEADER>
+    <XPD:BODY>
+        <XPD:OBJ name="DocumentElement" type="UMLProject" guid="ix6ceKhvhUKbHQ60PMP0fQAA">
+            <XPD:ATTR name="Title" type="string">temp</XPD:ATTR>
+            <XPD:ATTR name="#OwnedElements" type="integer">1</XPD:ATTR>
+            <XPD:OBJ name="OwnedElements[0]" type="UMLModel" guid="rXwOjrIwskaQz0KYDzVRcwAA">
+                <XPD:ATTR name="Name" type="string">스케치5</XPD:ATTR>
+                <XPD:REF name="Namespace">ix6ceKhvhUKbHQ60PMP0fQAA</XPD:REF>
+                <XPD:ATTR name="#OwnedDiagrams" type="integer">1</XPD:ATTR>
+                <XPD:OBJ name="OwnedDiagrams[0]" type="UMLClassDiagram" guid="Dw27sqwgkkCSSKpo9DEdpAAA">
+                    <XPD:ATTR name="Name" type="string">분석5</XPD:ATTR>
+                    <XPD:REF name="DiagramOwner">rXwOjrIwskaQz0KYDzVRcwAA</XPD:REF>
+                        <XPD:OBJ name="DiagramView" type="UMLClassDiagramView" guid="VsRCPIA4IkiPQVe1KfqBYwAA">
+                        <XPD:REF name="Diagram">Dw27sqwgkkCSSKpo9DEdpAAA</XPD:REF>
+                        </XPD:OBJ>
+                </XPD:OBJ>
+            </XPD:OBJ>
+        </XPD:OBJ>
+    </XPD:BODY>
+</XPD:PROJECT>

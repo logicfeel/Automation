@@ -34,5 +34,15 @@
                 "<node_internals>/**"
             ]
         },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "src/test_reg.js 실행",
+            "program": "${workspaceFolder}/src/test_reg.js",
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
+        },
+
     ]
 }
