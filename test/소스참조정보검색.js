@@ -63,10 +63,17 @@ function replaceObject(orgStr, arrObj) {
 
     for(var i = 0; i < arrObj.length; i++) {
         obj = arrObj[i];
+        // rep 문자열검사
+        // txt 문자열 1 이상
+        // idx > 
+        if (typeof obj.idx !== 'number' || typeof obj.txt !== 'string') {
+            console.warn('객체아님');
+            continue;
+        }
         idx = obj.idx + base_idx;                           // 시작 인텍스
-        if (org.substr(idx, obj.txt.length) === obj.txt) {
-            org_prev = org.slice(0, idx);                  // 앞 문자열
-            org_next = org.slice(idx + obj.txt.length);   // 뒤 문자열
+        if (org.substr(idx, obj.txt.length) === obj.txt) {  // 검사
+            org_prev = org.slice(0, idx);                   // 앞 문자열
+            org_next = org.slice(idx + obj.txt.length);     // 뒤 문자열
             org = org_prev + obj.rep + org_next;
             base_idx = base_idx + obj.rep.length - obj.txt.length;
         } else {
@@ -77,7 +84,8 @@ function replaceObject(orgStr, arrObj) {
 }
 
 let r = replaceObject(temp, refInfo)
-console.log(r)
+
 console.log(temp)
+console.log(r)
 
 console.log(0)
