@@ -1,9 +1,7 @@
-
 const fs = require('fs');
 const path = require('path');
-const { MetaElement, PropertyCollection, MetaObject} = require('entitybind');
-const { BaseTemplate } = require('r.x.x-auto');
-
+const {MetaElement, PropertyCollection, MetaObject} = require('entitybind');
+const {BaseTemplate} = require('r.x.x-auto');
 
 class Automation extends MetaElement {
     constructor(basePath, isInstance){

@@ -102,4 +102,6 @@ a.setParser(new PhpParser());
 
 a.build(s);
 
+var path            = require('path');
+
 console.log(1)
