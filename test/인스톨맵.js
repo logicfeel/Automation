@@ -198,7 +198,7 @@ class Automation {
         ];
 
         // 참조 4 : 대상/해결 구분 기준 + 콜백
-        this.refer = {
+        this.link = {
             target: {   // 대상
                 include: [],    // 포함
                 except: [],     // 제외
