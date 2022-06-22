@@ -354,7 +354,13 @@ BaseTemplate.prototype.build = function(pLocalCollection) {
         var template = wax.compile(local[i].content);
         
         // 파일 저장
-        var data = template();
+        // var data = template();
+        // 템플릿 옵션 추가함  
+        var data = template({}, {
+            allowProtoPropertiesByDefault: true,
+            allowProtoMethodsByDefault: true
+        });
+
         var writeFile = local[i].path.replace('.hbs', '');
         if (this._isWrite) {
             fs.writeFile(writeFile, data, 'utf8', function(error){ 
