@@ -1,16 +1,27 @@
 ccc
+1.src/[aaa.html]/filename
+/Users/kimneo/PJ-Git/Automation/src/src/aaa.html
 
-1./Users/logic/PJ-Git/Automation/src/src/aaa.html
-2./Users/logic/PJ-Git/Automation/src/src/aaa.html
-3./Users/logic/PJ-Git/Automation/src/src/aaa.html
-3./Users/logic/PJ-Git/Automation/src/src/aaa.html
-4./Users/logic/PJ-Git/Automation/src/src/aaa.html
+2. src/0/filename
+2./Users/kimneo/PJ-Git/Automation/src/src/aaa.html
 
-5./dist//Users/logic/PJ-Git/Automation/src/src/aaa.html?10
-5./dist//Users/logic/PJ-Git/Automation/src/src/aaa.html?20
-6./dist/a1.htm
+3. src.[aaa.html].filename
+3./Users/kimneo/PJ-Git/Automation/src/src/aaa.html
 
-6./dist/a1.htm
+4. src.0.filename
+4./Users/kimneo/PJ-Git/Automation/src/src/aaa.html
+
+5-1. src.0.rfile 'aaa' 10 
+5-1./dist//Users/kimneo/PJ-Git/Automation/src/src/aaa.html?10
+
+5-2. src.0.rfile 'bbb' 20 
+5-2./dist//Users/kimneo/PJ-Git/Automation/src/src/aaa.html?20
+
+6-1. dep.[a1.vv1].[0].filename3
+6-1./dist/a1.htm
+
+6-2. dep.[a1.vv1].[0].filename4
+6-2./dist/a1.htm
 
 
 방식으로 모듈을 참조한다.
@@ -22,7 +33,7 @@ mod.[별칭].src.[파일명].filename  // 전체를 참조하므로, 가능하�
 mod.[별칭].mod.[별칭].src.[파일명].filename  // 전체를 참조하므로, 가능하지만 우회하도록
 
 dep.[모듈명].src.[파일명].filename  // super, sub 의 경우
-
+=0  
 dep.[모듈명].[별칭].src.[파일명].filename  // super, sub 인스턴스의 경우 1
 
 dep.[모듈명.별칭].src.[파일명].filename  // super, sub 인스턴스의 경우 2
