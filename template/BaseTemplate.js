@@ -272,9 +272,13 @@ BaseTemplate.prototype.build = function(pLocalCollection) {
     hb = handlebars.create();
     ns_wax = handlebarsWax(hb);
     // ns_wax = handlebarsWax();
+    
+    var lab = 'Lab';
+
     ns_wax.partials({
         lorem: 'dolor',
-        ipsum: 'sit amet'
+        ipsum: 'sit amet',
+        lab: function() {return lab;}
     });
     ns_wax.data({
         lorem: '네임스페이스.door',
@@ -304,6 +308,8 @@ BaseTemplate.prototype.build = function(pLocalCollection) {
 
     var a = new classA();
     ns_wax.data(a);
+
+    ns_wax.data({dyData: function(){return lab}});
     
     // ns_wax.data({sub: {abc: "sub-abc"}});
     var b = new SubClass();
@@ -351,6 +357,7 @@ BaseTemplate.prototype.build = function(pLocalCollection) {
         wax.decorators(local[i]._decorator);
         wax.data(local[i]._data);
 
+    lab = 'Lab_';
         var template = wax.compile(local[i].content);
         
         // 파일 저장
